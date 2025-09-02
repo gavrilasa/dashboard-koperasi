@@ -1,4 +1,6 @@
-import { Link } from "@tanstack/react-router";
+"use client";
+
+import Link from "next/link"; // Mengganti impor dari @tanstack/react-router
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -9,6 +11,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 
+// Komponen untuk menampilkan judul aplikasi di sidebar
 export function AppTitle() {
 	const { setOpenMobile } = useSidebar();
 	return (
@@ -21,12 +24,12 @@ export function AppTitle() {
 				>
 					<div>
 						<Link
-							to="/"
+							href="/dashboard" // Menggunakan href bukan 'to'
 							onClick={() => setOpenMobile(false)}
 							className="grid flex-1 text-start text-sm leading-tight"
 						>
-							<span className="truncate font-bold">Shadcn-Admin</span>
-							<span className="truncate text-xs">Vite + ShadcnUI</span>
+							<span className="truncate font-bold">Dasbor Koperasi</span>
+							<span className="truncate text-xs">Manajemen Panel</span>
 						</Link>
 						<ToggleSidebar />
 					</div>
@@ -36,6 +39,7 @@ export function AppTitle() {
 	);
 }
 
+// Komponen terpisah untuk tombol toggle sidebar
 function ToggleSidebar({
 	className,
 	onClick,

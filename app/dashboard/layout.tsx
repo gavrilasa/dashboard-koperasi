@@ -1,8 +1,9 @@
 // path: app/dashboard/layout.tsx
 
-import Header from "@/components/layout/header";
-import Sidebar from "@/app/components/layout/sidebar";
 import type { Metadata } from "next";
+import AuthenticatedLayout from "@/components/layout/authenticated-layout";
+import { Header } from "@/components/layout/header"; // 1. Impor komponen Header
+import { Main } from "@/components/layout/main"; // 2. Impor komponen Main
 
 export const metadata: Metadata = {
 	title: "Dasbor Koperasi",
@@ -15,12 +16,13 @@ export default function DashboardLayout({
 	children: React.ReactNode;
 }) {
 	return (
-		<>
+		// AuthenticatedLayout akan menyediakan Sidebar
+		<AuthenticatedLayout>
+			{/* Di dalam area konten utama yang disediakan oleh AuthenticatedLayout,
+        kita tempatkan Header dan Main content.
+      */}
 			<Header />
-			<div className="flex h-screen overflow-hidden">
-				<Sidebar />
-				<main className="w-full pt-16">{children}</main>
-			</div>
-		</>
+			<Main>{children}</Main>
+		</AuthenticatedLayout>
 	);
 }
