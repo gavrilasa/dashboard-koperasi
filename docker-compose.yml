@@ -1,0 +1,57 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: db_koperasi
+    restart: unless-stopped
+    env_file: .env.dev
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis_koperasi
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  minio:
+    image: minio/minio:latest
+    container_name: minio_koperasi
+    restart: unless-stopped
+    env_file: .env.dev
+    ports:
+      - "9000:9000" # API Port
+      - "9001:9001" # Console Port
+    volumes:
+      - miniodata:/data
+    command: server /data --console-address ":9001"
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.app
+    container_name: app_koperasi
+    restart: unless-stopped
+    env_file: .env.dev
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+      - redis
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    container_name: worker_koperasi
+    restart: unless-stopped
+    env_file: .env.dev
+    depends_on:
+      - postgres
+      - redis
+
+volumes:
+  pgdata:
+  miniodata:
