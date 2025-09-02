@@ -1,6 +1,6 @@
 // path: app/dashboard/layout.tsx
 
-import Header from "@/app/components/layout/header";
+import Header from "@/components/layout/header";
 import Sidebar from "@/app/components/layout/sidebar";
 import type { Metadata } from "next";
 
