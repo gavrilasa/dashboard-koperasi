@@ -32,11 +32,17 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.app
+      target: deps
     container_name: app_koperasi
     restart: unless-stopped
     env_file: .env.dev
     ports:
       - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    command: npm run dev
     depends_on:
       - postgres
       - redis

@@ -1,12 +1,12 @@
 "use client";
 
-import Link from "next/link"; // Menggunakan Link dari Next.js
+import Link from "next/link";
 import {
 	Bell,
 	ChevronsUpDown,
 	CreditCard,
 	LogOut,
-	Settings, // Mengganti ikon yang tidak relevan
+	Settings,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -24,22 +24,16 @@ import {
 	SidebarMenuItem,
 	useSidebar,
 } from "@/components/ui/sidebar";
+import { signOutAction } from "@/lib/actions/auth-actions";
 
-// Data pengguna statis untuk placeholder
 const user = {
 	name: "Admin Koperasi",
 	email: "admin@koperasi.dev",
-	avatar: "/avatars/placeholder.png", // Anda bisa menambahkan gambar placeholder di folder public
+	avatar: "/avatars/placeholder.png",
 };
 
 export function NavUser() {
 	const { isMobile } = useSidebar();
-
-	// Fungsi logout bisa ditambahkan di sini nanti
-	const handleSignOut = () => {
-		// TODO: Implement logout logic
-		alert("Fungsi logout belum diimplementasikan.");
-	};
 
 	return (
 		<SidebarMenu>
@@ -101,10 +95,14 @@ export function NavUser() {
 							</DropdownMenuItem>
 						</DropdownMenuGroup>
 						<DropdownMenuSeparator />
-						<DropdownMenuItem onClick={handleSignOut}>
-							<LogOut />
-							Sign out
-						</DropdownMenuItem>
+						<form action={signOutAction}>
+							<DropdownMenuItem asChild>
+								<button type="submit" className="w-full">
+									<LogOut />
+									Sign out
+								</button>
+							</DropdownMenuItem>
+						</form>
 					</DropdownMenuContent>
 				</DropdownMenu>
 			</SidebarMenuItem>

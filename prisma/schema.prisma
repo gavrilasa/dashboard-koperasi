@@ -7,35 +7,73 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model AdminUser {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+// Model yang disesuaikan untuk NextAuth.js
+// Model AdminUser diubah menjadi User
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      String? // Tetap ada untuk provider kredensial
+  accounts      Account[] // Relasi ke model Account NextAuth
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  Session       Session[]
 }
 
-model Session {
-  id          String   @id
-  adminUserId String
-  expiresAt   DateTime
-  createdAt   DateTime @default(now())
-  data        Json?
+// Model baru yang dibutuhkan oleh NextAuth.js Prisma Adapter
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
 }
+
+// Model Session baru dari NextAuth.js
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// --- Model Spesifik Aplikasi (Tetap sama) ---
 
 model Customer {
-  id        String    @id @default(cuid())
+  id        String            @id @default(cuid())
   name      String
-  idNumber  String    @unique // Nomor KTP
+  idNumber  String            @unique // Nomor KTP
   address   String
   phone     String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  accounts  Account[]
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  accounts  CustomerAccount[] // Mengubah nama relasi untuk menghindari konflik
 }
 
-model Account {
+// Mengganti nama model 'Account' aplikasi menjadi 'CustomerAccount' untuk menghindari konflik nama
+model CustomerAccount {
   id            String        @id @default(cuid())
   accountNumber String        @unique
   balance       Decimal       @db.Decimal(15, 2)
@@ -47,13 +85,13 @@ model Account {
 }
 
 model Transaction {
-  id          String       @id @default(cuid())
+  id          String          @id @default(cuid())
   accountId   String
-  account     Account      @relation(fields: [accountId], references: [id])
-  amount      Decimal      @db.Decimal(15, 2)
+  account     CustomerAccount @relation(fields: [accountId], references: [id])
+  amount      Decimal         @db.Decimal(15, 2)
   type        String // DEBIT or CREDIT
   description String?
-  createdAt   DateTime     @default(now())
+  createdAt   DateTime        @default(now())
   attachments Attachment[]
 }
 
