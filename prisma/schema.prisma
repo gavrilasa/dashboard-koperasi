@@ -7,42 +7,78 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Model yang disesuaikan untuk NextAuth.js
-// Model AdminUser diubah menjadi User
+enum AccountStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+model Customer {
+  id        String   @id @default(cuid())
+  name      String
+  idNumber  String   @unique
+  address   String
+  phone     String
+  gender    Gender
+  birthDate DateTime
+
+  accountNumber String        @unique
+  balance       Decimal       @db.Decimal(15, 2)
+  status        AccountStatus @default(ACTIVE)
+
+  transactions Transaction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Transaction {
+  id         String   @id @default(cuid())
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id])
+
+  amount      Decimal @db.Decimal(15, 2)
+  type        String
+  description String
+  notes       String?
+
+  createdAt   DateTime     @default(now())
+  attachments Attachment[]
+}
+
+model IdempotencyKey {
+  id        String   @id
+  createdAt DateTime @default(now())
+}
+
+model Attachment {
+  id            String      @id @default(cuid())
+  transactionId String
+  transaction   Transaction @relation(fields: [transactionId], references: [id])
+  filePath      String
+  mimeType      String
+  size          Int
+  createdAt     DateTime    @default(now())
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String?
   email         String?   @unique
   emailVerified DateTime?
   image         String?
-  password      String? // Tetap ada untuk provider kredensial
-  accounts      Account[] // Relasi ke model Account NextAuth
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  Session       Session[]
+  password      String?
+
+  sessions Session[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-// Model baru yang dibutuhkan oleh NextAuth.js Prisma Adapter
-model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-}
-
-// Model Session baru dari NextAuth.js
 model Session {
   id           String   @id @default(cuid())
   sessionToken String   @unique
@@ -57,67 +93,4 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
-}
-
-// --- Model Spesifik Aplikasi (Tetap sama) ---
-
-model Customer {
-  id        String            @id @default(cuid())
-  name      String
-  idNumber  String            @unique // Nomor KTP
-  address   String
-  phone     String
-  createdAt DateTime          @default(now())
-  updatedAt DateTime          @updatedAt
-  accounts  CustomerAccount[] // Mengubah nama relasi untuk menghindari konflik
-}
-
-// Mengganti nama model 'Account' aplikasi menjadi 'CustomerAccount' untuk menghindari konflik nama
-model CustomerAccount {
-  id            String        @id @default(cuid())
-  accountNumber String        @unique
-  balance       Decimal       @db.Decimal(15, 2)
-  customerId    String
-  customer      Customer      @relation(fields: [customerId], references: [id])
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  transactions  Transaction[]
-}
-
-model Transaction {
-  id          String          @id @default(cuid())
-  accountId   String
-  account     CustomerAccount @relation(fields: [accountId], references: [id])
-  amount      Decimal         @db.Decimal(15, 2)
-  type        String // DEBIT or CREDIT
-  description String?
-  createdAt   DateTime        @default(now())
-  attachments Attachment[]
-}
-
-model Attachment {
-  id            String      @id @default(cuid())
-  transactionId String
-  transaction   Transaction @relation(fields: [transactionId], references: [id])
-  filePath      String // Path in MinIO
-  mimeType      String
-  size          Int
-  createdAt     DateTime    @default(now())
-}
-
-model IdempotencyKey {
-  id        String   @id
-  status    String // PROCESSING or COMPLETED
-  createdAt DateTime @default(now())
-
-  @@index([createdAt])
-}
-
-model ReportRequest {
-  id          String   @id @default(cuid())
-  status      String   @default("PENDING") // PENDING, COMPLETED, FAILED
-  filePath    String?
-  requestedBy String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
 }
