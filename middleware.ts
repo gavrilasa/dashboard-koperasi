@@ -5,11 +5,13 @@ export default auth((req) => {
 	const isLoggedIn = !!req.auth;
 	const { nextUrl } = req;
 
-	if (isLoggedIn && nextUrl.pathname.startsWith("/login")) {
-		return NextResponse.redirect(new URL("/dashboard", nextUrl));
+	const isAuthRoute = nextUrl.pathname.startsWith("/login");
+
+	if (isLoggedIn && isAuthRoute) {
+		return NextResponse.redirect(new URL("/", req.url));
 	}
 });
 
 export const config = {
-	matcher: ["/dashboard/:path*", "/login"],
+	matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 };

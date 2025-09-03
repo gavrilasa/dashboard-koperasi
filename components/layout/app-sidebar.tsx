@@ -4,13 +4,12 @@ import {
 	Sidebar,
 	SidebarContent,
 	SidebarHeader,
-	SidebarFooter,
+	SidebarFooter, // Hapus atau biarkan kosong
 	SidebarRail,
 } from "@/components/ui/sidebar";
 import { navData } from "@/data/nav";
 import { NavGroup } from "./nav-group";
 import { AppTitle } from "./app-title";
-import { NavUser } from "./nav-user";
 
 export function AppSidebar() {
 	return (
@@ -25,9 +24,7 @@ export function AppSidebar() {
 				))}
 			</SidebarContent>
 
-			<SidebarFooter>
-				<NavUser />
-			</SidebarFooter>
+			<SidebarFooter />
 
 			<SidebarRail />
 		</Sidebar>
