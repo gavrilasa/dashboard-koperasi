@@ -74,27 +74,6 @@ export function NavUser() {
 							</div>
 						</DropdownMenuLabel>
 						<DropdownMenuSeparator />
-						<DropdownMenuGroup>
-							<DropdownMenuItem asChild>
-								<Link href="/dashboard/settings">
-									<Settings />
-									Pengaturan
-								</Link>
-							</DropdownMenuItem>
-							<DropdownMenuItem asChild>
-								<Link href="/dashboard/billing">
-									<CreditCard />
-									Tagihan
-								</Link>
-							</DropdownMenuItem>
-							<DropdownMenuItem asChild>
-								<Link href="/dashboard/notifications">
-									<Bell />
-									Notifikasi
-								</Link>
-							</DropdownMenuItem>
-						</DropdownMenuGroup>
-						<DropdownMenuSeparator />
 						<form action={signOutAction}>
 							<DropdownMenuItem asChild>
 								<button type="submit" className="w-full">

@@ -1,16 +1,19 @@
+// auth.ts
+
 import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import Credentials from "next-auth/providers/credentials";
 import { PrismaClient } from "@prisma/client";
 import { z } from "zod";
-import * as argon2 from "argon2";
+import * as bcrypt from "bcryptjs";
 import type { Adapter } from "next-auth/adapters";
 
 const prisma = new PrismaClient();
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+	secret: process.env.AUTH_SECRET,
 	adapter: PrismaAdapter(prisma) as Adapter,
-	session: { strategy: "database" },
+	session: { strategy: "jwt" }, // <-- Ubah baris ini
 	pages: {
 		signIn: "/login",
 	},
@@ -33,7 +36,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
 					if (!user || !user.password) return null;
 
-					const passwordsMatch = await argon2.verify(user.password, password);
+					const passwordsMatch = await bcrypt.compare(password, user.password);
 
 					if (passwordsMatch) {
 						const { password, ...userWithoutPassword } = user;
@@ -46,12 +49,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 		}),
 	],
 	callbacks: {
-		session({ session, user }) {
-			if (session.user && user) {
-				session.user.id = user.id;
+		// Callback session ini tetap berguna untuk menambahkan data ke sesi jika diperlukan
+		session({ session, token }) {
+			// Dengan JWT, argumen kedua adalah 'token'
+			if (session.user && token.sub) {
+				session.user.id = token.sub; // 'sub' (subject) adalah ID pengguna di dalam JWT
 			}
-
 			return session;
+		},
+		// Anda juga mungkin perlu callback jwt untuk menambahkan info ke token
+		jwt({ token, user }) {
+			if (user) {
+				token.id = user.id;
+			}
+			return token;
 		},
 	},
 });

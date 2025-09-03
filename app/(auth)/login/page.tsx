@@ -1,6 +1,7 @@
 "use client";
 
-import { useFormState, useFormStatus } from "react-dom";
+import { useActionState } from "react"; // Diubah dari 'useFormState' dan 'react-dom'
+import { useFormStatus } from "react-dom"; // useFormStatus tetap dari 'react-dom'
 import { authenticate, type FormState } from "@/lib/actions/auth-actions";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,7 +17,8 @@ import { AlertCircle } from "lucide-react";
 
 export default function LoginPage() {
 	const initialState: FormState | undefined = undefined;
-	const [state, dispatch] = useFormState(authenticate, initialState);
+	// Nama hook diubah menjadi useActionState
+	const [state, dispatch] = useActionState(authenticate, initialState);
 
 	return (
 		<div className="flex min-h-screen items-center justify-center bg-gray-100">

@@ -1,4 +1,3 @@
-// path: data/nav.ts
 import { NavGroup } from "@/components/layout/types";
 import {
 	LayoutDashboard,
@@ -6,31 +5,37 @@ import {
 	Landmark,
 	CreditCard,
 	Settings,
+	HandCoins,
 } from "lucide-react";
 
 export const navData: NavGroup[] = [
 	{
-		title: "Menu Utama",
+		title: "Menu",
 		items: [
 			{
 				title: "Dashboard",
-				url: "/dashboard",
+				url: "/",
 				icon: LayoutDashboard,
 			},
 			{
-				title: "Nasabah",
-				url: "/dashboard/customers",
-				icon: Users,
-			},
-			{
-				title: "Rekening",
-				url: "/dashboard/accounts",
+				title: "Rekening Induk",
+				url: "/rekening-induk",
 				icon: Landmark,
 			},
 			{
-				title: "Transaksi",
-				url: "/dashboard/transactions",
+				title: "Nasabah",
+				url: "/nasabah",
+				icon: Users,
+			},
+			{
+				title: "Riwayat Transaksi",
+				url: "/transaksi",
 				icon: CreditCard,
+			},
+			{
+				title: "Bagi Hasil",
+				url: "/bagi-hasil",
+				icon: HandCoins,
 			},
 		],
 	},
@@ -39,7 +44,7 @@ export const navData: NavGroup[] = [
 		items: [
 			{
 				title: "Sistem",
-				url: "/dashboard/settings",
+				url: "/pengaturan",
 				icon: Settings,
 			},
 		],
