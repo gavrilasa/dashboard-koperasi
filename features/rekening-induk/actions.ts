@@ -3,9 +3,9 @@
 "use server";
 
 import { z } from "zod";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, MainAccountTransactionSource } from "@prisma/client";
 import { revalidatePath } from "next/cache";
-import type { State } from "@/features/nasabah/types"; // Bisa gunakan tipe State yang sama
+import type { ActionState } from "./types";
 
 const prisma = new PrismaClient();
 
@@ -17,7 +17,6 @@ const LedgerActionSchema = z.object({
 	notes: z.string().optional(),
 });
 
-// Fungsi untuk mendapatkan ID rekening induk (asumsi hanya ada satu)
 async function getMainAccountId(): Promise<string> {
 	let account = await prisma.mainAccount.findFirst();
 	if (!account) {
@@ -29,15 +28,16 @@ async function getMainAccountId(): Promise<string> {
 }
 
 export async function topUpMainAccount(
-	prevState: State,
+	prevState: ActionState,
 	formData: FormData
-): Promise<State> {
+): Promise<ActionState> {
 	const validatedFields = LedgerActionSchema.safeParse(
 		Object.fromEntries(formData.entries())
 	);
 
 	if (!validatedFields.success) {
 		return {
+			status: "validation_error",
 			errors: validatedFields.error.flatten().fieldErrors,
 			message: "Data tidak valid.",
 		};
@@ -60,27 +60,37 @@ export async function topUpMainAccount(
 					type: "KREDIT",
 					description,
 					notes,
+					source: MainAccountTransactionSource.MANUAL_OPERATIONAL,
 				},
 			});
 		});
 	} catch (error) {
-		return { message: "Database Error: Gagal melakukan top up." };
+		console.error(error);
+		return {
+			status: "error",
+			message: "Database Error: Gagal melakukan top up.",
+		};
 	}
 
 	revalidatePath("/rekening-induk");
-	return { message: "Top up berhasil." };
+	return {
+		status: "success",
+		message: "Top up berhasil.",
+	};
 }
 
 export async function withdrawMainAccount(
-	prevState: State,
+	prevState: ActionState,
 	formData: FormData
-): Promise<State> {
+): Promise<ActionState> {
 	const validatedFields = LedgerActionSchema.safeParse(
 		Object.fromEntries(formData.entries())
 	);
 
 	if (!validatedFields.success) {
 		return {
+			// DIUBAH: Menambahkan status
+			status: "validation_error",
 			errors: validatedFields.error.flatten().fieldErrors,
 			message: "Data tidak valid.",
 		};
@@ -110,15 +120,27 @@ export async function withdrawMainAccount(
 					type: "DEBIT",
 					description,
 					notes,
+					source: MainAccountTransactionSource.MANUAL_OPERATIONAL,
 				},
 			});
 		});
-	} catch (error: any) {
+	} catch (error: unknown) {
+		if (error instanceof Error) {
+			return {
+				status: "error",
+				message: error.message || "Database Error: Gagal melakukan penarikan.",
+			};
+		}
 		return {
-			message: error.message || "Database Error: Gagal melakukan penarikan.",
+			status: "error",
+			message: "Database Error: Gagal melakukan penarikan.",
 		};
 	}
 
 	revalidatePath("/rekening-induk");
-	return { message: "Penarikan berhasil." };
+	return {
+		// DIUBAH: Menambahkan status
+		status: "success",
+		message: "Penarikan berhasil.",
+	};
 }

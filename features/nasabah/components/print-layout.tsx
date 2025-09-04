@@ -66,10 +66,10 @@ export function PrintLayout({
 					<header className="flex items-center justify-between pb-4 border-b">
 						<div>
 							<h1 className="text-2xl font-bold text-gray-800">
-								Koperasi Simpan Pinjam Sejahtera
+								Koperasi Simpan Pinjam
 							</h1>
 							<p className="text-sm text-gray-500">
-								Jl. Pahlawan No. 1, Semarang, Jawa Tengah
+								Kota Bontang, Kalimantan Timur
 							</p>
 						</div>
 						{/* Anda bisa menambahkan logo di sini */}

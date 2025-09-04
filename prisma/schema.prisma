@@ -17,6 +17,12 @@ enum Gender {
   FEMALE
 }
 
+enum MainAccountTransactionSource {
+  MANUAL_OPERATIONAL
+  FROM_CUSTOMER_DEPOSIT
+  FROM_CUSTOMER_WITHDRAWAL
+}
+
 model Customer {
   id        String   @id @default(cuid())
   name      String
@@ -48,6 +54,9 @@ model Transaction {
 
   createdAt   DateTime     @default(now())
   attachments Attachment[]
+
+  profitSharingEventId String?
+  profitSharingEvent   ProfitSharingEvent? @relation(fields: [profitSharingEventId], references: [id])
 }
 
 model IdempotencyKey {
@@ -97,7 +106,7 @@ model VerificationToken {
 
 model MainAccount {
   id      String  @id @default(cuid())
-  name    String  @unique // Contoh: "Kas Operasional Koperasi"
+  name    String  @unique
   balance Decimal @db.Decimal(15, 2)
 
   transactions MainAccountTransaction[]
@@ -106,15 +115,30 @@ model MainAccount {
   updatedAt DateTime @updatedAt
 }
 
-// Model untuk Riwayat Transaksi Rekening Induk
 model MainAccountTransaction {
   id            String      @id @default(cuid())
   mainAccountId String
   account       MainAccount @relation(fields: [mainAccountId], references: [id])
 
+  source                MainAccountTransactionSource @default(MANUAL_OPERATIONAL)
+  customerTransactionId String?                      @unique
+
   amount      Decimal  @db.Decimal(15, 2)
-  type        String // "KREDIT" (Top Up) atau "DEBIT" (Tarik)
-  description String // Contoh: "Setoran Modal Awal", "Penarikan Biaya Operasional"
+  type        String
+  description String
   notes       String?
   createdAt   DateTime @default(now())
+}
+
+model ProfitSharingEvent {
+  id                   String   @id @default(cuid())
+  executedAt           DateTime @default(now())
+  totalAmountShared    Decimal  @db.Decimal(15, 2)
+  numberOfRecipients   Int
+  amountPerRecipient   Decimal  @db.Decimal(15, 2)
+  remainderAmount      Decimal  @db.Decimal(15, 2) // Sisa dana pembulatan
+  mainAccountDebitTxId String   @unique // Relasi ke transaksi debit di rekening induk
+
+  // Relasi ke transaksi kredit individual nasabah
+  recipientTransactions Transaction[]
 }

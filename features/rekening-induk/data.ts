@@ -1,6 +1,10 @@
 // features/rekening-induk/data.ts
 
-import { PrismaClient, MainAccountTransaction } from "@prisma/client";
+import {
+	PrismaClient,
+	MainAccountTransaction,
+	MainAccountTransactionSource, // Impor enum
+} from "@prisma/client";
 import { unstable_noStore as noStore } from "next/cache";
 
 const prisma = new PrismaClient();
@@ -39,6 +43,10 @@ export async function getMainAccountTransactions(
 	const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 	try {
 		const transactions = await prisma.mainAccountTransaction.findMany({
+			// PENAMBAHAN: Filter untuk hanya menampilkan transaksi manual
+			where: {
+				source: MainAccountTransactionSource.MANUAL_OPERATIONAL,
+			},
 			orderBy: {
 				createdAt: "desc",
 			},
@@ -59,7 +67,12 @@ export async function getMainAccountTransactions(
 export async function getMainAccountTransactionPages(): Promise<number> {
 	noStore();
 	try {
-		const count = await prisma.mainAccountTransaction.count();
+		const count = await prisma.mainAccountTransaction.count({
+			// PENAMBAHAN: Filter untuk hanya menghitung transaksi manual
+			where: {
+				source: MainAccountTransactionSource.MANUAL_OPERATIONAL,
+			},
+		});
 		const totalPages = Math.ceil(count / ITEMS_PER_PAGE);
 		return totalPages;
 	} catch (error) {

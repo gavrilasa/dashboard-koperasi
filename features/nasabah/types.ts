@@ -1,7 +1,7 @@
 // features/nasabah/types.ts
 
 import { z } from "zod";
-// FIX: Hapus impor 'Prisma' yang tidak digunakan
+
 export const CustomerFormSchema = z.object({
 	id: z.string().cuid().optional(),
 	name: z
@@ -39,10 +39,20 @@ export type Customer = {
 	updatedAt: Date;
 };
 
-// Tipe State untuk Server Actions
-export type State = {
+export type ActionState = {
+	status: "success" | "error" | "validation_error";
+	message: string | null;
+	data?: {
+		amount?: number;
+		customerName?: string;
+	};
 	errors?: {
 		[key: string]: string[] | undefined;
 	};
-	message?: string | null;
+};
+
+export type SearchedCustomer = {
+	id: string;
+	name: string;
+	accountNumber: string;
 };

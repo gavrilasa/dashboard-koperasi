@@ -7,7 +7,8 @@ const prisma = new PrismaClient();
 const ITEMS_PER_PAGE = 10;
 
 // Tipe kustom untuk menggabungkan data transaksi dengan data nasabah
-export type TransactionWithCustomer = Transaction & {
+export type TransactionWithCustomer = Omit<Transaction, "amount"> & {
+	amount: number; // Pastikan amount adalah number
 	customer: Pick<Customer, "name">;
 };
 
@@ -52,8 +53,8 @@ export async function fetchFilteredTransactions(
 					{
 						// Filter berdasarkan rentang tanggal jika ada
 						createdAt: {
-							gte: dateRange?.from, // gte: greater than or equal
-							lte: dateRange?.to, // lte: less than or equal
+							gte: dateRange?.from,
+							lte: dateRange?.to,
 						},
 					},
 				],
@@ -73,8 +74,11 @@ export async function fetchFilteredTransactions(
 			skip: offset,
 		});
 
-		// Mengembalikan data transaksi yang telah digabungkan
-		return transactions;
+		// Konversi Decimal ke number sebelum me-return data
+		return transactions.map((tx) => ({
+			...tx,
+			amount: tx.amount.toNumber(),
+		}));
 	} catch (error) {
 		console.error("Database Error:", error);
 		throw new Error("Gagal mengambil data transaksi.");
