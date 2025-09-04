@@ -120,3 +120,97 @@ export async function fetchCustomerTransactionPages(customerId: string) {
 		throw new Error("Gagal menghitung total halaman transaksi.");
 	}
 }
+
+/**
+ * Menghitung saldo awal nasabah sebelum tanggal tertentu.
+ * Dihitung dari saldo saat ini dikurangi/ditambah transaksi setelah tanggal tersebut.
+ * @param customerId - ID nasabah.
+ * @param fromDate - Tanggal mulai periode laporan.
+ * @returns Saldo awal nasabah.
+ */
+export async function calculateInitialBalance(
+	customerId: string,
+	fromDate: Date
+): Promise<number> {
+	noStore();
+	try {
+		const customer = await prisma.customer.findUniqueOrThrow({
+			where: { id: customerId },
+			select: { balance: true },
+		});
+
+		const transactionsAfter = await prisma.transaction.aggregate({
+			_sum: {
+				amount: true,
+			},
+			where: {
+				customerId,
+				createdAt: {
+					gte: fromDate,
+				},
+				type: "KREDIT",
+			},
+		});
+
+		const transactionsBefore = await prisma.transaction.aggregate({
+			_sum: {
+				amount: true,
+			},
+			where: {
+				customerId,
+				createdAt: {
+					gte: fromDate,
+				},
+				type: "DEBIT",
+			},
+		});
+
+		const currentBalance = customer.balance.toNumber();
+		const totalKreditAfter = transactionsAfter._sum.amount?.toNumber() || 0;
+		const totalDebitAfter = transactionsBefore._sum.amount?.toNumber() || 0;
+
+		// Rumus: Saldo Awal = Saldo Sekarang - (Total Kredit Setelahnya) + (Total Debit Setelahnya)
+		const initialBalance = currentBalance - totalKreditAfter + totalDebitAfter;
+
+		return initialBalance;
+	} catch (error) {
+		console.error("Database Error:", error);
+		throw new Error("Gagal menghitung saldo awal.");
+	}
+}
+
+/**
+ * Mengambil semua transaksi nasabah dalam rentang tanggal tertentu (tanpa paginasi).
+ * @param customerId - ID nasabah.
+ * @param dateRange - Objek berisi tanggal 'from' dan 'to'.
+ * @returns Array dari semua transaksi yang cocok.
+ */
+export async function fetchCustomerTransactionsByDateRange(
+	customerId: string,
+	dateRange: { from: Date; to: Date }
+) {
+	noStore();
+	try {
+		const transactions = await prisma.transaction.findMany({
+			where: {
+				customerId,
+				createdAt: {
+					gte: dateRange.from,
+					lte: dateRange.to,
+				},
+			},
+			orderBy: {
+				createdAt: "asc",
+			},
+		});
+
+		return transactions.map((tx) => ({
+			...tx,
+			amount: tx.amount.toNumber(),
+			type: tx.type as "KREDIT" | "DEBIT",
+		}));
+	} catch (error) {
+		console.error("Database Error:", error);
+		throw new Error("Gagal mengambil riwayat transaksi untuk dicetak.");
+	}
+}

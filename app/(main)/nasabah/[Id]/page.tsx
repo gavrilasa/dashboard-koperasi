@@ -19,11 +19,13 @@ import {
 	ArrowDownCircle,
 	ShieldOff,
 	UserCheck,
+	Printer,
 } from "lucide-react";
 import { TableSkeleton } from "@/components/shared/skeletons";
 import { TransactionHistory } from "@/features/nasabah/components/transaction-history";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { EditNasabahButton } from "@/features/nasabah/components/nasabah-dialogs";
+import { PrintStatementDialog } from "@/features/nasabah/components/print-statement-dialog";
 
 export default async function NasabahDetailPage({
 	params,
@@ -71,6 +73,7 @@ export default async function NasabahDetailPage({
 						</div>
 						<div className="flex flex-shrink-0 gap-2">
 							<EditNasabahButton customer={customer} />
+							<PrintStatementDialog customerId={customer.id} />
 							{customer.status === "ACTIVE" ? (
 								<Button variant="destructive" size="sm">
 									<ShieldOff className="w-4 h-4 mr-2" /> Nonaktifkan
