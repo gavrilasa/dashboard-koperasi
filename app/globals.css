@@ -111,6 +111,37 @@
 	--sidebar-ring: oklch(0.556 0 0);
 }
 
+@media print {
+	body {
+		-webkit-print-color-adjust: exact;
+		print-color-adjust: exact;
+	}
+
+	/* Sembunyikan semua elemen yang tidak perlu dicetak */
+	header,
+	[data-slot="sidebar-wrapper"],
+	.print-hidden {
+		display: none !important;
+	}
+
+	/* Pastikan area cetak menggunakan seluruh halaman */
+	main[data-slot="sidebar-inset"] {
+		margin: 0 !important;
+		padding: 0 !important;
+		border-radius: 0 !important;
+		box-shadow: none !important;
+	}
+
+	/* Reset background dan warna untuk visibilitas cetak */
+	#printable-area {
+		background: white !important;
+		color: black !important;
+		box-shadow: none !important;
+		border: none !important;
+		padding: 0.5rem !important;
+	}
+}
+
 @layer base {
 	* {
 		@apply border-border outline-ring/50;

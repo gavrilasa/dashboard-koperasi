@@ -1,0 +1,177 @@
+// app/(main)/rekening-induk/page.tsx
+
+import { Suspense } from "react";
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { PlusCircle, MinusCircle } from "lucide-react";
+import {
+	getMainAccountBalance,
+	getMainAccountTransactions,
+	getMainAccountTransactionPages,
+} from "@/features/rekening-induk/data";
+import { formatCurrency } from "@/lib/utils";
+import { Pagination } from "@/components/shared/pagination";
+import { TableSkeleton } from "@/components/shared/skeletons";
+import { LedgerActionDialog } from "@/features/rekening-induk/components/ledger-action-dialog";
+import { MainAccountTransaction } from "@prisma/client";
+
+export const metadata = {
+	title: "Rekening Induk",
+};
+
+// Fungsi helper untuk format tanggal dan waktu
+const formatDateTime = (date: Date) => {
+	return new Intl.DateTimeFormat("id-ID", {
+		dateStyle: "medium",
+		timeStyle: "short",
+	}).format(date);
+};
+
+/**
+ * Komponen Server untuk menampilkan tabel transaksi rekening induk.
+ */
+async function MainAccountTransactionTable({
+	currentPage,
+}: {
+	currentPage: number;
+}) {
+	const transactions: MainAccountTransaction[] =
+		await getMainAccountTransactions(currentPage);
+
+	return (
+		<div className="border rounded-md">
+			<Table>
+				<TableHeader>
+					<TableRow>
+						<TableHead className="w-[25%]">Tanggal</TableHead>
+						<TableHead className="w-[40%]">Deskripsi</TableHead>
+						<TableHead className="w-[15%] text-center">Tipe</TableHead>
+						<TableHead className="w-[20%] text-right">Jumlah</TableHead>
+					</TableRow>
+				</TableHeader>
+				<TableBody>
+					{transactions?.length > 0 ? (
+						transactions.map((tx) => (
+							<TableRow key={tx.id}>
+								<TableCell>{formatDateTime(tx.createdAt)}</TableCell>
+								<TableCell className="font-medium">{tx.description}</TableCell>
+								<TableCell className="text-center">
+									<Badge
+										variant={tx.type === "KREDIT" ? "default" : "destructive"}
+									>
+										{tx.type}
+									</Badge>
+								</TableCell>
+								<TableCell
+									className={`text-right font-semibold ${
+										tx.type === "KREDIT" ? "text-green-600" : "text-red-600"
+									}`}
+								>
+									{tx.type === "KREDIT" ? "+ " : "- "}
+									{formatCurrency(Number(tx.amount))}
+								</TableCell>
+							</TableRow>
+						))
+					) : (
+						<TableRow>
+							<TableCell colSpan={4} className="h-24 text-center">
+								Tidak ada riwayat mutasi ditemukan.
+							</TableCell>
+						</TableRow>
+					)}
+				</TableBody>
+			</Table>
+		</div>
+	);
+}
+
+/**
+ * Komponen Halaman Utama Rekening Induk.
+ */
+export default async function RekeningIndukPage({
+	searchParams,
+}: {
+	searchParams?: {
+		page?: string;
+	};
+}) {
+	const currentPage = Number(searchParams?.page) || 1;
+
+	// Mengambil data total saldo dan total halaman secara paralel
+	const [mainBalance, totalPages] = await Promise.all([
+		getMainAccountBalance(),
+		getMainAccountTransactionPages(),
+	]);
+
+	return (
+		<div className="flex flex-col w-full gap-6">
+			<div>
+				<h1 className="text-2xl font-bold tracking-tight">Rekening Induk</h1>
+				<p className="text-muted-foreground">
+					Kelola dan pantau dana operasional koperasi.
+				</p>
+			</div>
+
+			<Card className="shadow-lg">
+				<CardHeader className="flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+					<div>
+						<CardTitle>Total Saldo Koperasi</CardTitle>
+						<CardDescription>
+							Total dana operasional yang tersedia di rekening induk.
+						</CardDescription>
+					</div>
+					<div className="flex gap-2">
+						<LedgerActionDialog type="deposit">
+							<Button>
+								<PlusCircle className="w-4 h-4 mr-2" /> Top Up Saldo
+							</Button>
+						</LedgerActionDialog>
+
+						<LedgerActionDialog type="withdraw">
+							<Button variant="outline">
+								<MinusCircle className="w-4 h-4 mr-2" /> Tarik Saldo
+							</Button>
+						</LedgerActionDialog>
+					</div>
+				</CardHeader>
+				<CardContent>
+					<p className="text-4xl font-bold tracking-tight text-green-600">
+						{formatCurrency(mainBalance)}
+					</p>
+				</CardContent>
+			</Card>
+
+			<Card>
+				<CardHeader>
+					<CardTitle>Riwayat Mutasi Rekening Induk</CardTitle>
+					<CardDescription>
+						Daftar semua transaksi masuk dan keluar dari rekening induk.
+					</CardDescription>
+				</CardHeader>
+				<CardContent className="space-y-4">
+					<Suspense key={currentPage} fallback={<TableSkeleton />}>
+						<MainAccountTransactionTable currentPage={currentPage} />
+					</Suspense>
+					<div className="flex justify-center w-full">
+						<Pagination totalPages={totalPages} />
+					</div>
+				</CardContent>
+			</Card>
+		</div>
+	);
+}

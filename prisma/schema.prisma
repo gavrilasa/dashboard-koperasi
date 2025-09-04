@@ -94,3 +94,27 @@ model VerificationToken {
 
   @@unique([identifier, token])
 }
+
+model MainAccount {
+  id      String  @id @default(cuid())
+  name    String  @unique // Contoh: "Kas Operasional Koperasi"
+  balance Decimal @db.Decimal(15, 2)
+
+  transactions MainAccountTransaction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Model untuk Riwayat Transaksi Rekening Induk
+model MainAccountTransaction {
+  id            String      @id @default(cuid())
+  mainAccountId String
+  account       MainAccount @relation(fields: [mainAccountId], references: [id])
+
+  amount      Decimal  @db.Decimal(15, 2)
+  type        String // "KREDIT" (Top Up) atau "DEBIT" (Tarik)
+  description String // Contoh: "Setoran Modal Awal", "Penarikan Biaya Operasional"
+  notes       String?
+  createdAt   DateTime @default(now())
+}
