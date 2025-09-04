@@ -1,10 +1,9 @@
-import { z } from "zod";
+// features/nasabah/types.ts
 
-// Skema validasi untuk form nasabah menggunakan Zod.
-// Skema ini akan menjadi satu-satunya sumber kebenaran (single source of truth)
-// untuk validasi di sisi server (Server Action) dan klien (form).
-export const CustomerSchema = z.object({
-	id: z.string().cuid().optional(), // CUID opsional, ada saat update
+import { z } from "zod";
+// FIX: Hapus impor 'Prisma' yang tidak digunakan
+export const CustomerFormSchema = z.object({
+	id: z.string().cuid().optional(),
 	name: z
 		.string()
 		.min(3, { message: "Nama harus terdiri dari minimal 3 karakter." }),
@@ -17,19 +16,33 @@ export const CustomerSchema = z.object({
 	phone: z
 		.string()
 		.min(10, { message: "Nomor telepon harus terdiri dari minimal 10 digit." }),
+	gender: z.enum(["MALE", "FEMALE"], {
+		message: "Jenis kelamin harus dipilih.",
+	}),
+	birthDate: z.coerce.date({
+		message: "Tanggal lahir wajib diisi.",
+	}),
 });
 
-// Mengekstrak tipe TypeScript dari skema Zod untuk digunakan di komponen.
-export type Customer = z.infer<typeof CustomerSchema>;
+export type Customer = {
+	id: string;
+	name: string;
+	idNumber: string;
+	address: string;
+	phone: string;
+	gender: "MALE" | "FEMALE";
+	birthDate: Date;
+	accountNumber: string;
+	balance: number;
+	status: "ACTIVE" | "INACTIVE";
+	createdAt: Date;
+	updatedAt: Date;
+};
 
-// Tipe untuk state yang akan dikembalikan oleh Server Action,
-// terutama untuk menangani pesan error validasi form.
+// Tipe State untuk Server Actions
 export type State = {
 	errors?: {
-		name?: string[];
-		idNumber?: string[];
-		address?: string[];
-		phone?: string[];
+		[key: string]: string[] | undefined;
 	};
 	message?: string | null;
 };

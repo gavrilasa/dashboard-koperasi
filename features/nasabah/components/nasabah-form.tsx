@@ -5,17 +5,34 @@ import { useFormStatus } from "react-dom";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
 import { createCustomer, updateCustomer } from "../actions";
 import type { Customer, State } from "../types";
 
-// Props untuk komponen form, menerima data nasabah opsional untuk mode edit
+// Props untuk komponen form
 interface NasabahFormProps {
 	customer?: Customer | null;
 }
 
+// Helper untuk format tanggal YYYY-MM-DD
+const formatDateForInput = (date?: Date | string | null): string => {
+	if (!date) return "";
+	const d = new Date(date);
+	if (isNaN(d.getTime())) return "";
+	const year = d.getFullYear();
+	const month = (d.getMonth() + 1).toString().padStart(2, "0");
+	const day = d.getDate().toString().padStart(2, "0");
+	return `${year}-${month}-${day}`;
+};
+
 export function NasabahForm({ customer }: NasabahFormProps) {
-	// Tentukan action yang akan digunakan berdasarkan mode (buat baru atau update)
 	const actionToUse = customer
 		? updateCustomer.bind(null, customer.id!)
 		: createCustomer;
@@ -34,14 +51,14 @@ export function NasabahForm({ customer }: NasabahFormProps) {
 					placeholder="Masukkan nama lengkap"
 					defaultValue={customer?.name}
 					aria-describedby="name-error"
+					required
 				/>
 				<div id="name-error" aria-live="polite" aria-atomic="true">
-					{state.errors?.name &&
-						state.errors.name.map((error: string) => (
-							<p className="mt-1 text-sm text-destructive" key={error}>
-								{error}
-							</p>
-						))}
+					{state.errors?.name?.map((error: string) => (
+						<p className="mt-1 text-sm text-destructive" key={error}>
+							{error}
+						</p>
+					))}
 				</div>
 			</div>
 
@@ -54,14 +71,55 @@ export function NasabahForm({ customer }: NasabahFormProps) {
 					placeholder="Masukkan 16 digit Nomor KTP"
 					defaultValue={customer?.idNumber}
 					aria-describedby="idNumber-error"
+					required
 				/>
 				<div id="idNumber-error" aria-live="polite" aria-atomic="true">
-					{state.errors?.idNumber &&
-						state.errors.idNumber.map((error: string) => (
+					{state.errors?.idNumber?.map((error: string) => (
+						<p className="mt-1 text-sm text-destructive" key={error}>
+							{error}
+						</p>
+					))}
+				</div>
+			</div>
+
+			{/* Gender and Birth Date Fields (in a grid) */}
+			<div className="grid grid-cols-2 gap-4">
+				<div className="space-y-2">
+					<Label htmlFor="gender">Jenis Kelamin</Label>
+					<Select name="gender" defaultValue={customer?.gender}>
+						<SelectTrigger id="gender" aria-describedby="gender-error">
+							<SelectValue placeholder="Pilih jenis kelamin" />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value="MALE">Laki-laki</SelectItem>
+							<SelectItem value="FEMALE">Perempuan</SelectItem>
+						</SelectContent>
+					</Select>
+					<div id="gender-error" aria-live="polite" aria-atomic="true">
+						{state.errors?.gender?.map((error: string) => (
 							<p className="mt-1 text-sm text-destructive" key={error}>
 								{error}
 							</p>
 						))}
+					</div>
+				</div>
+				<div className="space-y-2">
+					<Label htmlFor="birthDate">Tanggal Lahir</Label>
+					<Input
+						id="birthDate"
+						name="birthDate"
+						type="date"
+						defaultValue={formatDateForInput(customer?.birthDate)}
+						aria-describedby="birthDate-error"
+						required
+					/>
+					<div id="birthDate-error" aria-live="polite" aria-atomic="true">
+						{state.errors?.birthDate?.map((error: string) => (
+							<p className="mt-1 text-sm text-destructive" key={error}>
+								{error}
+							</p>
+						))}
+					</div>
 				</div>
 			</div>
 
@@ -74,14 +132,14 @@ export function NasabahForm({ customer }: NasabahFormProps) {
 					placeholder="Masukkan alamat lengkap"
 					defaultValue={customer?.address}
 					aria-describedby="address-error"
+					required
 				/>
 				<div id="address-error" aria-live="polite" aria-atomic="true">
-					{state.errors?.address &&
-						state.errors.address.map((error: string) => (
-							<p className="mt-1 text-sm text-destructive" key={error}>
-								{error}
-							</p>
-						))}
+					{state.errors?.address?.map((error: string) => (
+						<p className="mt-1 text-sm text-destructive" key={error}>
+							{error}
+						</p>
+					))}
 				</div>
 			</div>
 
@@ -95,40 +153,39 @@ export function NasabahForm({ customer }: NasabahFormProps) {
 					placeholder="Masukkan nomor telepon aktif"
 					defaultValue={customer?.phone}
 					aria-describedby="phone-error"
+					required
 				/>
 				<div id="phone-error" aria-live="polite" aria-atomic="true">
-					{state.errors?.phone &&
-						state.errors.phone.map((error: string) => (
-							<p className="mt-1 text-sm text-destructive" key={error}>
-								{error}
-							</p>
-						))}
+					{state.errors?.phone?.map((error: string) => (
+						<p className="mt-1 text-sm text-destructive" key={error}>
+							{error}
+						</p>
+					))}
 				</div>
 			</div>
 
-			{/* Menampilkan pesan error umum */}
 			{state.message && (
 				<p className="text-sm text-destructive">{state.message}</p>
 			)}
 
-			<SubmitButton />
+			<SubmitButton isEdit={!!customer} />
 		</form>
 	);
 }
 
-// Komponen terpisah untuk tombol submit agar bisa menggunakan hook useFormStatus
-function SubmitButton() {
+function SubmitButton({ isEdit }: { isEdit: boolean }) {
 	const { pending } = useFormStatus();
+	const buttonText = isEdit ? "Simpan Perubahan" : "Tambah Nasabah";
 
 	return (
 		<Button type="submit" className="w-full" aria-disabled={pending}>
 			{pending ? (
 				<>
-					<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+					<Loader2 className="w-4 h-4 mr-2 animate-spin" />
 					Menyimpan...
 				</>
 			) : (
-				"Simpan"
+				buttonText
 			)}
 		</Button>
 	);

@@ -1,3 +1,5 @@
+// app/(main)/nasabah/[id]/page.tsx
+
 import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -11,28 +13,17 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Coins, Edit, ShieldOff, UserCheck } from "lucide-react";
+import {
+	ArrowLeft,
+	ArrowUpCircle,
+	ArrowDownCircle,
+	ShieldOff,
+	UserCheck,
+} from "lucide-react";
 import { TableSkeleton } from "@/components/shared/skeletons";
 import { TransactionHistory } from "@/features/nasabah/components/transaction-history";
-
-// Fungsi utilitas untuk format mata uang
-const formatCurrency = (amount: number | bigint) => {
-	return new Intl.NumberFormat("id-ID", {
-		style: "currency",
-		currency: "IDR",
-		minimumFractionDigits: 0,
-	}).format(amount);
-};
-
-// Fungsi utilitas untuk format tanggal
-const formatDate = (date: Date) => {
-	return new Intl.DateTimeFormat("id-ID", {
-		year: "numeric",
-		month: "long",
-		day: "numeric",
-	}).format(date);
-};
+import { formatCurrency, formatDate } from "@/lib/utils";
+import { EditNasabahButton } from "@/features/nasabah/components/nasabah-dialogs";
 
 export default async function NasabahDetailPage({
 	params,
@@ -44,28 +35,25 @@ export default async function NasabahDetailPage({
 	const id = params.id;
 	const currentPage = Number(searchParams?.page) || 1;
 
-	// Mengambil data profil nasabah dari server
 	const customer = await fetchCustomerById(id);
 
-	// Jika nasabah tidak ditemukan, tampilkan halaman 404
 	if (!customer) {
 		notFound();
 	}
 
 	return (
-		<div className="flex w-full flex-col gap-4">
+		<div className="flex flex-col w-full gap-4">
 			<Link
 				href="/nasabah"
 				className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
 			>
-				<ArrowLeft className="h-4 w-4" />
+				<ArrowLeft className="w-4 h-4" />
 				Kembali ke Daftar Nasabah
 			</Link>
 
-			{/* Kartu Profil Utama */}
 			<Card>
 				<CardHeader>
-					<div className="flex items-start justify-between gap-4">
+					<div className="flex flex-wrap items-start justify-between gap-4">
 						<div>
 							<div className="flex items-center gap-3">
 								<CardTitle className="text-2xl">{customer.name}</CardTitle>
@@ -78,87 +66,105 @@ export default async function NasabahDetailPage({
 								</Badge>
 							</div>
 							<CardDescription>
-								Nomor Rekening: {customer.accountNumber}
+								Detail informasi dan saldo nasabah.
 							</CardDescription>
 						</div>
-						{/* Tombol Aksi di Header */}
-						<div className="flex gap-2">
-							{/* TODO: Ganti dengan Dialog Aksi Edit Profil */}
-							<Button variant="outline" size="sm">
-								<Edit className="mr-2 h-4 w-4" /> Edit Profil
-							</Button>
-
-							{/* TODO: Ganti dengan Dialog Aksi Aktifkan/Nonaktifkan */}
+						<div className="flex flex-shrink-0 gap-2">
+							<EditNasabahButton customer={customer} />
 							{customer.status === "ACTIVE" ? (
 								<Button variant="destructive" size="sm">
-									<ShieldOff className="mr-2 h-4 w-4" /> Nonaktifkan
+									<ShieldOff className="w-4 h-4 mr-2" /> Nonaktifkan
 								</Button>
 							) : (
 								<Button size="sm">
-									<UserCheck className="mr-2 h-4 w-4" /> Aktifkan
+									<UserCheck className="w-4 h-4 mr-2" /> Aktifkan
 								</Button>
 							)}
 						</div>
 					</div>
 				</CardHeader>
 				<CardContent>
-					{/* Detail Informasi Nasabah */}
-					<div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-						<div>
-							<strong>Nomor KTP:</strong> {customer.idNumber}
+					<div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+						<div className="md:col-span-1">
+							<div className="flex flex-col justify-between p-6 text-white shadow-lg h-52 rounded-xl bg-gradient-to-br from-green-600 to-gray-900">
+								<div>
+									<p className="font-mono text-lg tracking-wider">
+										{customer.accountNumber}
+									</p>
+								</div>
+								<div>
+									<p className="text-xl font-medium">{customer.name}</p>
+								</div>
+							</div>
 						</div>
-						<div>
-							<strong>Jenis Kelamin:</strong>{" "}
-							{customer.gender === "MALE" ? "Laki-laki" : "Perempuan"}
-						</div>
-						<div>
-							<strong>Tanggal Lahir:</strong> {formatDate(customer.birthDate)}
-						</div>
+
+						{/* Kolom Kanan: Detail Informasi */}
 						<div className="md:col-span-2">
-							<strong>Alamat:</strong> {customer.address}
+							<div className="space-y-4">
+								<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+									<div>
+										<strong>Nama:</strong> {customer.name}
+									</div>
+									<div>
+										<strong>Nomor Rekening:</strong> {customer.accountNumber}
+									</div>
+									<div>
+										<strong>NIK:</strong> {customer.idNumber}
+									</div>
+									<div>
+										<strong>Jenis Kelamin:</strong>{" "}
+										{customer.gender === "MALE" ? "Laki-laki" : "Perempuan"}
+									</div>
+									<div>
+										<strong>Tanggal Lahir:</strong>{" "}
+										{formatDate(customer.birthDate)}
+									</div>
+									<div>
+										<strong>No. Telepon:</strong> {customer.phone}
+									</div>
+									<div className="sm:col-span-2">
+										<strong>Alamat:</strong> {customer.address}
+									</div>
+								</div>
+
+								<div className="p-4 border rounded-lg bg-muted">
+									<p className="text-sm text-muted-foreground">Total Saldo</p>
+									<p className="text-2xl font-bold">
+										{formatCurrency(customer.balance)}
+									</p>
+								</div>
+
+								<div className="flex gap-2 mt-4">
+									<Button>
+										<ArrowUpCircle className="w-4 h-4 mr-2" /> Simpan Tunai
+									</Button>
+									<Button variant="outline">
+										<ArrowDownCircle className="w-4 h-4 mr-2" /> Tarik Tunai
+									</Button>
+								</div>
+							</div>
 						</div>
-						<div>
-							<strong>No. Telepon:</strong> {customer.phone}
-						</div>
-						<div className="md:col-span-3 text-xl font-bold">
-							Saldo: {formatCurrency(Number(customer.balance))}
-						</div>
-					</div>
-					{/* Tombol Aksi Transaksi */}
-					<div className="mt-4 flex gap-2">
-						{/* TODO: Ganti dengan Dialog Aksi Simpan/Tarik */}
-						<Button>
-							<Coins className="mr-2 h-4 w-4" /> Simpan / Tarik
-						</Button>
 					</div>
 				</CardContent>
 			</Card>
 
-			{/* Tabs untuk Riwayat Transaksi */}
-			<Tabs defaultValue="transactions">
-				<TabsList>
-					<TabsTrigger value="transactions">Riwayat Transaksi</TabsTrigger>
-				</TabsList>
-				<TabsContent value="transactions">
-					<Card>
-						<CardHeader>
-							<CardTitle>Riwayat Transaksi</CardTitle>
-							<CardDescription>
-								Daftar semua transaksi yang tercatat untuk nasabah ini.
-							</CardDescription>
-						</CardHeader>
-						<CardContent>
-							{/* Suspense untuk menangani loading state dari data transaksi */}
-							<Suspense key={currentPage} fallback={<TableSkeleton />}>
-								<TransactionHistory
-									customerId={customer.id}
-									currentPage={currentPage}
-								/>
-							</Suspense>
-						</CardContent>
-					</Card>
-				</TabsContent>
-			</Tabs>
+			{/* Kartu Riwayat Transaksi (menggantikan Tabs) */}
+			<Card>
+				<CardHeader>
+					<CardTitle>Riwayat Transaksi</CardTitle>
+					<CardDescription>
+						Daftar semua transaksi yang tercatat untuk nasabah ini.
+					</CardDescription>
+				</CardHeader>
+				<CardContent>
+					<Suspense key={currentPage} fallback={<TableSkeleton />}>
+						<TransactionHistory
+							customerId={customer.id}
+							currentPage={currentPage}
+						/>
+					</Suspense>
+				</CardContent>
+			</Card>
 		</div>
 	);
 }

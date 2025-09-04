@@ -1,52 +1,63 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
 	DialogContent,
+	DialogDescription,
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import { PlusCircle, Pencil } from "lucide-react";
 import { NasabahForm } from "./nasabah-form";
-import type { Customer } from "../types";
+import type { Customer, State } from "../types";
+import { updateCustomer } from "../actions"; // Import action update
 
 // Tipe props untuk komponen dialog
 interface NasabahDialogProps {
 	customer?: Customer | null;
 	children: React.ReactNode; // Trigger untuk membuka dialog
+	open?: boolean;
+	onOpenChange?: (open: boolean) => void;
 }
 
 /**
  * Komponen Dialog generik untuk menampilkan form nasabah.
- * Bisa digunakan untuk mode "Create" (jika customer tidak disediakan)
- * atau "Update" (jika customer disediakan).
+ * Bisa digunakan untuk mode "Create" atau "Update".
  */
-export function NasabahDialog({ customer, children }: NasabahDialogProps) {
-	const [open, setOpen] = useState(false);
+export function NasabahDialog({
+	customer,
+	children,
+	open,
+	onOpenChange,
+}: NasabahDialogProps) {
+	const [isOpen, setIsOpen] = useState(open);
 
-	// Fungsi ini akan dipanggil saat form berhasil disubmit
-	// dan action redirect dieksekusi, atau saat dialog ditutup manual.
-	const handleOpenChange = (isOpen: boolean) => {
-		if (!isOpen) {
-			setOpen(false);
-		}
+	useEffect(() => {
+		setIsOpen(open);
+	}, [open]);
+
+	const handleOpenChange = (open: boolean) => {
+		setIsOpen(open);
+		onOpenChange?.(open);
 	};
 
 	return (
-		<Dialog open={open} onOpenChange={handleOpenChange}>
-			<DialogTrigger asChild onClick={() => setOpen(true)}>
-				{children}
-			</DialogTrigger>
+		<Dialog open={isOpen} onOpenChange={handleOpenChange}>
+			<DialogTrigger asChild>{children}</DialogTrigger>
 			<DialogContent className="sm:max-w-[425px]">
 				<DialogHeader>
 					<DialogTitle>
 						{customer ? "Edit Data Nasabah" : "Tambah Nasabah Baru"}
 					</DialogTitle>
+					<DialogDescription>
+						{customer
+							? "Lakukan perubahan pada data profil nasabah."
+							: "Isi formulir di bawah ini untuk mendaftarkan nasabah baru."}
+					</DialogDescription>
 				</DialogHeader>
-				{/* Render form di dalam dialog, teruskan data customer jika ada */}
 				<NasabahForm customer={customer} />
 			</DialogContent>
 		</Dialog>
@@ -54,15 +65,28 @@ export function NasabahDialog({ customer, children }: NasabahDialogProps) {
 }
 
 /**
- * Komponen tombol khusus untuk "Tambah Nasabah".
- * Ini adalah contoh penggunaan NasabahDialog untuk mode "Create".
+ * Tombol untuk membuat nasabah baru.
  */
 export function CreateNasabahButton() {
 	return (
 		<NasabahDialog>
-			<Button>
-				<PlusCircle className="mr-2 h-4 w-4" />
+			<Button className="cursor-pointer">
+				<PlusCircle className="w-4 h-4 mr-2" />
 				Tambah Nasabah
+			</Button>
+		</NasabahDialog>
+	);
+}
+
+/**
+ * Tombol untuk mengedit data nasabah yang sudah ada.
+ */
+export function EditNasabahButton({ customer }: { customer: Customer }) {
+	return (
+		<NasabahDialog customer={customer}>
+			<Button variant="outline" size="sm">
+				<Pencil className="w-4 h-4 mr-2" />
+				Edit Profil
 			</Button>
 		</NasabahDialog>
 	);

@@ -49,7 +49,7 @@ export async function TransactionHistory({
 
 	return (
 		<div className="space-y-4">
-			<div className="rounded-md border">
+			<div className="border rounded-md">
 				<Table>
 					<TableHeader>
 						<TableRow>
@@ -86,7 +86,7 @@ export async function TransactionHistory({
 					</TableBody>
 				</Table>
 			</div>
-			<div className="flex w-full justify-center">
+			<div className="flex justify-center w-full">
 				<Pagination totalPages={totalPages} />
 			</div>
 		</div>

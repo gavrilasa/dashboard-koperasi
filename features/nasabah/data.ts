@@ -1,24 +1,28 @@
-import { PrismaClient } from "@prisma/client";
+// features/nasabah/data.ts
+
+import { PrismaClient, Customer, AccountStatus } from "@prisma/client";
 import { unstable_noStore as noStore } from "next/cache";
 
 const prisma = new PrismaClient();
-
 const ITEMS_PER_PAGE = 10;
 
-/**
- * Mengambil data nasabah dari database dengan filter pencarian dan paginasi.
- * Mengurutkan berdasarkan status (Aktif lebih dulu) lalu tanggal dibuat.
- */
+export type SafeCustomer = Omit<Customer, "balance"> & {
+	balance: number;
+};
+
 export async function fetchFilteredCustomers(
 	query: string,
-	currentPage: number
-) {
-	noStore(); // Mencegah caching untuk data yang sering berubah
+	currentPage: number,
+	status?: AccountStatus
+): Promise<SafeCustomer[]> {
+	noStore();
 	const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
 	try {
 		const customers = await prisma.customer.findMany({
 			where: {
+				// Tambahkan filter status jika ada
+				status: status ? { equals: status } : undefined,
 				OR: [
 					{ name: { contains: query, mode: "insensitive" } },
 					{ accountNumber: { contains: query, mode: "insensitive" } },
@@ -29,16 +33,16 @@ export async function fetchFilteredCustomers(
 			skip: offset,
 		});
 
-		return customers;
+		return customers.map((customer) => ({
+			...customer,
+			balance: customer.balance.toNumber(),
+		}));
 	} catch (error) {
 		console.error("Database Error:", error);
 		throw new Error("Gagal mengambil data nasabah.");
 	}
 }
 
-/**
- * Menghitung total jumlah halaman untuk paginasi nasabah berdasarkan query pencarian.
- */
 export async function fetchCustomersPages(query: string) {
 	noStore();
 	try {
@@ -59,32 +63,29 @@ export async function fetchCustomersPages(query: string) {
 	}
 }
 
-// --- FUNGSI TAMBAHAN UNTUK HALAMAN DETAIL ---
-
-/**
- * Mengambil data profil lengkap dari satu nasabah berdasarkan ID.
- * @param id - ID unik nasabah.
- * @returns Objek data nasabah atau null jika tidak ditemukan.
- */
-export async function fetchCustomerById(id: string) {
+export async function fetchCustomerById(
+	id: string
+): Promise<SafeCustomer | null> {
 	noStore();
 	try {
 		const customer = await prisma.customer.findUnique({
 			where: { id },
 		});
-		return customer;
+
+		if (!customer) {
+			return null;
+		}
+
+		return {
+			...customer,
+			balance: customer.balance.toNumber(),
+		};
 	} catch (error) {
 		console.error("Database Error:", error);
 		throw new Error("Gagal mengambil detail profil nasabah.");
 	}
 }
 
-/**
- * Mengambil riwayat transaksi untuk satu nasabah dengan paginasi.
- * @param customerId - ID nasabah yang transaksinya ingin diambil.
- * @param currentPage - Halaman saat ini untuk paginasi transaksi.
- * @returns Array dari data transaksi nasabah.
- */
 export async function fetchCustomerTransactions(
 	customerId: string,
 	currentPage: number
@@ -106,11 +107,6 @@ export async function fetchCustomerTransactions(
 	}
 }
 
-/**
- * Menghitung total halaman untuk paginasi riwayat transaksi nasabah.
- * @param customerId - ID nasabah.
- * @returns Total jumlah halaman transaksi.
- */
 export async function fetchCustomerTransactionPages(customerId: string) {
 	noStore();
 	try {

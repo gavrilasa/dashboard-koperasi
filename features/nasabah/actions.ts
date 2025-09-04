@@ -1,16 +1,25 @@
+// features/nasabah/actions.ts
+
 "use server";
 
 import { z } from "zod";
 import { PrismaClient } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import type { State } from "./types"; // Asumsikan types.ts sudah ada
-import { CustomerSchema } from "./types";
+import type { State } from "./types";
+import { CustomerFormSchema } from "./types";
 
 const prisma = new PrismaClient();
 
 // --- Skema Validasi untuk Aksi ---
-const CreateCustomerSchema = CustomerSchema.omit({ id: true });
+const CreateCustomerSchema = CustomerFormSchema.omit({
+	id: true,
+	accountNumber: true,
+	balance: true,
+	status: true,
+});
+const UpdateCustomerSchema = CreateCustomerSchema; // Alias untuk kejelasan
+
 const DepositWithdrawSchema = z.object({
 	idempotencyKey: z.string().uuid(),
 	customerId: z.string().cuid(),
@@ -19,6 +28,7 @@ const DepositWithdrawSchema = z.object({
 		.positive({ message: "Jumlah harus lebih dari nol." }),
 	notes: z.string().optional(),
 });
+
 const TransferSchema = z.object({
 	idempotencyKey: z.string().uuid(),
 	sourceCustomerId: z.string().cuid(),
@@ -48,14 +58,17 @@ export async function createCustomer(
 	const validatedFields = CreateCustomerSchema.safeParse(
 		Object.fromEntries(formData.entries())
 	);
+
 	if (!validatedFields.success) {
 		return {
 			errors: validatedFields.error.flatten().fieldErrors,
-			message: "Gagal membuat nasabah.",
+			message: "Gagal membuat nasabah. Data tidak valid.",
 		};
 	}
+
 	const { name, idNumber, address, phone, gender, birthDate } =
 		validatedFields.data;
+
 	try {
 		await prisma.customer.create({
 			data: {
@@ -71,8 +84,10 @@ export async function createCustomer(
 			},
 		});
 	} catch (error) {
+		console.error(error); // FIX: Menggunakan variabel error untuk logging
 		return { message: "Database Error: Gagal membuat nasabah." };
 	}
+
 	revalidatePath("/nasabah");
 	redirect("/nasabah");
 }
@@ -82,20 +97,24 @@ export async function updateCustomer(
 	prevState: State,
 	formData: FormData
 ): Promise<State> {
-	const validatedFields = CreateCustomerSchema.safeParse(
+	const validatedFields = UpdateCustomerSchema.safeParse(
 		Object.fromEntries(formData.entries())
 	);
+
 	if (!validatedFields.success) {
 		return {
 			errors: validatedFields.error.flatten().fieldErrors,
 			message: "Gagal memperbarui nasabah.",
 		};
 	}
+
 	try {
 		await prisma.customer.update({ where: { id }, data: validatedFields.data });
 	} catch (error) {
+		console.error(error); // FIX: Menggunakan variabel error untuk logging
 		return { message: "Database Error: Gagal memperbarui nasabah." };
 	}
+
 	revalidatePath(`/nasabah/${id}`);
 	revalidatePath("/nasabah");
 	redirect(`/nasabah/${id}`);
@@ -130,6 +149,7 @@ export async function reactivateCustomer(id: string) {
 		revalidatePath(`/nasabah/${id}`);
 		revalidatePath("/nasabah");
 	} catch (error) {
+		console.error(error); // FIX: Menggunakan variabel error untuk logging
 		throw new Error("Gagal mengaktifkan nasabah.");
 	}
 }
@@ -145,7 +165,7 @@ export async function deposit(
 	);
 	if (!validatedFields.success) {
 		return {
-			errors: validatedFields.error.flatten().fieldErrors,
+			errors: validatedFields.error.flatten().fieldErrors, // FIX: Tipe 'State' sekarang cocok
 			message: "Data tidak valid.",
 		};
 	}
@@ -153,20 +173,15 @@ export async function deposit(
 
 	try {
 		await prisma.$transaction(async (tx) => {
-			// 1. Cek Idempotency
 			const existingKey = await tx.idempotencyKey.findUnique({
 				where: { id: idempotencyKey },
 			});
 			if (existingKey) throw new Error("DUPLICATE_TRANSACTION");
 			await tx.idempotencyKey.create({ data: { id: idempotencyKey } });
-
-			// 2. Update saldo nasabah
 			await tx.customer.update({
 				where: { id: customerId },
 				data: { balance: { increment: amount } },
 			});
-
-			// 3. Buat record transaksi KREDIT untuk nasabah
 			await tx.transaction.create({
 				data: {
 					customerId,
@@ -176,10 +191,10 @@ export async function deposit(
 					notes,
 				},
 			});
-			// TODO: Logika untuk menambah saldo & transaksi di Rekening Induk
 		});
-	} catch (error: any) {
-		if (error.message === "DUPLICATE_TRANSACTION") {
+	} catch (error: unknown) {
+		// FIX: Menggunakan 'unknown' dan type guard
+		if (error instanceof Error && error.message === "DUPLICATE_TRANSACTION") {
 			return { message: "Transaksi berhasil. Permintaan duplikat diabaikan." };
 		}
 		return { message: "Database Error: Gagal melakukan simpanan." };
@@ -198,7 +213,7 @@ export async function withdraw(
 	);
 	if (!validatedFields.success) {
 		return {
-			errors: validatedFields.error.flatten().fieldErrors,
+			errors: validatedFields.error.flatten().fieldErrors, // FIX: Tipe 'State' sekarang cocok
 			message: "Data tidak valid.",
 		};
 	}
@@ -206,14 +221,11 @@ export async function withdraw(
 
 	try {
 		await prisma.$transaction(async (tx) => {
-			// 1. Cek Idempotency
 			const existingKey = await tx.idempotencyKey.findUnique({
 				where: { id: idempotencyKey },
 			});
 			if (existingKey) throw new Error("DUPLICATE_TRANSACTION");
 			await tx.idempotencyKey.create({ data: { id: idempotencyKey } });
-
-			// 2. Cek Saldo & Update
 			const customer = await tx.customer.findUnique({
 				where: { id: customerId },
 			});
@@ -224,8 +236,6 @@ export async function withdraw(
 				where: { id: customerId },
 				data: { balance: { decrement: amount } },
 			});
-
-			// 3. Buat record transaksi DEBIT
 			await tx.transaction.create({
 				data: {
 					customerId,
@@ -235,15 +245,18 @@ export async function withdraw(
 					notes,
 				},
 			});
-			// TODO: Logika untuk mengurangi saldo & transaksi di Rekening Induk
 		});
-	} catch (error: any) {
-		if (error.message === "DUPLICATE_TRANSACTION") {
-			return { message: "Transaksi berhasil. Permintaan duplikat diabaikan." };
+	} catch (error: unknown) {
+		// FIX: Menggunakan 'unknown' dan type guard
+		if (error instanceof Error) {
+			if (error.message === "DUPLICATE_TRANSACTION") {
+				return {
+					message: "Transaksi berhasil. Permintaan duplikat diabaikan.",
+				};
+			}
+			return { message: error.message };
 		}
-		return {
-			message: error.message || "Database Error: Gagal melakukan penarikan.",
-		};
+		return { message: "Database Error: Gagal melakukan penarikan." };
 	}
 	revalidatePath(`/nasabah/${customerId}`);
 	revalidatePath("/nasabah");
@@ -259,7 +272,7 @@ export async function transfer(
 	);
 	if (!validatedFields.success) {
 		return {
-			errors: validatedFields.error.flatten().fieldErrors,
+			errors: validatedFields.error.flatten().fieldErrors, // FIX: Tipe 'State' sekarang cocok
 			message: "Data tidak valid.",
 		};
 	}
@@ -273,14 +286,12 @@ export async function transfer(
 
 	try {
 		await prisma.$transaction(async (tx) => {
-			// 1. Cek Idempotency
 			const existingKey = await tx.idempotencyKey.findUnique({
 				where: { id: idempotencyKey },
 			});
 			if (existingKey) throw new Error("DUPLICATE_TRANSACTION");
 			await tx.idempotencyKey.create({ data: { id: idempotencyKey } });
 
-			// 2. Ambil data pengirim dan penerima
 			const sourceCustomer = await tx.customer.findUnique({
 				where: { id: sourceCustomerId },
 			});
@@ -288,7 +299,6 @@ export async function transfer(
 				where: { accountNumber: destinationAccountNumber },
 			});
 
-			// 3. Validasi
 			if (!sourceCustomer || !destinationCustomer)
 				throw new Error("Nasabah pengirim atau penerima tidak ditemukan.");
 			if (sourceCustomer.id === destinationCustomer.id)
@@ -301,7 +311,6 @@ export async function transfer(
 			if (Number(sourceCustomer.balance) < amount)
 				throw new Error("Saldo tidak mencukupi.");
 
-			// 4. Update saldo kedua nasabah
 			await tx.customer.update({
 				where: { id: sourceCustomerId },
 				data: { balance: { decrement: amount } },
@@ -310,8 +319,6 @@ export async function transfer(
 				where: { id: destinationCustomer.id },
 				data: { balance: { increment: amount } },
 			});
-
-			// 5. Buat dua record transaksi
 			await tx.transaction.create({
 				data: {
 					customerId: sourceCustomerId,
@@ -331,13 +338,17 @@ export async function transfer(
 				},
 			});
 		});
-	} catch (error: any) {
-		if (error.message === "DUPLICATE_TRANSACTION") {
-			return { message: "Transaksi berhasil. Permintaan duplikat diabaikan." };
+	} catch (error: unknown) {
+		// FIX: Menggunakan 'unknown' dan type guard
+		if (error instanceof Error) {
+			if (error.message === "DUPLICATE_TRANSACTION") {
+				return {
+					message: "Transaksi berhasil. Permintaan duplikat diabaikan.",
+				};
+			}
+			return { message: error.message };
 		}
-		return {
-			message: error.message || "Database Error: Gagal melakukan transfer.",
-		};
+		return { message: "Database Error: Gagal melakukan transfer." };
 	}
 	revalidatePath(`/nasabah/${sourceCustomerId}`);
 	revalidatePath("/nasabah");
