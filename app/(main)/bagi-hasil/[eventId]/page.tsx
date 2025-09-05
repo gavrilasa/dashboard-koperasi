@@ -1,3 +1,5 @@
+// app/(main)/bagi-hasil/[eventId]/page.tsx
+
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
@@ -17,14 +19,12 @@ export const metadata = {
 	title: "Detail Bagi Hasil",
 };
 
-// Definisikan tipe untuk props halaman ini secara eksplisit
-type BagiHasilDetailPageProps = {
-	params: { eventId: string };
-};
-
+// FIX: Define the props type inline for compatibility
 export default async function BagiHasilDetailPage({
 	params,
-}: BagiHasilDetailPageProps) {
+}: {
+	params: { eventId: string };
+}) {
 	const eventId = params.eventId;
 	const eventDetails = await fetchProfitSharingEventDetails(eventId);
 
