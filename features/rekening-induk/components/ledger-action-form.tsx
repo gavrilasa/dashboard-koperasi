@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { topUpMainAccount, withdrawMainAccount } from "../actions";
-import type { State } from "@/features/nasabah/types";
+import type { ActionState } from "@/features/nasabah/types";
 
 interface LedgerActionFormProps {
 	type: "deposit" | "withdraw";
@@ -39,7 +39,7 @@ function SubmitButton({ type }: { type: "deposit" | "withdraw" }) {
 export function LedgerActionForm({ type, onSuccess }: LedgerActionFormProps) {
 	const actionToUse =
 		type === "deposit" ? topUpMainAccount : withdrawMainAccount;
-	const initialState: State = { message: null, errors: {} };
+	const initialState: ActionState = { message: null, errors: {} };
 	const [state, formAction] = useActionState(actionToUse, initialState);
 
 	useEffect(() => {

@@ -14,6 +14,19 @@ export const formatCurrency = (amount: number | bigint): string => {
 	}).format(amount);
 };
 
+export const formatCompactCurrency = (amount: number): string => {
+	if (Math.abs(amount) >= 1_000_000_000) {
+		return `Rp ${(Math.abs(amount) / 1_000_000_000).toFixed(2)} M`;
+	}
+	if (Math.abs(amount) >= 1_000_000) {
+		return `Rp ${(Math.abs(amount) / 1_000_000).toFixed(1)} Jt`;
+	}
+	if (Math.abs(amount) >= 1_000) {
+		return `Rp ${(Math.abs(amount) / 1_000).toFixed(0)} Rb`;
+	}
+	return `Rp ${amount.toString()}`;
+};
+
 export const formatDate = (date: string | number | Date): string => {
 	const dateObj = new Date(date);
 	if (isNaN(dateObj.getTime())) {

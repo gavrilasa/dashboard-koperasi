@@ -12,8 +12,8 @@ import {
 } from "@/components/ui/dialog";
 import { PlusCircle, Pencil } from "lucide-react";
 import { NasabahForm } from "./nasabah-form";
-import type { Customer, State } from "../types";
-import { updateCustomer } from "../actions"; // Import action update
+import type { Customer } from "../types";
+// import { updateCustomer } from "../actions";
 
 // Tipe props untuk komponen dialog
 interface NasabahDialogProps {

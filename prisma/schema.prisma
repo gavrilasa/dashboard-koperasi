@@ -142,3 +142,10 @@ model ProfitSharingEvent {
 
   recipientTransactions Transaction[]
 }
+
+model DailyBalanceSnapshot {
+  id        String   @id @default(cuid())
+  date      DateTime @unique @db.Date
+  balance   Decimal  @db.Decimal(15, 2)
+  createdAt DateTime @default(now())
+}
