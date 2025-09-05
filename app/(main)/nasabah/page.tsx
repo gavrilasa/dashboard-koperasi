@@ -1,12 +1,9 @@
 // app/(main)/nasabah/page.tsx
 
-import {
-	fetchFilteredCustomers,
-	fetchCustomersPages,
-} from "@/features/nasabah/data";
+import { fetchFilteredCustomers } from "@/features/nasabah/data";
 import { CreateNasabahButton } from "@/features/nasabah/components/nasabah-dialogs";
 import { Search } from "@/components/shared/search";
-import { DataTable } from "@/features/nasabah/components/data-table";
+import { DataTable } from "@/components/shared/data-table";
 import { columns } from "@/features/nasabah/components/columns";
 
 export const metadata = {

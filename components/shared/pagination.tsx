@@ -53,23 +53,23 @@ export function Pagination({ totalPages }: { totalPages: number }) {
 			<Button
 				asChild
 				variant="outline"
-				className="hidden h-8 w-8 p-0 sm:flex"
+				className="hidden w-8 h-8 p-0 sm:flex"
 				disabled={currentPage <= 1}
 			>
 				<Link href={createPageURL(1)}>
 					<span className="sr-only">Halaman pertama</span>
-					<ChevronsLeft className="h-4 w-4" />
+					<ChevronsLeft className="w-4 h-4" />
 				</Link>
 			</Button>
 			<Button
 				asChild
 				variant="outline"
-				className="h-8 w-8 p-0"
+				className="w-8 h-8 p-0"
 				disabled={currentPage <= 1}
 			>
 				<Link href={createPageURL(currentPage - 1)}>
 					<span className="sr-only">Halaman sebelumnya</span>
-					<ChevronLeft className="h-4 w-4" />
+					<ChevronLeft className="w-4 h-4" />
 				</Link>
 			</Button>
 
@@ -87,7 +87,7 @@ export function Pagination({ totalPages }: { totalPages: number }) {
 							key={index}
 							asChild
 							variant={currentPage === page ? "default" : "outline"}
-							className="h-8 w-8 p-0"
+							className="w-8 h-8 p-0"
 						>
 							<Link href={createPageURL(page)}>{page}</Link>
 						</Button>
@@ -98,23 +98,23 @@ export function Pagination({ totalPages }: { totalPages: number }) {
 			<Button
 				asChild
 				variant="outline"
-				className="h-8 w-8 p-0"
+				className="w-8 h-8 p-0"
 				disabled={currentPage >= totalPages}
 			>
 				<Link href={createPageURL(currentPage + 1)}>
 					<span className="sr-only">Halaman berikutnya</span>
-					<ChevronRight className="h-4 w-4" />
+					<ChevronRight className="w-4 h-4" />
 				</Link>
 			</Button>
 			<Button
 				asChild
 				variant="outline"
-				className="hidden h-8 w-8 p-0 sm:flex"
+				className="hidden w-8 h-8 p-0 sm:flex"
 				disabled={currentPage >= totalPages}
 			>
 				<Link href={createPageURL(totalPages)}>
 					<span className="sr-only">Halaman terakhir</span>
-					<ChevronsRight className="h-4 w-4" />
+					<ChevronsRight className="w-4 h-4" />
 				</Link>
 			</Button>
 		</div>

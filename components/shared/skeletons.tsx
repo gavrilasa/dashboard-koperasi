@@ -10,7 +10,7 @@ import {
 
 export function TableSkeleton() {
 	return (
-		<div className="rounded-md border">
+		<div className="border rounded-md">
 			<Table>
 				<TableHeader>
 					<TableRow>
@@ -24,23 +24,22 @@ export function TableSkeleton() {
 					</TableRow>
 				</TableHeader>
 				<TableBody>
-					{/* Membuat 5 baris skeleton sebagai placeholder */}
 					{Array.from({ length: 5 }).map((_, index) => (
 						<TableRow key={index}>
 							<TableCell>
-								<Skeleton className="h-4 w-32" />
+								<Skeleton className="w-32 h-4" />
 							</TableCell>
 							<TableCell>
-								<Skeleton className="h-4 w-40" />
+								<Skeleton className="w-40 h-4" />
 							</TableCell>
 							<TableCell className="hidden md:table-cell">
-								<Skeleton className="h-4 w-full" />
+								<Skeleton className="w-full h-4" />
 							</TableCell>
 							<TableCell>
-								<Skeleton className="h-4 w-32" />
+								<Skeleton className="w-32 h-4" />
 							</TableCell>
 							<TableCell>
-								<Skeleton className="h-8 w-8 rounded-md" />
+								<Skeleton className="w-8 h-8 rounded-md" />
 							</TableCell>
 						</TableRow>
 					))}

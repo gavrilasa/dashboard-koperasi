@@ -5,23 +5,14 @@ import { useSearchParams, usePathname, useRouter } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
 import { Input } from "@/components/ui/input";
 
-/**
- * Komponen input pencarian yang memperbarui parameter 'query' di URL.
- * Didesain untuk digunakan di Server Pages yang membaca 'searchParams'.
- */
 export function Search({ placeholder }: { placeholder: string }) {
 	const searchParams = useSearchParams();
 	const pathname = usePathname();
 	const { replace } = useRouter();
-
-	// Gunakan useDebouncedCallback untuk menunda eksekusi handleSearch
-	// Ini mencegah pemanggilan database pada setiap ketikan
 	const handleSearch = useDebouncedCallback((term: string) => {
 		console.log(`Searching for... ${term}`);
 
 		const params = new URLSearchParams(searchParams);
-
-		// Reset ke halaman pertama setiap kali ada query pencarian baru
 		params.set("page", "1");
 
 		if (term) {
@@ -30,9 +21,8 @@ export function Search({ placeholder }: { placeholder: string }) {
 			params.delete("query");
 		}
 
-		// Ganti URL saat ini dengan URL yang baru termasuk query pencarian
 		replace(`${pathname}?${params.toString()}`);
-	}, 300); // Tunda 300ms
+	}, 300);
 
 	return (
 		<div className="relative flex-1 md:grow-0">
@@ -44,7 +34,6 @@ export function Search({ placeholder }: { placeholder: string }) {
 				onChange={(e) => {
 					handleSearch(e.target.value);
 				}}
-				// Pastikan input menampilkan query dari URL saat halaman dimuat
 				defaultValue={searchParams.get("query")?.toString()}
 			/>
 		</div>

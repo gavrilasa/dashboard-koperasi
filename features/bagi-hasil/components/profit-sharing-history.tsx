@@ -6,9 +6,8 @@ import {
 	fetchProfitSharingPages,
 } from "@/features/bagi-hasil/data";
 import { columns } from "./columns";
-import { DataTable } from "./data-table"; // Menggunakan data-table lokal
+import { DataTable } from "@/components/shared/data-table";
 import { Search } from "@/components/shared/search";
-import { Pagination } from "@/components/shared/pagination";
 import { TableSkeleton } from "@/components/shared/skeletons";
 import {
 	Card,
@@ -27,7 +26,7 @@ export async function ProfitSharingHistory({
 	query,
 	currentPage,
 }: ProfitSharingHistoryProps) {
-	const [events, totalPages] = await Promise.all([
+	const [events] = await Promise.all([
 		fetchProfitSharingEvents(query, currentPage),
 		fetchProfitSharingPages(query),
 	]);
@@ -47,9 +46,6 @@ export async function ProfitSharingHistory({
 				<Suspense key={query + currentPage} fallback={<TableSkeleton />}>
 					<DataTable columns={columns} data={events} />
 				</Suspense>
-				<div className="flex justify-center w-full">
-					<Pagination totalPages={totalPages} />
-				</div>
 			</CardContent>
 		</Card>
 	);
