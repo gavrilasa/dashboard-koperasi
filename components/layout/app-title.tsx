@@ -1,17 +1,14 @@
 "use client";
 
-import Link from "next/link"; // Mengganti impor dari @tanstack/react-router
-import { Menu, X } from "lucide-react";
-import { cn } from "@/lib/utils";
+import Link from "next/link";
 import {
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
 	useSidebar,
 } from "@/components/ui/sidebar";
-import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
-// Komponen untuk menampilkan judul aplikasi di sidebar
 export function AppTitle() {
 	const { setOpenMobile } = useSidebar();
 	return (
@@ -19,50 +16,26 @@ export function AppTitle() {
 			<SidebarMenuItem>
 				<SidebarMenuButton
 					size="lg"
-					className="gap-0 py-0 hover:bg-transparent active:bg-transparent"
+					className="justify-center gap-0 py-2 hover:bg-transparent active:bg-transparent"
 					asChild
 				>
 					<div>
 						<Link
-							href="/dashboard" // Menggunakan href bukan 'to'
+							href="/"
 							onClick={() => setOpenMobile(false)}
-							className="grid flex-1 text-start text-sm leading-tight"
+							className="flex items-center justify-center"
 						>
-							<span className="truncate font-bold">Dasbor Koperasi</span>
-							<span className="truncate text-xs">Manajemen Panel</span>
+							<Image
+								src="/LogoKoperasi.png"
+								width={100}
+								height={20}
+								alt="Logo Koperasi"
+								className="object-contain h-auto max-w-full"
+							/>
 						</Link>
-						<ToggleSidebar />
 					</div>
 				</SidebarMenuButton>
 			</SidebarMenuItem>
 		</SidebarMenu>
-	);
-}
-
-// Komponen terpisah untuk tombol toggle sidebar
-function ToggleSidebar({
-	className,
-	onClick,
-	...props
-}: React.ComponentProps<typeof Button>) {
-	const { toggleSidebar } = useSidebar();
-
-	return (
-		<Button
-			data-sidebar="trigger"
-			data-slot="sidebar-trigger"
-			variant="ghost"
-			size="icon"
-			className={cn("aspect-square size-8 max-md:scale-125", className)}
-			onClick={(event) => {
-				onClick?.(event);
-				toggleSidebar();
-			}}
-			{...props}
-		>
-			<X className="md:hidden" />
-			<Menu className="max-md:hidden" />
-			<span className="sr-only">Toggle Sidebar</span>
-		</Button>
 	);
 }

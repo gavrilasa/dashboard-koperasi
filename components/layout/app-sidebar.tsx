@@ -4,7 +4,7 @@ import {
 	Sidebar,
 	SidebarContent,
 	SidebarHeader,
-	SidebarFooter, // Hapus atau biarkan kosong
+	SidebarFooter,
 	SidebarRail,
 } from "@/components/ui/sidebar";
 import { navData } from "@/data/nav";

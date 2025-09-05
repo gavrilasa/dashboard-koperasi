@@ -1,90 +1,101 @@
 "use client";
 
-import Link from "next/link";
-import {
-	Bell,
-	ChevronsUpDown,
-	CreditCard,
-	LogOut,
-	Settings,
-} from "lucide-react";
+import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
-	DropdownMenuGroup,
 	DropdownMenuItem,
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
+	DropdownMenuShortcut,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-	SidebarMenu,
-	SidebarMenuButton,
-	SidebarMenuItem,
-	useSidebar,
-} from "@/components/ui/sidebar";
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { signOutAction } from "@/lib/actions/auth-actions";
 
-const user = {
-	name: "Admin Koperasi",
-	email: "admin@koperasi.dev",
-	avatar: "/avatars/placeholder.png",
-};
+function SignOutDialog({
+	open,
+	onOpenChange,
+}: {
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
+}) {
+	return (
+		<AlertDialog open={open} onOpenChange={onOpenChange}>
+			<AlertDialogContent>
+				<AlertDialogHeader>
+					<AlertDialogTitle>
+						Are you sure you want to sign out?
+					</AlertDialogTitle>
+					<AlertDialogDescription>
+						You will be returned to the login page.
+					</AlertDialogDescription>
+				</AlertDialogHeader>
+				<AlertDialogFooter>
+					<AlertDialogCancel>Cancel</AlertDialogCancel>
+					<form action={signOutAction} className="w-full">
+						<AlertDialogAction type="submit" className="w-full">
+							Sign Out
+						</AlertDialogAction>
+					</form>
+				</AlertDialogFooter>
+			</AlertDialogContent>
+		</AlertDialog>
+	);
+}
 
 export function NavUser() {
-	const { isMobile } = useSidebar();
+	const [open, setOpen] = useState(false);
 
 	return (
-		<SidebarMenu>
-			<SidebarMenuItem>
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<SidebarMenuButton
-							size="lg"
-							className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-						>
-							<Avatar className="h-8 w-8 rounded-lg">
-								<AvatarImage src={user.avatar} alt={user.name} />
-								<AvatarFallback className="rounded-lg">AK</AvatarFallback>
-							</Avatar>
-							<div className="grid flex-1 text-start text-sm leading-tight">
-								<span className="truncate font-semibold">{user.name}</span>
-								<span className="truncate text-xs">{user.email}</span>
-							</div>
-							<ChevronsUpDown className="ms-auto size-4" />
-						</SidebarMenuButton>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent
-						className="w-[var(--radix-dropdown-menu-trigger-width)] min-w-56 rounded-lg"
-						side={isMobile ? "bottom" : "right"}
-						align="end"
-						sideOffset={4}
+		<>
+			<DropdownMenu modal={false}>
+				<DropdownMenuTrigger asChild>
+					<Button
+						variant="ghost"
+						className="relative w-8 h-8 rounded-full cursor-pointer"
 					>
-						<DropdownMenuLabel className="p-0 font-normal">
-							<div className="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
-								<Avatar className="h-8 w-8 rounded-lg">
-									<AvatarImage src={user.avatar} alt={user.name} />
-									<AvatarFallback className="rounded-lg">AK</AvatarFallback>
-								</Avatar>
-								<div className="grid flex-1 text-start text-sm leading-tight">
-									<span className="truncate font-semibold">{user.name}</span>
-									<span className="truncate text-xs">{user.email}</span>
-								</div>
-							</div>
-						</DropdownMenuLabel>
-						<DropdownMenuSeparator />
-						<form action={signOutAction}>
-							<DropdownMenuItem asChild>
-								<button type="submit" className="w-full">
-									<LogOut />
-									Sign out
-								</button>
-							</DropdownMenuItem>
-						</form>
-					</DropdownMenuContent>
-				</DropdownMenu>
-			</SidebarMenuItem>
-		</SidebarMenu>
+						<Avatar className="w-8 h-8">
+							<AvatarImage
+								src="/avatars/01.png"
+								alt="admin"
+								className="text-white bg-green-800"
+							/>
+							<AvatarFallback className="text-white bg-green-800">
+								AD
+							</AvatarFallback>
+						</Avatar>
+					</Button>
+				</DropdownMenuTrigger>
+				<DropdownMenuContent className="w-56" align="end" forceMount>
+					<DropdownMenuLabel className="font-normal">
+						<div className="flex flex-col gap-1.5">
+							<p className="text-sm font-medium leading-none">Admin</p>
+							<p className="text-xs leading-none text-muted-foreground">
+								admin@dev.com
+							</p>
+						</div>
+					</DropdownMenuLabel>
+					<DropdownMenuSeparator />
+					<DropdownMenuItem onClick={() => setOpen(true)}>
+						Sign out
+						<DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+					</DropdownMenuItem>
+				</DropdownMenuContent>
+			</DropdownMenu>
+
+			<SignOutDialog open={!!open} onOpenChange={setOpen} />
+		</>
 	);
 }

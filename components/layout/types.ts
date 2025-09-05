@@ -28,3 +28,18 @@ export type NavGroup = {
 	title: string;
 	items: NavItem[];
 };
+
+export type AuthenticatedLayoutProps = {
+	children?: React.ReactNode;
+};
+
+export type HeaderProps = React.HTMLAttributes<HTMLElement> & {
+	fixed?: boolean;
+	ref?: React.Ref<HTMLElement>;
+};
+
+export type MainProps = React.HTMLAttributes<HTMLElement> & {
+	fixed?: boolean;
+	fluid?: boolean;
+	ref?: React.Ref<HTMLElement>;
+};

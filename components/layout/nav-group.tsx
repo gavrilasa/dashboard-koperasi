@@ -1,8 +1,8 @@
 "use client";
 
 import { type ReactNode } from "react";
-import Link from "next/link"; // Menggunakan Link dari Next.js
-import { usePathname } from "next/navigation"; // Menggunakan hook dari Next.js
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ChevronRight } from "lucide-react";
 import {
 	Collapsible,
@@ -34,22 +34,23 @@ import {
 	type NavItem,
 	type NavLink,
 	type NavGroup as NavGroupProps,
-} from "./types"; // Pastikan file types.ts ada dan benar
+} from "./types";
 
-// Fungsi untuk memeriksa apakah sebuah link navigasi aktif
-function checkIsActive(pathname: string, item: NavItem, mainNav = false) {
+function checkIsActive(pathname: string, item: NavItem) {
 	if (!item.url) {
-		// Jika item adalah collapsible group, periksa apakah ada sub-item yang aktif
 		return !!item.items?.some((subItem) => pathname.startsWith(subItem.url));
 	}
 
-	// Jika item adalah link biasa, periksa apakah pathname dimulai dengan URL item
+	if (item.url === "/") {
+		return pathname === "/";
+	}
+
 	return pathname.startsWith(item.url);
 }
 
 export function NavGroup({ title, items }: NavGroupProps) {
 	const { state, isMobile } = useSidebar();
-	const pathname = usePathname(); // Mendapatkan path URL saat ini
+	const pathname = usePathname();
 	return (
 		<SidebarGroup>
 			<SidebarGroupLabel>{title}</SidebarGroupLabel>
@@ -89,7 +90,7 @@ export function NavGroup({ title, items }: NavGroupProps) {
 }
 
 function NavBadge({ children }: { children: ReactNode }) {
-	return <Badge className="rounded-full px-1 py-0 text-xs">{children}</Badge>;
+	return <Badge className="px-1 py-0 text-xs rounded-full">{children}</Badge>;
 }
 
 function SidebarMenuLink({
@@ -128,7 +129,7 @@ function SidebarMenuCollapsible({
 	return (
 		<Collapsible
 			asChild
-			defaultOpen={checkIsActive(pathname, item, true)}
+			defaultOpen={checkIsActive(pathname, item)}
 			className="group/collapsible"
 		>
 			<SidebarMenuItem>
@@ -200,7 +201,7 @@ function SidebarMenuCollapsedDropdown({
 								{sub.icon && <sub.icon />}
 								<span className="max-w-52 text-wrap">{sub.title}</span>
 								{sub.badge && (
-									<span className="ms-auto text-xs">{sub.badge}</span>
+									<span className="text-xs ms-auto">{sub.badge}</span>
 								)}
 							</Link>
 						</DropdownMenuItem>
