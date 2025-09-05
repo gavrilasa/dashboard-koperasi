@@ -1,5 +1,3 @@
-// app/(main)/bagi-hasil/[eventId]/page.tsx
-
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
@@ -19,11 +17,14 @@ export const metadata = {
 	title: "Detail Bagi Hasil",
 };
 
+// Definisikan tipe untuk props halaman ini secara eksplisit
+type BagiHasilDetailPageProps = {
+	params: { eventId: string };
+};
+
 export default async function BagiHasilDetailPage({
 	params,
-}: {
-	params: { eventId: string };
-}) {
+}: BagiHasilDetailPageProps) {
 	const eventId = params.eventId;
 	const eventDetails = await fetchProfitSharingEventDetails(eventId);
 
@@ -31,13 +32,11 @@ export default async function BagiHasilDetailPage({
 		notFound();
 	}
 
-	// 👇 **FIX APPLIED HERE:** Convert Decimal to number during data transformation.
 	const recipients = eventDetails.recipientTransactions.map((tx) => ({
 		...tx.customer,
-		amountReceived: tx.amount.toNumber(), // Convert Decimal to number here
+		amountReceived: tx.amount.toNumber(),
 	}));
 
-	// Proactive fix: create a safe version for the summary card as well.
 	const safeEventSummary = {
 		...eventDetails,
 		totalAmountShared: eventDetails.totalAmountShared.toNumber(),
