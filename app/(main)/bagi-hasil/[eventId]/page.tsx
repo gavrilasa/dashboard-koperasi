@@ -19,12 +19,13 @@ export const metadata = {
 	title: "Detail Bagi Hasil",
 };
 
-// FIX: Define the props type inline for compatibility
+interface BagiHasilDetailPageProps {
+	params: { eventId: string };
+}
+
 export default async function BagiHasilDetailPage({
 	params,
-}: {
-	params: { eventId: string };
-}) {
+}: BagiHasilDetailPageProps) {
 	const eventId = params.eventId;
 	const eventDetails = await fetchProfitSharingEventDetails(eventId);
 
