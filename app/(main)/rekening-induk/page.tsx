@@ -34,7 +34,6 @@ export const metadata = {
 	title: "Rekening Induk",
 };
 
-// Fungsi helper untuk format tanggal dan waktu
 const formatDateTime = (date: Date) => {
 	return new Intl.DateTimeFormat("id-ID", {
 		dateStyle: "medium",
@@ -42,9 +41,6 @@ const formatDateTime = (date: Date) => {
 	}).format(date);
 };
 
-/**
- * Komponen Server untuk menampilkan tabel transaksi rekening induk.
- */
 async function MainAccountTransactionTable({
 	currentPage,
 }: {
@@ -100,9 +96,6 @@ async function MainAccountTransactionTable({
 	);
 }
 
-/**
- * Komponen Halaman Utama Rekening Induk.
- */
 export default async function RekeningIndukPage({
 	searchParams,
 }: {
@@ -112,7 +105,6 @@ export default async function RekeningIndukPage({
 }) {
 	const currentPage = Number(searchParams?.page) || 1;
 
-	// Mengambil data total saldo dan total halaman secara paralel
 	const [mainBalance, totalPages] = await Promise.all([
 		getMainAccountBalance(),
 		getMainAccountTransactionPages(),
@@ -123,36 +115,34 @@ export default async function RekeningIndukPage({
 			<div>
 				<h1 className="text-2xl font-bold tracking-tight">Rekening Induk</h1>
 				<p className="text-muted-foreground">
-					Kelola dan pantau dana operasional koperasi.
+					Kelola dan pantau dana koperasi.
 				</p>
 			</div>
 
 			<Card className="shadow-lg">
-				<CardHeader className="flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-					<div>
-						<CardTitle>Total Saldo Koperasi</CardTitle>
-						<CardDescription>
-							Total dana operasional yang tersedia di rekening induk.
-						</CardDescription>
-					</div>
+				<CardHeader className="flex-col sm:flex-row sm:items-center sm:justify-between">
+					<CardTitle>Total Saldo Koperasi</CardTitle>
+					<CardDescription>
+						Total dana yang tersedia di rekening induk.
+					</CardDescription>
+				</CardHeader>
+				<CardContent className="space-y-4">
+					<p className="text-5xl font-bold tracking-tight text-green-600">
+						{formatCurrency(mainBalance)}
+					</p>
 					<div className="flex gap-2">
 						<LedgerActionDialog type="deposit">
-							<Button>
+							<Button className="cursor-pointer">
 								<PlusCircle className="w-4 h-4 mr-2" /> Top Up Saldo
 							</Button>
 						</LedgerActionDialog>
 
 						<LedgerActionDialog type="withdraw">
-							<Button variant="outline">
+							<Button variant="outline" className="cursor-pointer">
 								<MinusCircle className="w-4 h-4 mr-2" /> Tarik Saldo
 							</Button>
 						</LedgerActionDialog>
 					</div>
-				</CardHeader>
-				<CardContent>
-					<p className="text-4xl font-bold tracking-tight text-green-600">
-						{formatCurrency(mainBalance)}
-					</p>
 				</CardContent>
 			</Card>
 

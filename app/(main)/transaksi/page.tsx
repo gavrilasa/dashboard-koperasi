@@ -8,6 +8,7 @@ import {
 import { DataTable } from "@/components/shared/data-table";
 import { columns } from "@/features/transaksi/components/columns";
 import { Search } from "@/components/shared/search";
+import { Pagination } from "@/components/shared/pagination";
 import { TableSkeleton } from "@/components/shared/skeletons";
 
 export const metadata = {
@@ -20,23 +21,14 @@ export default async function TransaksiPage({
 	searchParams?: {
 		query?: string;
 		page?: string;
-		// Anda dapat menambahkan parameter untuk tanggal di sini
-		// from?: string;
-		// to?: string;
 	};
 }) {
 	const query = searchParams?.query || "";
 	const currentPage = Number(searchParams?.page) || 1;
-	// Logika untuk mengambil dan mem-parsing rentang tanggal akan ditambahkan di sini
-	// const dateRange = {
-	//  from: searchParams?.from ? new Date(searchParams.from) : undefined,
-	//  to: searchParams?.to ? new Date(searchParams.to) : undefined,
-	// };
 
-	// Mengambil data dan total halaman secara paralel
 	const [transactions, totalPages] = await Promise.all([
-		fetchFilteredTransactions(query, currentPage /*, dateRange */),
-		fetchTransactionPages(query /*, dateRange */),
+		fetchFilteredTransactions(query, currentPage),
+		fetchTransactionPages(query),
 	]);
 
 	return (
@@ -54,6 +46,10 @@ export default async function TransaksiPage({
 				<Suspense key={query + currentPage} fallback={<TableSkeleton />}>
 					<DataTable columns={columns} data={transactions} />
 				</Suspense>
+
+				<div className="flex justify-end w-full mt-1">
+					<Pagination totalPages={totalPages} />
+				</div>
 			</div>
 		</div>
 	);
