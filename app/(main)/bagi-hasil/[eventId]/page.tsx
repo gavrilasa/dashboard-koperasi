@@ -11,7 +11,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import { DataTable } from "@/features/nasabah/components/data-table"; // Assuming use of nasabah data-table for now
+import { DataTable } from "@/components/shared/data-table";
 import { EventSummaryCard } from "@/features/bagi-hasil/components/event-summary-card";
 import { recipientListColumns } from "@/features/bagi-hasil/components/recipient-list-columns";
 

@@ -1,5 +1,3 @@
-// features/rekening-induk/components/ledger-action-form.tsx
-
 "use client";
 
 import { useEffect } from "react";
@@ -10,11 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { topUpMainAccount, withdrawMainAccount } from "../actions";
-import type { ActionState } from "@/features/nasabah/types";
+import type { ActionState } from "../types";
 
 interface LedgerActionFormProps {
 	type: "deposit" | "withdraw";
-	onSuccess: () => void; // Fungsi untuk menutup dialog setelah berhasil
+	onSuccess: () => void;
 }
 
 function SubmitButton({ type }: { type: "deposit" | "withdraw" }) {
@@ -39,18 +37,24 @@ function SubmitButton({ type }: { type: "deposit" | "withdraw" }) {
 export function LedgerActionForm({ type, onSuccess }: LedgerActionFormProps) {
 	const actionToUse =
 		type === "deposit" ? topUpMainAccount : withdrawMainAccount;
-	const initialState: ActionState = { message: null, errors: {} };
+
+	// FIX 2: Tambahkan properti 'status' yang wajib ada
+	const initialState: ActionState = {
+		status: "validation_error", // atau 'error', sesuaikan
+		message: null,
+		errors: {},
+	};
 	const [state, formAction] = useActionState(actionToUse, initialState);
 
 	useEffect(() => {
-		if (state.message?.includes("berhasil")) {
+		// Periksa status 'success' untuk memicu onSuccess
+		if (state.status === "success") {
 			onSuccess();
 		}
 	}, [state, onSuccess]);
 
 	return (
 		<form action={formAction} className="space-y-4">
-			{/* Amount Field */}
 			<div className="space-y-2">
 				<Label htmlFor="amount">Jumlah</Label>
 				<Input
@@ -70,7 +74,6 @@ export function LedgerActionForm({ type, onSuccess }: LedgerActionFormProps) {
 				</div>
 			</div>
 
-			{/* Description Field */}
 			<div className="space-y-2">
 				<Label htmlFor="description">Deskripsi Transaksi</Label>
 				<Input
@@ -89,7 +92,6 @@ export function LedgerActionForm({ type, onSuccess }: LedgerActionFormProps) {
 				</div>
 			</div>
 
-			{/* Notes Field (Optional) */}
 			<div className="space-y-2">
 				<Label htmlFor="notes">Catatan (Opsional)</Label>
 				<Input
@@ -99,7 +101,7 @@ export function LedgerActionForm({ type, onSuccess }: LedgerActionFormProps) {
 				/>
 			</div>
 
-			{state.message && !state.message.includes("berhasil") && (
+			{state.status === "error" && state.message && (
 				<p className="text-sm text-destructive">{state.message}</p>
 			)}
 

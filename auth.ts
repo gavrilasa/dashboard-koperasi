@@ -1,5 +1,4 @@
-// auth.ts
-
+"use client";
 import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import Credentials from "next-auth/providers/credentials";
@@ -13,7 +12,7 @@ const prisma = new PrismaClient();
 export const { handlers, auth, signIn, signOut } = NextAuth({
 	secret: process.env.AUTH_SECRET,
 	adapter: PrismaAdapter(prisma) as Adapter,
-	session: { strategy: "jwt" }, // <-- Ubah baris ini
+	session: { strategy: "jwt" },
 	pages: {
 		signIn: "/login",
 	},
@@ -39,6 +38,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 					const passwordsMatch = await bcrypt.compare(password, user.password);
 
 					if (passwordsMatch) {
+						// eslint-disable-next-line @typescript-eslint/no-unused-vars
 						const { password, ...userWithoutPassword } = user;
 						return userWithoutPassword;
 					}
@@ -49,15 +49,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 		}),
 	],
 	callbacks: {
-		// Callback session ini tetap berguna untuk menambahkan data ke sesi jika diperlukan
 		session({ session, token }) {
-			// Dengan JWT, argumen kedua adalah 'token'
 			if (session.user && token.sub) {
-				session.user.id = token.sub; // 'sub' (subject) adalah ID pengguna di dalam JWT
+				session.user.id = token.sub;
 			}
 			return session;
 		},
-		// Anda juga mungkin perlu callback jwt untuk menambahkan info ke token
 		jwt({ token, user }) {
 			if (user) {
 				token.id = user.id;

@@ -1,17 +1,13 @@
-// features/bagi-hasil/components/recipient-list-columns.tsx
-
 "use client";
 
 import { type ColumnDef } from "@tanstack/react-table";
 import { formatCurrency } from "@/lib/utils";
 import { Customer } from "@prisma/client";
 
-// Tipe data kustom untuk baris tabel, menggabungkan data nasabah dengan jumlah yang diterima
 export type RecipientData = Pick<Customer, "id" | "name" | "accountNumber"> & {
-	amountReceived: number | any; // Dibuat `any` untuk mengakomodasi tipe Decimal dari Prisma
+	amountReceived: number;
 };
 
-// Definisi kolom untuk tabel daftar penerima bagi hasil
 export const recipientListColumns: ColumnDef<RecipientData>[] = [
 	{
 		accessorKey: "name",
@@ -40,7 +36,7 @@ export const recipientListColumns: ColumnDef<RecipientData>[] = [
 			align: "right",
 		},
 		cell: ({ row }) => {
-			const amount = parseFloat(row.getValue("amountReceived"));
+			const amount = row.getValue("amountReceived") as number;
 			return (
 				<div className="font-semibold text-green-600">
 					{formatCurrency(amount)}
