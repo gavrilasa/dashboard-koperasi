@@ -4,16 +4,27 @@ import { z } from "zod";
 import { PrismaClient, MainAccountTransactionSource } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { v2 as cloudinary, type UploadApiResponse } from "cloudinary";
+import sharp from "sharp";
 import type { ActionState, SearchedCustomer } from "./types";
 import { CustomerFormSchema } from "./types";
 import { formatCurrency } from "@/lib/utils";
 
 const prisma = new PrismaClient();
 
-const CreateCustomerSchema = CustomerFormSchema.omit({
-	id: true,
+cloudinary.config({
+	cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+	api_key: process.env.CLOUDINARY_API_KEY,
+	api_secret: process.env.CLOUDINARY_API_SECRET,
 });
-const UpdateCustomerSchema = CreateCustomerSchema;
+
+const CreateCustomerSchema = CustomerFormSchema.extend({
+	ktpImage: CustomerFormSchema.shape.ktpImage.refine(
+		(file) => file !== undefined && file !== null,
+		{ message: "Foto KTP wajib diunggah." }
+	),
+});
+const UpdateCustomerSchema = CustomerFormSchema.omit({ ktpImage: true });
 
 const DepositWithdrawSchema = z.object({
 	idempotencyKey: z.string().uuid(),
@@ -53,6 +64,27 @@ function generateAccountNumber(): string {
 	return `${prefix}${year}${randomPart}`;
 }
 
+async function uploadToCloudinary(buffer: Buffer): Promise<string> {
+	return new Promise((resolve, reject) => {
+		const uploadStream = cloudinary.uploader.upload_stream(
+			{
+				resource_type: "image",
+				folder: "koperasi/ktp",
+			},
+			(error, result: UploadApiResponse | undefined) => {
+				if (error) {
+					return reject(new Error("Gagal mengunggah gambar ke Cloudinary."));
+				}
+				if (!result) {
+					return reject(new Error("Hasil unggah Cloudinary tidak valid."));
+				}
+				resolve(result.secure_url);
+			}
+		);
+		uploadStream.end(buffer);
+	});
+}
+
 export async function createCustomer(
 	prevState: ActionState,
 	formData: FormData
@@ -69,28 +101,41 @@ export async function createCustomer(
 		};
 	}
 
-	const { name, idNumber, address, phone, gender, birthDate } =
-		validatedFields.data;
+	const { ktpImage, ...customerData } = validatedFields.data;
+	const imageFile = ktpImage as File;
 
 	try {
+		const imageBuffer = await imageFile.arrayBuffer();
+		const processedImageBuffer = await sharp(Buffer.from(imageBuffer))
+			.resize({ width: 1024 })
+			.webp({ quality: 90 })
+			.toBuffer();
+
+		const imageUrl = await uploadToCloudinary(processedImageBuffer);
+
 		await prisma.customer.create({
 			data: {
-				name,
-				idNumber,
-				address,
-				phone,
-				gender,
-				birthDate,
+				...customerData,
 				accountNumber: generateAccountNumber(),
 				balance: 0,
 				status: "ACTIVE",
+				ktpAttachment: {
+					create: {
+						url: imageUrl,
+						mimeType: "image/webp",
+						size: processedImageBuffer.length,
+					},
+				},
 			},
 		});
 	} catch (error) {
 		console.error(error);
 		return {
 			status: "error",
-			message: "Database Error: Gagal membuat nasabah.",
+			message:
+				error instanceof Error
+					? error.message
+					: "Terjadi kesalahan: Gagal membuat nasabah.",
 		};
 	}
 
@@ -116,7 +161,10 @@ export async function updateCustomer(
 	}
 
 	try {
-		await prisma.customer.update({ where: { id }, data: validatedFields.data });
+		await prisma.customer.update({
+			where: { id },
+			data: validatedFields.data,
+		});
 	} catch (error) {
 		console.error(error);
 		return {
@@ -465,8 +513,6 @@ export async function deactivateCustomer(id: string): Promise<ActionState> {
 			select: { balance: true },
 		});
 
-		// --- LOGIKA BARU DI SINI ---
-		// Tolak hanya jika saldo 1 Rupiah atau lebih.
 		if (customer.balance.greaterThanOrEqualTo(1)) {
 			return {
 				status: "error",
@@ -476,15 +522,13 @@ export async function deactivateCustomer(id: string): Promise<ActionState> {
 			};
 		}
 
-		// Jika saldo antara 0 dan 1, nolkan saldo sebelum menonaktifkan.
 		await prisma.customer.update({
 			where: { id },
 			data: {
 				status: "INACTIVE",
-				balance: 0, // Mengatur sisa saldo menjadi 0
+				balance: 0,
 			},
 		});
-		// --- AKHIR LOGIKA BARU ---
 	} catch (error) {
 		console.error("Database Error:", error);
 		return {

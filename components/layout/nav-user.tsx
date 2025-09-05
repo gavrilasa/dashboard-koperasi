@@ -9,7 +9,6 @@ import {
 	DropdownMenuItem,
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
-	DropdownMenuShortcut,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -88,9 +87,11 @@ export function NavUser() {
 						</div>
 					</DropdownMenuLabel>
 					<DropdownMenuSeparator />
-					<DropdownMenuItem onClick={() => setOpen(true)}>
-						Sign out
-						<DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+					<DropdownMenuItem
+						onClick={() => setOpen(true)}
+						className="cursor-pointer"
+					>
+						<p className="font-medium text-red-500">Sign out</p>
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>

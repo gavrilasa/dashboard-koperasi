@@ -2,6 +2,14 @@
 
 import { z } from "zod";
 
+const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3 MB
+const ACCEPTED_IMAGE_TYPES = [
+	"image/jpeg",
+	"image/jpg",
+	"image/png",
+	"image/webp",
+];
+
 export const CustomerFormSchema = z.object({
 	id: z.string().cuid().optional(),
 	name: z
@@ -22,6 +30,15 @@ export const CustomerFormSchema = z.object({
 	birthDate: z.coerce.date({
 		message: "Tanggal lahir wajib diisi.",
 	}),
+	ktpImage: z
+		.instanceof(File, { message: "Foto KTP wajib diunggah." })
+		.refine((file) => file.size <= MAX_FILE_SIZE, {
+			message: `Ukuran gambar maksimal adalah 3 MB.`,
+		})
+		.refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type), {
+			message: "Hanya format .jpg, .jpeg, .png, dan .webp yang didukung.",
+		})
+		.optional(),
 });
 
 export type Customer = {

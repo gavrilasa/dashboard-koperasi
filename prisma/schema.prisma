@@ -36,7 +36,8 @@ model Customer {
   balance       Decimal       @db.Decimal(15, 2)
   status        AccountStatus @default(ACTIVE)
 
-  transactions Transaction[]
+  transactions  Transaction[]
+  ktpAttachment Attachment?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -52,8 +53,7 @@ model Transaction {
   description String
   notes       String?
 
-  createdAt   DateTime     @default(now())
-  attachments Attachment[]
+  createdAt DateTime @default(now())
 
   profitSharingEventId String?
   profitSharingEvent   ProfitSharingEvent? @relation(fields: [profitSharingEventId], references: [id])
@@ -65,13 +65,14 @@ model IdempotencyKey {
 }
 
 model Attachment {
-  id            String      @id @default(cuid())
-  transactionId String
-  transaction   Transaction @relation(fields: [transactionId], references: [id])
-  filePath      String
-  mimeType      String
-  size          Int
-  createdAt     DateTime    @default(now())
+  id        String   @id @default(cuid())
+  url       String
+  mimeType  String
+  size      Int
+  createdAt DateTime @default(now())
+
+  customerId String   @unique
+  customer   Customer @relation(fields: [customerId], references: [id])
 }
 
 model User {
@@ -136,9 +137,8 @@ model ProfitSharingEvent {
   totalAmountShared    Decimal  @db.Decimal(15, 2)
   numberOfRecipients   Int
   amountPerRecipient   Decimal  @db.Decimal(15, 2)
-  remainderAmount      Decimal  @db.Decimal(15, 2) // Sisa dana pembulatan
-  mainAccountDebitTxId String   @unique // Relasi ke transaksi debit di rekening induk
+  remainderAmount      Decimal  @db.Decimal(15, 2)
+  mainAccountDebitTxId String   @unique
 
-  // Relasi ke transaksi kredit individual nasabah
   recipientTransactions Transaction[]
 }

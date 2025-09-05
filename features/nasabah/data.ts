@@ -1,10 +1,21 @@
 // features/nasabah/data.ts
 
-import { PrismaClient, Customer, AccountStatus } from "@prisma/client";
+import {
+	PrismaClient,
+	Customer,
+	AccountStatus,
+	Attachment,
+} from "@prisma/client";
 import { unstable_noStore as noStore } from "next/cache";
 
 const prisma = new PrismaClient();
 const ITEMS_PER_PAGE = 10;
+
+// Definisikan tipe baru yang menyertakan relasi lampiran
+export type SafeCustomerWithAttachment = Omit<Customer, "balance"> & {
+	balance: number;
+	ktpAttachment: Attachment | null; // Lampiran bisa jadi null
+};
 
 export type SafeCustomer = Omit<Customer, "balance"> & {
 	balance: number;
@@ -21,7 +32,6 @@ export async function fetchFilteredCustomers(
 	try {
 		const customers = await prisma.customer.findMany({
 			where: {
-				// Tambahkan filter status jika ada
 				status: status ? { equals: status } : undefined,
 				OR: [
 					{ name: { contains: query, mode: "insensitive" } },
@@ -63,13 +73,17 @@ export async function fetchCustomersPages(query: string) {
 	}
 }
 
+// SOLUSI: Modifikasi fungsi ini untuk menyertakan data lampiran
 export async function fetchCustomerById(
 	id: string
-): Promise<SafeCustomer | null> {
+): Promise<SafeCustomerWithAttachment | null> {
 	noStore();
 	try {
 		const customer = await prisma.customer.findUnique({
 			where: { id },
+			include: {
+				ktpAttachment: true, // Sertakan data dari relasi ktpAttachment
+			},
 		});
 
 		if (!customer) {
@@ -121,13 +135,6 @@ export async function fetchCustomerTransactionPages(customerId: string) {
 	}
 }
 
-/**
- * Menghitung saldo awal nasabah sebelum tanggal tertentu.
- * Dihitung dari saldo saat ini dikurangi/ditambah transaksi setelah tanggal tersebut.
- * @param customerId - ID nasabah.
- * @param fromDate - Tanggal mulai periode laporan.
- * @returns Saldo awal nasabah.
- */
 export async function calculateInitialBalance(
 	customerId: string,
 	fromDate: Date
@@ -169,7 +176,6 @@ export async function calculateInitialBalance(
 		const totalKreditAfter = transactionsAfter._sum.amount?.toNumber() || 0;
 		const totalDebitAfter = transactionsBefore._sum.amount?.toNumber() || 0;
 
-		// Rumus: Saldo Awal = Saldo Sekarang - (Total Kredit Setelahnya) + (Total Debit Setelahnya)
 		const initialBalance = currentBalance - totalKreditAfter + totalDebitAfter;
 
 		return initialBalance;
@@ -179,12 +185,6 @@ export async function calculateInitialBalance(
 	}
 }
 
-/**
- * Mengambil semua transaksi nasabah dalam rentang tanggal tertentu (tanpa paginasi).
- * @param customerId - ID nasabah.
- * @param dateRange - Objek berisi tanggal 'from' dan 'to'.
- * @returns Array dari semua transaksi yang cocok.
- */
 export async function fetchCustomerTransactionsByDateRange(
 	customerId: string,
 	dateRange: { from: Date; to: Date }
