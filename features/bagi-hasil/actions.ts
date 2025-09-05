@@ -6,6 +6,7 @@ import { z } from "zod";
 import { PrismaClient } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { formatDate } from "@/lib/utils";
+import { unstable_noStore as noStore } from "next/cache";
 
 // Menggunakan tipe State yang serupa dengan fitur nasabah untuk konsistensi
 import type { ActionState } from "./types";
@@ -157,4 +158,23 @@ export async function executeProfitSharing(
 		status: "success", // FIX: Added status
 		message: "Proses bagi hasil berhasil dieksekusi.",
 	};
+}
+
+/**
+ * Server action to safely get the count of active customers.
+ * This function is designed to be called from client components.
+ */
+export async function getActiveCustomersCount(): Promise<number> {
+	noStore();
+	try {
+		const count = await prisma.customer.count({
+			where: { status: "ACTIVE" },
+		});
+		return count;
+	} catch (error) {
+		console.error("Database Error:", error);
+		// In a real app, you might want more robust error handling
+		// but for this purpose, throwing an error is clear.
+		throw new Error("Gagal menghitung jumlah nasabah aktif.");
+	}
 }

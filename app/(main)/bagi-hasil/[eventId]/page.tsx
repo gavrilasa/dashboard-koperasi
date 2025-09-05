@@ -1,0 +1,74 @@
+// app/(main)/bagi-hasil/[eventId]/page.tsx
+
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
+import { fetchProfitSharingEventDetails } from "@/features/bagi-hasil/data";
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
+import { DataTable } from "@/features/nasabah/components/data-table"; // Assuming use of nasabah data-table for now
+import { EventSummaryCard } from "@/features/bagi-hasil/components/event-summary-card";
+import { recipientListColumns } from "@/features/bagi-hasil/components/recipient-list-columns";
+
+export const metadata = {
+	title: "Detail Bagi Hasil",
+};
+
+export default async function BagiHasilDetailPage({
+	params,
+}: {
+	params: { eventId: string };
+}) {
+	const eventId = params.eventId;
+	const eventDetails = await fetchProfitSharingEventDetails(eventId);
+
+	if (!eventDetails) {
+		notFound();
+	}
+
+	// 👇 **FIX APPLIED HERE:** Convert Decimal to number during data transformation.
+	const recipients = eventDetails.recipientTransactions.map((tx) => ({
+		...tx.customer,
+		amountReceived: tx.amount.toNumber(), // Convert Decimal to number here
+	}));
+
+	// Proactive fix: create a safe version for the summary card as well.
+	const safeEventSummary = {
+		...eventDetails,
+		totalAmountShared: eventDetails.totalAmountShared.toNumber(),
+		amountPerRecipient: eventDetails.amountPerRecipient.toNumber(),
+		remainderAmount: eventDetails.remainderAmount.toNumber(),
+	};
+
+	return (
+		<div className="flex flex-col w-full gap-4">
+			<Link
+				href="/bagi-hasil"
+				className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+			>
+				<ArrowLeft className="w-4 h-4" />
+				Kembali ke Riwayat Bagi Hasil
+			</Link>
+
+			<EventSummaryCard event={safeEventSummary} />
+
+			<Card>
+				<CardHeader>
+					<CardTitle>Daftar Nasabah Penerima</CardTitle>
+					<CardDescription>
+						Berikut adalah daftar semua nasabah yang menerima dana dari event
+						bagi hasil ini.
+					</CardDescription>
+				</CardHeader>
+				<CardContent>
+					<DataTable columns={recipientListColumns} data={recipients} />
+				</CardContent>
+			</Card>
+		</div>
+	);
+}
