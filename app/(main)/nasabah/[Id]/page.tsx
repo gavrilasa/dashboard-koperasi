@@ -12,20 +12,14 @@ import {
 	CardDescription,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-	ArrowLeft,
-	ArrowUpCircle,
-	ArrowDownCircle,
-	ShieldOff,
-	UserCheck,
-	Printer,
-} from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { TableSkeleton } from "@/components/shared/skeletons";
 import { TransactionHistory } from "@/features/nasabah/components/transaction-history";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { EditNasabahButton } from "@/features/nasabah/components/nasabah-dialogs";
 import { PrintStatementDialog } from "@/features/nasabah/components/print-statement-dialog";
+import { StatusActionButton } from "@/features/nasabah/components/status-action-button";
+import { DetailPageActions } from "@/features/nasabah/components/detail-page-actions";
 
 export default async function NasabahDetailPage({
 	params,
@@ -74,15 +68,7 @@ export default async function NasabahDetailPage({
 						<div className="flex flex-shrink-0 gap-2">
 							<EditNasabahButton customer={customer} />
 							<PrintStatementDialog customerId={customer.id} />
-							{customer.status === "ACTIVE" ? (
-								<Button variant="destructive" size="sm">
-									<ShieldOff className="w-4 h-4 mr-2" /> Nonaktifkan
-								</Button>
-							) : (
-								<Button size="sm">
-									<UserCheck className="w-4 h-4 mr-2" /> Aktifkan
-								</Button>
-							)}
+							<StatusActionButton customer={customer} />
 						</div>
 					</div>
 				</CardHeader>
@@ -137,14 +123,7 @@ export default async function NasabahDetailPage({
 									</p>
 								</div>
 
-								<div className="flex gap-2 mt-4">
-									<Button>
-										<ArrowUpCircle className="w-4 h-4 mr-2" /> Simpan Tunai
-									</Button>
-									<Button variant="outline">
-										<ArrowDownCircle className="w-4 h-4 mr-2" /> Tarik Tunai
-									</Button>
-								</div>
+								<DetailPageActions customer={customer} />
 							</div>
 						</div>
 					</div>

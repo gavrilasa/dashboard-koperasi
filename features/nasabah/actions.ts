@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import type { ActionState, SearchedCustomer } from "./types";
 import { CustomerFormSchema } from "./types";
+import { formatCurrency } from "@/lib/utils";
 
 const prisma = new PrismaClient();
 
@@ -436,4 +437,63 @@ export async function searchActiveCustomers(
 		console.error("Database Error:", error);
 		return [];
 	}
+}
+
+export async function activateCustomer(id: string): Promise<ActionState> {
+	try {
+		await prisma.customer.update({
+			where: { id },
+			data: { status: "ACTIVE" },
+		});
+	} catch (error) {
+		console.error("Database Error:", error);
+		return {
+			status: "error",
+			message: "Database Error: Gagal mengaktifkan nasabah.",
+		};
+	}
+
+	revalidatePath("/nasabah");
+	revalidatePath(`/nasabah/${id}`);
+	redirect(`/nasabah/${id}`);
+}
+
+export async function deactivateCustomer(id: string): Promise<ActionState> {
+	try {
+		const customer = await prisma.customer.findUniqueOrThrow({
+			where: { id },
+			select: { balance: true },
+		});
+
+		// --- LOGIKA BARU DI SINI ---
+		// Tolak hanya jika saldo 1 Rupiah atau lebih.
+		if (customer.balance.greaterThanOrEqualTo(1)) {
+			return {
+				status: "error",
+				message: `Gagal menonaktifkan. Saldo nasabah harus kurang dari Rp1 (Saldo saat ini: ${formatCurrency(
+					Number(customer.balance)
+				)}).`,
+			};
+		}
+
+		// Jika saldo antara 0 dan 1, nolkan saldo sebelum menonaktifkan.
+		await prisma.customer.update({
+			where: { id },
+			data: {
+				status: "INACTIVE",
+				balance: 0, // Mengatur sisa saldo menjadi 0
+			},
+		});
+		// --- AKHIR LOGIKA BARU ---
+	} catch (error) {
+		console.error("Database Error:", error);
+		return {
+			status: "error",
+			message: "Database Error: Gagal menonaktifkan nasabah.",
+		};
+	}
+
+	revalidatePath("/nasabah");
+	revalidatePath(`/nasabah/${id}`);
+	redirect(`/nasabah/${id}`);
 }
