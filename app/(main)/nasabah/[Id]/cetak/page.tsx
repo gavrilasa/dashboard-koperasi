@@ -17,7 +17,7 @@ export default async function CetakRekeningKoranPage({
 	params,
 	searchParams,
 }: {
-	params: Promise<{ id: string }>;
+	params: Promise<{ Id: string }>; // Corrected from 'id' to 'Id'
 	searchParams?: Promise<{
 		from?: string;
 		to?: string;
@@ -25,7 +25,7 @@ export default async function CetakRekeningKoranPage({
 }) {
 	const resolvedParams = await params;
 	const resolvedSearchParams = await searchParams;
-	const id = resolvedParams.id;
+	const id = resolvedParams.Id; // Corrected from 'id' to 'Id'
 	// Validasi tanggal, default ke bulan ini jika tidak ada
 	const fromDate = resolvedSearchParams?.from
 		? new Date(resolvedSearchParams.from)
