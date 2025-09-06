@@ -35,17 +35,22 @@ function SignOutDialog({
 			<AlertDialogContent>
 				<AlertDialogHeader>
 					<AlertDialogTitle>
-						Are you sure you want to sign out?
+						Anda yakin ingin keluar dari akun ini?
 					</AlertDialogTitle>
 					<AlertDialogDescription>
-						You will be returned to the login page.
+						Sesi aktif anda akan berakhir dan akan memerlukan Masuk kembali.
 					</AlertDialogDescription>
 				</AlertDialogHeader>
 				<AlertDialogFooter>
-					<AlertDialogCancel>Cancel</AlertDialogCancel>
-					<form action={signOutAction} className="w-full">
-						<AlertDialogAction type="submit" className="w-full">
-							Sign Out
+					<AlertDialogCancel className="cursor-pointer">
+						Batal
+					</AlertDialogCancel>
+					<form action={signOutAction}>
+						<AlertDialogAction
+							type="submit"
+							className="font-medium bg-red-500 cursor-pointer hover:bg-red-600"
+						>
+							Keluar
 						</AlertDialogAction>
 					</form>
 				</AlertDialogFooter>
