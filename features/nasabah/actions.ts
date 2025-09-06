@@ -23,7 +23,11 @@ const CreateCustomerSchema = CustomerFormSchema.extend({
 		(file) => file !== undefined && file !== null,
 		{ message: "Foto KTP wajib diunggah." }
 	),
+	initialBalance: z.coerce
+		.number()
+		.min(50000, { message: "Saldo awal minimal adalah Rp 50.000." }),
 });
+
 const UpdateCustomerSchema = CustomerFormSchema.omit({ ktpImage: true });
 
 const DepositWithdrawSchema = z.object({
@@ -98,11 +102,13 @@ export async function createCustomer(
 			status: "validation_error",
 			errors: validatedFields.error.flatten().fieldErrors,
 			message: "Gagal membuat nasabah. Data tidak valid.",
+			fields: Object.fromEntries(formData.entries()),
 		};
 	}
 
-	const { ktpImage, ...customerData } = validatedFields.data;
+	const { ktpImage, initialBalance, ...customerData } = validatedFields.data;
 	const imageFile = ktpImage as File;
+	const mainAccountId = await getMainAccountId();
 
 	try {
 		const imageBuffer = await imageFile.arrayBuffer();
@@ -113,20 +119,47 @@ export async function createCustomer(
 
 		const imageUrl = await uploadToCloudinary(processedImageBuffer);
 
-		await prisma.customer.create({
-			data: {
-				...customerData,
-				accountNumber: generateAccountNumber(),
-				balance: 0,
-				status: "ACTIVE",
-				ktpAttachment: {
-					create: {
-						url: imageUrl,
-						mimeType: "image/webp",
-						size: processedImageBuffer.length,
+		await prisma.$transaction(async (tx) => {
+			const newCustomer = await tx.customer.create({
+				data: {
+					...customerData,
+					accountNumber: generateAccountNumber(),
+					balance: initialBalance,
+					status: "ACTIVE",
+					ktpAttachment: {
+						create: {
+							url: imageUrl,
+							mimeType: "image/webp",
+							size: processedImageBuffer.length,
+						},
 					},
 				},
-			},
+			});
+
+			const initialTransaction = await tx.transaction.create({
+				data: {
+					customerId: newCustomer.id,
+					amount: initialBalance,
+					type: "KREDIT",
+					description: "SETORAN AWAL",
+				},
+			});
+
+			await tx.mainAccount.update({
+				where: { id: mainAccountId },
+				data: { balance: { increment: initialBalance } },
+			});
+
+			await tx.mainAccountTransaction.create({
+				data: {
+					mainAccountId: mainAccountId,
+					amount: initialBalance,
+					type: "KREDIT",
+					description: `Setoran Awal Nasabah Baru: ${newCustomer.name}`,
+					source: MainAccountTransactionSource.FROM_CUSTOMER_DEPOSIT,
+					customerTransactionId: initialTransaction.id,
+				},
+			});
 		});
 	} catch (error) {
 		console.error(error);
@@ -301,6 +334,12 @@ export async function withdraw(
 				throw new Error("Saldo nasabah tidak mencukupi.");
 			}
 			customerName = customer.name;
+
+			if (Number(customer.balance) - amount < 50000) {
+				throw new Error(
+					"Penarikan gagal. Saldo nasabah tidak boleh kurang dari Rp 50.000."
+				);
+			}
 
 			await tx.customer.update({
 				where: { id: customerId },
@@ -503,7 +542,11 @@ export async function activateCustomer(id: string): Promise<ActionState> {
 
 	revalidatePath("/nasabah");
 	revalidatePath(`/nasabah/${id}`);
-	redirect(`/nasabah/${id}`);
+
+	return {
+		status: "success",
+		message: "Nasabah berhasil diaktifkan.",
+	};
 }
 
 export async function deactivateCustomer(id: string): Promise<ActionState> {
@@ -516,7 +559,7 @@ export async function deactivateCustomer(id: string): Promise<ActionState> {
 		if (customer.balance.greaterThanOrEqualTo(1)) {
 			return {
 				status: "error",
-				message: `Gagal menonaktifkan. Saldo nasabah harus kurang dari Rp1 (Saldo saat ini: ${formatCurrency(
+				message: `Gagal menonaktifkan. Saldo nasabah harus Rp0 (Saldo saat ini: ${formatCurrency(
 					Number(customer.balance)
 				)}).`,
 			};

@@ -35,11 +35,11 @@ export function StatusActionButton({ customer }: StatusActionButtonProps) {
 				toast.error("Aksi Gagal", {
 					description: result.message,
 				});
-			} else if (result && result.status !== "error") {
+			} else if (result && result.status === "success") {
 				const successMessage =
 					customer.status === "ACTIVE"
 						? `Nasabah ${customer.name} berhasil dinonaktifkan.`
-						: `Nasabah ${customer.name} berhasil diaktifkan kembali.`;
+						: `Nasabah ${customer.name} berhasil diaktifkan dan kini dapat menerima setoran.`;
 				toast.success("Aksi Berhasil", {
 					description: successMessage,
 				});
@@ -51,7 +51,9 @@ export function StatusActionButton({ customer }: StatusActionButtonProps) {
 
 	const dialogDetails = {
 		trigger: {
-			variant: isActive ? "destructive" : "default",
+			variant: isActive
+				? "destructive"
+				: ("default" as "destructive" | "default"),
 			icon: isActive ? ShieldOff : UserCheck,
 			text: isActive ? "Nonaktifkan" : "Aktifkan",
 		},

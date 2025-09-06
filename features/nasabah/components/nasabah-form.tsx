@@ -37,7 +37,9 @@ export function NasabahForm({ customer }: { customer?: Customer | null }) {
 		status: "validation_error",
 		message: null,
 		errors: {},
+		fields: {},
 	};
+
 	const [state, formAction] = useActionState(actionToUse, initialState);
 
 	const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -85,7 +87,7 @@ export function NasabahForm({ customer }: { customer?: Customer | null }) {
 					id="name"
 					name="name"
 					placeholder="Masukkan nama lengkap"
-					defaultValue={customer?.name}
+					defaultValue={state.fields?.name ?? customer?.name}
 					aria-describedby="name-error"
 					required
 				/>
@@ -104,7 +106,7 @@ export function NasabahForm({ customer }: { customer?: Customer | null }) {
 					id="idNumber"
 					name="idNumber"
 					placeholder="Masukkan 16 digit Nomor KTP"
-					defaultValue={customer?.idNumber}
+					defaultValue={state.fields?.idNumber ?? customer?.idNumber}
 					aria-describedby="idNumber-error"
 					required
 				/>
@@ -153,10 +155,35 @@ export function NasabahForm({ customer }: { customer?: Customer | null }) {
 				</div>
 			)}
 
+			{!customer && (
+				<div className="space-y-2">
+					<Label htmlFor="initialBalance">Saldo Awal</Label>
+					<Input
+						id="initialBalance"
+						name="initialBalance"
+						type="number"
+						placeholder="Minimal Rp 50.000"
+						defaultValue={state.fields?.initialBalance ?? ""}
+						aria-describedby="initialBalance-error"
+						required
+					/>
+					<div id="initialBalance-error" aria-live="polite" aria-atomic="true">
+						{state.errors?.initialBalance?.map((error: string) => (
+							<p className="mt-1 text-sm text-destructive" key={error}>
+								{error}
+							</p>
+						))}
+					</div>
+				</div>
+			)}
+
 			<div className="grid grid-cols-2 gap-4">
 				<div className="space-y-2">
 					<Label htmlFor="gender">Jenis Kelamin</Label>
-					<Select name="gender" defaultValue={customer?.gender}>
+					<Select
+						name="gender"
+						defaultValue={state.fields?.gender ?? customer?.gender}
+					>
 						<SelectTrigger id="gender" aria-describedby="gender-error">
 							<SelectValue placeholder="Pilih jenis kelamin" />
 						</SelectTrigger>
@@ -179,7 +206,9 @@ export function NasabahForm({ customer }: { customer?: Customer | null }) {
 						id="birthDate"
 						name="birthDate"
 						type="date"
-						defaultValue={formatDateForInput(customer?.birthDate)}
+						defaultValue={formatDateForInput(
+							state.fields?.birthDate ?? customer?.birthDate
+						)}
 						aria-describedby="birthDate-error"
 						required
 					/>
@@ -199,7 +228,7 @@ export function NasabahForm({ customer }: { customer?: Customer | null }) {
 					id="address"
 					name="address"
 					placeholder="Masukkan alamat lengkap"
-					defaultValue={customer?.address}
+					defaultValue={state.fields?.address ?? customer?.address}
 					aria-describedby="address-error"
 					required
 				/>
@@ -219,7 +248,7 @@ export function NasabahForm({ customer }: { customer?: Customer | null }) {
 					name="phone"
 					type="tel"
 					placeholder="Masukkan nomor telepon aktif"
-					defaultValue={customer?.phone}
+					defaultValue={state.fields?.phone ?? customer?.phone}
 					aria-describedby="phone-error"
 					required
 				/>

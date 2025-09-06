@@ -37,6 +37,11 @@ export const CustomerFormSchema = z.object({
 			message: "Hanya format .jpg, .jpeg, .png, dan .webp yang didukung.",
 		})
 		.optional(),
+
+	initialBalance: z.coerce
+		.number()
+		.min(50000, { message: "Saldo awal minimal adalah Rp 50.000." })
+		.optional(),
 });
 
 export type Customer = {
@@ -57,6 +62,7 @@ export type Customer = {
 export type ActionState = {
 	status: "success" | "error" | "validation_error";
 	message: string | null;
+	fields?: FormFields;
 	data?: {
 		amount?: number;
 		customerName?: string;
@@ -64,6 +70,16 @@ export type ActionState = {
 	errors?: {
 		[key: string]: string[] | undefined;
 	};
+};
+
+type FormFields = {
+	name?: string;
+	idNumber?: string;
+	address?: string;
+	phone?: string;
+	gender?: "MALE" | "FEMALE";
+	birthDate?: string;
+	initialBalance?: string;
 };
 
 export type SearchedCustomer = {
