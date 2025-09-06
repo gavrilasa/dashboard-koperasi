@@ -112,25 +112,33 @@ export async function executeProfitSharing(
 				},
 			});
 
-			// c. Kredit ke setiap nasabah
-			for (const customer of activeCustomers) {
-				// Update saldo nasabah
-				await tx.customer.update({
-					where: { id: customer.id },
-					data: { balance: { increment: amountPerRecipient } },
-				});
+			// c. Kredit ke setiap nasabah (BULK OPERATIONS)
+			const customerIds = activeCustomers.map((c) => c.id);
 
-				// Buat record transaksi untuk nasabah
-				await tx.transaction.create({
-					data: {
-						customerId: customer.id,
-						amount: amountPerRecipient,
-						type: "KREDIT",
-						description: `Bagi Hasil - ${formatDate(new Date())}`,
-						profitSharingEventId: profitSharingEvent.id, // Menghubungkan ke event
+			// Update balances in bulk
+			await tx.customer.updateMany({
+				where: {
+					id: {
+						in: customerIds,
 					},
-				});
-			}
+				},
+				data: {
+					balance: {
+						increment: amountPerRecipient,
+					},
+				},
+			});
+
+			// Create transactions in bulk
+			await tx.transaction.createMany({
+				data: customerIds.map((customerId) => ({
+					customerId,
+					amount: amountPerRecipient,
+					type: "KREDIT",
+					description: `Bagi Hasil - ${formatDate(new Date())}`,
+					profitSharingEventId: profitSharingEvent.id,
+				})),
+			});
 		});
 	} catch (error: unknown) {
 		if (error instanceof Error) {

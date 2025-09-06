@@ -99,11 +99,12 @@ async function MainAccountTransactionTable({
 export default async function RekeningIndukPage({
 	searchParams,
 }: {
-	searchParams?: {
+	searchParams?: Promise<{
 		page?: string;
-	};
+	}>;
 }) {
-	const currentPage = Number(searchParams?.page) || 1;
+	const resolvedSearchParams = await searchParams;
+	const currentPage = Number(resolvedSearchParams?.page) || 1;
 
 	const [mainBalance, totalPages] = await Promise.all([
 		getMainAccountBalance(),

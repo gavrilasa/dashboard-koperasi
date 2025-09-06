@@ -20,17 +20,19 @@ import { EditNasabahButton } from "@/features/nasabah/components/nasabah-dialogs
 import { PrintStatementDialog } from "@/features/nasabah/components/print-statement-dialog";
 import { StatusActionButton } from "@/features/nasabah/components/status-action-button";
 import { DetailPageActions } from "@/features/nasabah/components/detail-page-actions";
-import { KtpDisplay } from "@/features/nasabah/components/ktp-display"; // IMPOR KOMPONEN BARU
+import { KtpDisplay } from "@/features/nasabah/components/ktp-display";
 
 export default async function NasabahDetailPage({
 	params,
 	searchParams,
 }: {
-	params: { id: string };
-	searchParams?: { page?: string };
+	params: Promise<{ id: string }>;
+	searchParams?: Promise<{ page?: string }>;
 }) {
-	const id = params.id;
-	const currentPage = Number(searchParams?.page) || 1;
+	const resolvedParams = await params;
+	const resolvedSearchParams = await searchParams;
+	const id = resolvedParams.id;
+	const currentPage = Number(resolvedSearchParams?.page) || 1;
 
 	const customer = await fetchCustomerById(id);
 

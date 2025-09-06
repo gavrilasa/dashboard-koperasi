@@ -42,21 +42,22 @@ async function DashboardContent({
  * skeleton loader menggunakan Suspense saat data sedang dimuat atau saat
  * filter tanggal diubah di sisi klien.
  */
-export default function HomePage({
+export default async function HomePage({
 	searchParams,
 }: {
-	searchParams?: {
+	searchParams?: Promise<{
 		from?: string;
 		to?: string;
-	};
+	}>;
 }) {
+	const resolvedSearchParams = await searchParams;
 	// FIX: Pastikan rentang waktu mencakup seluruh hari
-	const from = searchParams?.from
-		? startOfDay(new Date(searchParams.from)) // Gunakan awal hari dari tanggal 'from'
+	const from = resolvedSearchParams?.from
+		? startOfDay(new Date(resolvedSearchParams.from)) // Gunakan awal hari dari tanggal 'from'
 		: startOfDay(new Date()); // Default ke awal hari ini
 
-	const to = searchParams?.to
-		? endOfDay(new Date(searchParams.to)) // Gunakan akhir hari dari tanggal 'to'
+	const to = resolvedSearchParams?.to
+		? endOfDay(new Date(resolvedSearchParams.to)) // Gunakan akhir hari dari tanggal 'to'
 		: endOfDay(new Date()); // Default ke akhir hari ini
 
 	// Kunci unik untuk Suspense. Saat searchParams berubah, kunci ini berubah,
