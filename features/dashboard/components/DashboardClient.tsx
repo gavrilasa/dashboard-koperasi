@@ -1,7 +1,7 @@
 "use client";
 
 import { Banknote, Landmark, Users } from "lucide-react";
-import { formatCompactCurrency } from "@/lib/utils";
+import { formatCompactCurrency, formatCurrency } from "@/lib/utils";
 import { StatCard } from "./StatCard";
 import { DashboardChart } from "./DashboardChart";
 import { DateRangeFilter } from "./DateRangeFilter";
@@ -32,21 +32,21 @@ export function DashboardClient({
 			<div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
 				<StatCard
 					title="Saldo Rekening Induk"
-					value={stats.mainAccountBalance}
+					value={formatCurrency(stats.mainAccountBalance)}
 					description="Saldo akhir pada periode terpilih"
 					icon={Landmark}
 					isLoading={false}
 				/>
 				<StatCard
 					title="Total Volume Transaksi"
-					value={stats.totalTransactionVolume}
+					value={formatCurrency(stats.totalTransactionVolume)}
 					description="Total nilai transaksi pada periode ini"
 					icon={Banknote}
 					isLoading={false}
 				/>
 				<StatCard
 					title="Nasabah Aktif"
-					value={stats.activeCustomerCount}
+					value={String(stats.activeCustomerCount)}
 					description="Total nasabah dengan status aktif"
 					icon={Users}
 					isLoading={false}

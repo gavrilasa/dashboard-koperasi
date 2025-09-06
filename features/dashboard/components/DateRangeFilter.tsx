@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { format } from "date-fns";
+import { format, subDays } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { DateRange } from "react-day-picker";
 
@@ -69,13 +69,11 @@ export function DateRangeFilter() {
 		if (preset === "today") {
 			newRange = { from: today, to: today };
 		} else if (preset === "week") {
-			const startOfWeek = new Date(today);
-			startOfWeek.setDate(today.getDate() - today.getDay());
-			newRange = { from: startOfWeek, to: today };
+			const sixDaysAgo = subDays(today, 6);
+			newRange = { from: sixDaysAgo, to: today };
 		} else {
-			// month
-			const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-			newRange = { from: startOfMonth, to: today };
+			const twentyNineDaysAgo = subDays(today, 29);
+			newRange = { from: twentyNineDaysAgo, to: today };
 		}
 
 		setActiveDate(newRange);
@@ -104,8 +102,8 @@ export function DateRangeFilter() {
 			>
 				<TabsList>
 					<TabsTrigger value="today">Hari Ini</TabsTrigger>
-					<TabsTrigger value="week">Minggu Ini</TabsTrigger>
-					<TabsTrigger value="month">Bulan Ini</TabsTrigger>
+					<TabsTrigger value="week">Minggu lalu</TabsTrigger>
+					<TabsTrigger value="month">Bulan lalu</TabsTrigger>
 				</TabsList>
 			</Tabs>
 

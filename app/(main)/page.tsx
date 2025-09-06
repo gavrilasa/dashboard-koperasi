@@ -1,5 +1,6 @@
 import { Suspense } from "react";
-import { endOfDay, startOfDay } from "date-fns";
+import { redirect } from "next/navigation";
+import { endOfDay, startOfDay, format } from "date-fns";
 import {
 	getDashboardStats,
 	getTransactionChartData,
@@ -36,9 +37,20 @@ export default async function HomePage({
 	searchParams?: Promise<{
 		from?: string;
 		to?: string;
+		preset?: string;
 	}>;
 }) {
 	const resolvedSearchParams = await searchParams;
+
+	if (
+		!resolvedSearchParams?.from &&
+		!resolvedSearchParams?.to &&
+		!resolvedSearchParams?.preset
+	) {
+		const today = format(new Date(), "yyyy-MM-dd");
+		redirect(`/?from=${today}&to=${today}&preset=today`);
+	}
+
 	const from = resolvedSearchParams?.from
 		? startOfDay(new Date(resolvedSearchParams.from))
 		: startOfDay(new Date());

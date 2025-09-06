@@ -4,7 +4,7 @@ import {
 	Users,
 	Landmark,
 	CreditCard,
-	Settings,
+	// Settings,
 	HandCoins,
 	CirclePercent,
 } from "lucide-react";
@@ -45,14 +45,14 @@ export const navData: NavGroup[] = [
 			},
 		],
 	},
-	{
-		title: "Pengaturan",
-		items: [
-			{
-				title: "Sistem",
-				url: "/pengaturan",
-				icon: Settings,
-			},
-		],
-	},
+	// {
+	// 	title: "Pengaturan",
+	// 	items: [
+	// 		{
+	// 			title: "Sistem",
+	// 			url: "/pengaturan",
+	// 			icon: Settings,
+	// 		},
+	// 	],
+	// },
 ];

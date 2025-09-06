@@ -2,7 +2,6 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { formatCurrency } from "@/lib/utils";
 import { StatCardProps } from "../types";
 
 export function StatCard({
@@ -13,10 +12,10 @@ export function StatCard({
 	isLoading,
 }: StatCardProps) {
 	return (
-		<Card>
-			<CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-				<CardTitle className="text-sm font-medium">{title}</CardTitle>
-				<Icon className="w-4 h-4 text-muted-foreground" />
+		<Card className="gap-4">
+			<CardHeader className="flex flex-row items-center justify-between space-y-0">
+				<CardTitle className="font-medium">{title}</CardTitle>
+				<Icon className="w-5 h-5 text-muted-foreground" />
 			</CardHeader>
 			<CardContent>
 				{isLoading ? (
@@ -26,8 +25,8 @@ export function StatCard({
 					</div>
 				) : (
 					<>
-						<div className="text-2xl font-bold">{formatCurrency(value)}</div>
-						<p className="text-xs text-muted-foreground">{description}</p>
+						<div className="text-3xl font-bold">{value}</div>
+						<p className="mt-1 text-sm text-muted-foreground">{description}</p>
 					</>
 				)}
 			</CardContent>

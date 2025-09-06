@@ -37,7 +37,7 @@ export type Preset = "today" | "week" | "month" | "custom";
 
 export interface StatCardProps {
 	title: string;
-	value: number;
+	value: string;
 	description: string;
 	icon: LucideIcon;
 	isLoading: boolean;

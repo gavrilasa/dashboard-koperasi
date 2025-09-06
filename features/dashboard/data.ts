@@ -42,23 +42,72 @@ export async function getTransactionChartData(range: {
 	try {
 		const diffDays =
 			(range.to.getTime() - range.from.getTime()) / (1000 * 3600 * 24);
-		const timeZone = "Asia/Jakarta";
 
-		let query;
+		const displayTimeZone = "Asia/Jakarta";
+
 		if (diffDays <= 2) {
-			query = prisma.$queryRaw<
-				{ label: string; value: number }[]
-			>`SELECT TO_CHAR("createdAt" AT TIME ZONE ${timeZone}, 'HH24:00') as label, COUNT(id)::int as value FROM "Transaction" WHERE "createdAt" BETWEEN ${range.from} AND ${range.to} GROUP BY label ORDER BY label ASC;`;
+			const result = await prisma.$queryRaw<
+				{ utc_hour: Date; value: number }[]
+			>`
+        SELECT 
+          DATE_TRUNC('hour', "createdAt" AT TIME ZONE 'UTC') as utc_hour, 
+          COUNT(id)::int as value 
+        FROM "Transaction" 
+        WHERE "createdAt" BETWEEN ${range.from} AND ${range.to} 
+        GROUP BY utc_hour 
+        ORDER BY utc_hour ASC;
+      `;
+
+			return result.map((item) => ({
+				value: item.value,
+				label: new Date(item.utc_hour).toLocaleTimeString("id-ID", {
+					hour: "2-digit",
+					minute: "2-digit",
+					hour12: false,
+					timeZone: displayTimeZone,
+				}),
+			}));
 		} else if (diffDays <= 90) {
-			query = prisma.$queryRaw<
-				{ label: string; value: number }[]
-			>`SELECT TO_CHAR("createdAt" AT TIME ZONE ${timeZone}, 'YYYY-MM-DD') as label, COUNT(id)::int as value FROM "Transaction" WHERE "createdAt" BETWEEN ${range.from} AND ${range.to} GROUP BY label ORDER BY label ASC;`;
+			const result = await prisma.$queryRaw<{ utc_day: Date; value: number }[]>`
+        SELECT 
+          DATE_TRUNC('day', "createdAt" AT TIME ZONE 'UTC')::date as utc_day, 
+          COUNT(id)::int as value 
+        FROM "Transaction" 
+        WHERE "createdAt" BETWEEN ${range.from} AND ${range.to} 
+        GROUP BY utc_day 
+        ORDER BY utc_day ASC;
+      `;
+
+			return result.map((item) => ({
+				value: item.value,
+				label: new Date(item.utc_day).toLocaleDateString("id-ID", {
+					month: "short",
+					day: "numeric",
+					timeZone: "UTC",
+				}),
+			}));
 		} else {
-			query = prisma.$queryRaw<
-				{ label: string; value: number }[]
-			>`SELECT TO_CHAR("createdAt" AT TIME ZONE ${timeZone}, 'YYYY-MM') as label, COUNT(id)::int as value FROM "Transaction" WHERE "createdAt" BETWEEN ${range.from} AND ${range.to} GROUP BY label ORDER BY label ASC;`;
+			const result = await prisma.$queryRaw<
+				{ utc_month: Date; value: number }[]
+			>`
+        SELECT 
+          DATE_TRUNC('month', "createdAt" AT TIME ZONE 'UTC')::date as utc_month, 
+          COUNT(id)::int as value 
+        FROM "Transaction" 
+        WHERE "createdAt" BETWEEN ${range.from} AND ${range.to} 
+        GROUP BY utc_month 
+        ORDER BY utc_month ASC;
+      `;
+
+			return result.map((item) => ({
+				value: item.value,
+				label: new Date(item.utc_month).toLocaleDateString("id-ID", {
+					month: "short",
+					year: "numeric",
+					timeZone: "UTC",
+				}),
+			}));
 		}
-		return await query;
 	} catch (error) {
 		console.error("Database Error:", error);
 		throw new Error("Gagal mengambil data untuk grafik transaksi.");
