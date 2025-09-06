@@ -7,18 +7,19 @@ export const metadata = {
 	title: "Bagi Hasil",
 };
 
-// Define the shape of the props, including searchParams
-type BagiHasilPageProps = {
-	searchParams?: {
-		query?: string;
-		page?: string;
-	};
-};
-
-// 👇 Destructure searchParams directly in the function signature
-export default function BagiHasilPage({ searchParams }: BagiHasilPageProps) {
-	const query = searchParams?.query || "";
-	const currentPage = Number(searchParams?.page) || 1;
+// Use async pattern for Next.js 15
+export default async function BagiHasilPage({
+	searchParams,
+}: {
+	searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+	// Must await searchParams in Next.js 15
+	const resolvedSearchParams = await searchParams;
+	const query =
+		typeof resolvedSearchParams?.query === "string"
+			? resolvedSearchParams.query
+			: "";
+	const currentPage = Number(resolvedSearchParams?.page) || 1;
 
 	return (
 		<div className="flex flex-col w-full gap-6">
@@ -34,7 +35,6 @@ export default function BagiHasilPage({ searchParams }: BagiHasilPageProps) {
 					<ProfitSharingActionCard />
 				</div>
 				<div className="lg:col-span-2">
-					{/* Pass the clean variables down as props */}
 					<ProfitSharingHistory query={query} currentPage={currentPage} />
 				</div>
 			</div>
