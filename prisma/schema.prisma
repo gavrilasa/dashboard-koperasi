@@ -58,6 +58,8 @@ model Transaction {
 
   profitSharingEventId String?
   profitSharingEvent   ProfitSharingEvent? @relation(fields: [profitSharingEventId], references: [id])
+  adminFeeEventId      String?
+  adminFeeEvent        AdminFeeEvent?      @relation(fields: [adminFeeEventId], references: [id])
 
   @@index([customerId, createdAt])
 }
@@ -142,6 +144,18 @@ model ProfitSharingEvent {
   amountPerRecipient   Decimal  @db.Decimal(15, 2)
   remainderAmount      Decimal  @db.Decimal(15, 2)
   mainAccountDebitTxId String   @unique
+
+  recipientTransactions Transaction[]
+}
+
+model AdminFeeEvent {
+  id                        String   @id @default(cuid())
+  executedAt                DateTime @default(now())
+  totalAmountCollected      Decimal  @db.Decimal(15, 2)
+  numberOfAffectedCustomers Int
+  amountPerCustomer         Decimal  @db.Decimal(15, 2)
+  description               String
+  mainAccountCreditTxId     String   @unique
 
   recipientTransactions Transaction[]
 }

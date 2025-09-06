@@ -18,10 +18,10 @@ export const columns: ColumnDef<SafeProfitSharingEvent>[] = [
 	},
 	{
 		accessorKey: "totalAmountShared",
-		header: () => <div className="text-right">Total Dibagikan</div>,
+		header: () => <div className="text-center">Total Dibagikan</div>,
 		meta: {
 			width: "25%",
-			align: "right",
+			align: "center",
 		},
 		cell: ({ row }) => {
 			const total = row.getValue("totalAmountShared") as number;
@@ -42,7 +42,7 @@ export const columns: ColumnDef<SafeProfitSharingEvent>[] = [
 		header: () => <div className="text-right">Jumlah per Nasabah</div>,
 		meta: {
 			width: "25%",
-			align: "right",
+			align: "center",
 		},
 		cell: ({ row }) => {
 			const amount = row.getValue("amountPerRecipient") as number;

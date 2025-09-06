@@ -6,6 +6,7 @@ import {
 	CreditCard,
 	Settings,
 	HandCoins,
+	CirclePercent,
 } from "lucide-react";
 
 export const navData: NavGroup[] = [
@@ -36,6 +37,11 @@ export const navData: NavGroup[] = [
 				title: "Bagi Hasil",
 				url: "/bagi-hasil",
 				icon: HandCoins,
+			},
+			{
+				title: "Biaya Admin",
+				url: "/biaya-admin",
+				icon: CirclePercent,
 			},
 		],
 	},
