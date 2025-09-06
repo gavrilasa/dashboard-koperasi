@@ -8,12 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { topUpMainAccount, withdrawMainAccount } from "../actions";
-import type { ActionState } from "../types";
-
-interface LedgerActionFormProps {
-	type: "deposit" | "withdraw";
-	onSuccess: () => void;
-}
+import { ActionState, LedgerActionFormProps } from "../types";
 
 function SubmitButton({ type }: { type: "deposit" | "withdraw" }) {
 	const { pending } = useFormStatus();

@@ -1,5 +1,3 @@
-// app/(main)/rekening-induk/page.tsx
-
 import { Suspense } from "react";
 import {
 	Card,

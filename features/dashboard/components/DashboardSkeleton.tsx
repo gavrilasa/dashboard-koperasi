@@ -1,14 +1,9 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
-/**
- * Komponen skeleton loader untuk halaman dashboard.
- * Menampilkan placeholder untuk kartu statistik dan grafik saat data sedang dimuat.
- */
 export function DashboardSkeleton() {
 	return (
 		<div className="flex flex-col w-full gap-6">
-			{/* Skeleton untuk Header dan Filter Tanggal */}
 			<div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
 				<div className="flex-1 space-y-2">
 					<Skeleton className="w-48 h-8" />
@@ -17,7 +12,6 @@ export function DashboardSkeleton() {
 				<Skeleton className="h-10 w-full md:w-[490px]" />
 			</div>
 
-			{/* Skeleton untuk Kartu Statistik */}
 			<div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
 				{Array.from({ length: 3 }).map((_, index) => (
 					<Card key={index}>
@@ -35,7 +29,6 @@ export function DashboardSkeleton() {
 				))}
 			</div>
 
-			{/* Skeleton untuk Grafik */}
 			<div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
 				{Array.from({ length: 2 }).map((_, index) => (
 					<Card key={index}>

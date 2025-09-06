@@ -1,18 +1,12 @@
 "use client";
 
 import { Banknote, Landmark, Users } from "lucide-react";
-import { formatCompactCurrency } from "@/lib/utils"; // <-- Impor fungsi baru
+import { formatCompactCurrency } from "@/lib/utils";
 import { StatCard } from "./StatCard";
 import { DashboardChart } from "./DashboardChart";
 import { DateRangeFilter } from "./DateRangeFilter";
-import type { ChartDataPoint, DashboardStats } from "../types";
 import { ClientOnly } from "@/components/shared/ClientOnly";
-
-interface DashboardClientProps {
-	stats: DashboardStats;
-	transactionChartData: ChartDataPoint[];
-	mainAccountChartData: ChartDataPoint[];
-}
+import { DashboardClientProps } from "../types";
 
 export function DashboardClient({
 	stats,
@@ -66,15 +60,15 @@ export function DashboardClient({
 					isLoading={false}
 					valueFormatter={formatAsInteger}
 					chartColor="yellow"
-					yAxisWidth={30} // Beri ruang secukupnya
+					yAxisWidth={30}
 				/>
 				<DashboardChart
 					title="Tren Saldo Rekening Induk"
 					data={mainAccountChartData}
 					isLoading={false}
-					valueFormatter={formatCompactCurrency} // Gunakan formatter ringkas
+					valueFormatter={formatCompactCurrency}
 					chartColor="green"
-					yAxisWidth={85} // Beri ruang lebih lebar
+					yAxisWidth={85}
 				/>
 			</div>
 		</div>

@@ -1,35 +1,9 @@
-// features/nasabah/components/print-layout.tsx
-
 "use client";
 
 import { Button } from "@/components/ui/button";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { Printer } from "lucide-react";
-
-// Tipe sederhana untuk data yang dibutuhkan komponen ini
-type CustomerInfo = {
-	name: string;
-	accountNumber: string;
-	address: string;
-};
-
-type TransactionInfo = {
-	id: string;
-	createdAt: Date;
-	description: string;
-	type: "KREDIT" | "DEBIT";
-	amount: number;
-};
-
-type PrintLayoutProps = {
-	customer: CustomerInfo;
-	transactions: TransactionInfo[];
-	dateRange: {
-		from: string;
-		to: string;
-	};
-	saldoAwal: number;
-};
+import { PrintLayoutProps } from "../types";
 
 export function PrintLayout({
 	customer,

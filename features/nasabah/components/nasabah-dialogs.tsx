@@ -13,20 +13,9 @@ import {
 import { PlusCircle, Pencil } from "lucide-react";
 import { NasabahForm } from "./nasabah-form";
 import type { Customer } from "../types";
+import { NasabahDialogProps } from "../types";
 // import { updateCustomer } from "../actions";
 
-// Tipe props untuk komponen dialog
-interface NasabahDialogProps {
-	customer?: Customer | null;
-	children: React.ReactNode; // Trigger untuk membuka dialog
-	open?: boolean;
-	onOpenChange?: (open: boolean) => void;
-}
-
-/**
- * Komponen Dialog generik untuk menampilkan form nasabah.
- * Bisa digunakan untuk mode "Create" atau "Update".
- */
 export function NasabahDialog({
 	customer,
 	children,
@@ -64,9 +53,6 @@ export function NasabahDialog({
 	);
 }
 
-/**
- * Tombol untuk membuat nasabah baru.
- */
 export function CreateNasabahButton() {
 	return (
 		<NasabahDialog>
@@ -78,9 +64,6 @@ export function CreateNasabahButton() {
 	);
 }
 
-/**
- * Tombol untuk mengedit data nasabah yang sudah ada.
- */
 export function EditNasabahButton({ customer }: { customer: Customer }) {
 	return (
 		<NasabahDialog customer={customer}>

@@ -15,14 +15,9 @@ import {
 	PopoverTrigger,
 } from "@/components/ui/popover";
 import { toast } from "sonner";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"; // <-- Impor komponen Tabs
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Preset } from "../types";
 
-type Preset = "today" | "week" | "month" | "custom";
-
-/**
- * Komponen untuk memfilter data dashboard berdasarkan rentang waktu.
- * Menggunakan Tabs untuk preset dan Popover untuk rentang kustom.
- */
 export function DateRangeFilter() {
 	const router = useRouter();
 	const pathname = usePathname();
@@ -103,7 +98,6 @@ export function DateRangeFilter() {
 
 	return (
 		<div className="flex items-center gap-2">
-			{/* Ganti Select dengan Tabs */}
 			<Tabs
 				value={activePreset === "custom" ? "" : activePreset}
 				onValueChange={(value) => handlePresetChange(value as Preset)}
@@ -123,7 +117,7 @@ export function DateRangeFilter() {
 						className={cn(
 							"w-[280px] justify-start text-left font-normal",
 							!activeDate && "text-muted-foreground",
-							activePreset === "custom" && "border-primary ring-1 ring-primary" // Tambahkan highlight jika custom aktif
+							activePreset === "custom" && "border-primary ring-1 ring-primary"
 						)}
 					>
 						<CalendarIcon className="w-4 h-4 mr-2" />

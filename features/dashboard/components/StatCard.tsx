@@ -3,20 +3,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency } from "@/lib/utils";
-import type { LucideIcon } from "lucide-react";
+import { StatCardProps } from "../types";
 
-interface StatCardProps {
-	title: string;
-	value: number;
-	description: string;
-	icon: LucideIcon;
-	isLoading: boolean;
-}
-
-/**
- * Komponen kartu untuk menampilkan metrik individual di dashboard.
- * Menampilkan skeleton loader saat data sedang dimuat.
- */
 export function StatCard({
 	title,
 	value,

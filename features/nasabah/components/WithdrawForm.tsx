@@ -11,14 +11,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
+import { WithdrawFormProps } from "../types";
 
-interface WithdrawFormProps {
-	onSuccess: () => void; // Prop untuk menutup dialog setelah sukses
-}
-
-/**
- * Komponen Tombol Submit dengan status pending.
- */
 function SubmitButton({ disabled }: { disabled: boolean }) {
 	const { pending } = useFormStatus();
 
@@ -41,9 +35,6 @@ function SubmitButton({ disabled }: { disabled: boolean }) {
 	);
 }
 
-/**
- * Form untuk melakukan aksi tarik tunai (withdraw).
- */
 export function WithdrawForm({ onSuccess }: WithdrawFormProps) {
 	const { customer } = useCustomer();
 	const [amount, setAmount] = useState(0);
@@ -77,7 +68,7 @@ export function WithdrawForm({ onSuccess }: WithdrawFormProps) {
 					state.data?.amount ?? 0
 				)} dari nasabah ${state.data?.customerName}.`,
 			});
-			onSuccess(); // Panggil callback untuk menutup dialog
+			onSuccess();
 		}
 	}, [state, onSuccess]);
 
@@ -85,7 +76,6 @@ export function WithdrawForm({ onSuccess }: WithdrawFormProps) {
 
 	return (
 		<form action={formAction} className="space-y-4">
-			{/* Input tersembunyi untuk data penting */}
 			<input type="hidden" name="customerId" value={customer.id} />
 			<input type="hidden" name="idempotencyKey" value={crypto.randomUUID()} />
 
@@ -94,7 +84,6 @@ export function WithdrawForm({ onSuccess }: WithdrawFormProps) {
 				<p className="text-lg font-bold">{formatCurrency(customer.balance)}</p>
 			</div>
 
-			{/* Input Jumlah */}
 			<div className="space-y-2">
 				<Label htmlFor="amount">Jumlah Penarikan</Label>
 				<Input
@@ -107,11 +96,9 @@ export function WithdrawForm({ onSuccess }: WithdrawFormProps) {
 					aria-describedby="amount-error"
 				/>
 				<div id="amount-error" aria-live="polite" aria-atomic="true">
-					{/* Menampilkan error dari validasi sisi klien */}
 					{clientError && (
 						<p className="mt-1 text-sm text-destructive">{clientError}</p>
 					)}
-					{/* Menampilkan error dari validasi server */}
 					{state.errors?.amount?.map((error: string) => (
 						<p className="mt-1 text-sm text-destructive" key={error}>
 							{error}
@@ -120,7 +107,6 @@ export function WithdrawForm({ onSuccess }: WithdrawFormProps) {
 				</div>
 			</div>
 
-			{/* Input Catatan (Opsional) */}
 			<div className="space-y-2">
 				<Label htmlFor="notes">Catatan (Opsional)</Label>
 				<Input
@@ -130,7 +116,6 @@ export function WithdrawForm({ onSuccess }: WithdrawFormProps) {
 				/>
 			</div>
 
-			{/* Menampilkan pesan error umum dari server */}
 			{state.status === "error" && state.message && (
 				<p className="text-sm text-destructive">{state.message}</p>
 			)}

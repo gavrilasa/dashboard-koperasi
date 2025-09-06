@@ -1,5 +1,3 @@
-// features/bagi-hasil/components/profit-sharing-history.tsx
-
 import { Suspense } from "react";
 import {
 	fetchProfitSharingEvents,
@@ -16,11 +14,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-
-interface ProfitSharingHistoryProps {
-	query: string;
-	currentPage: number;
-}
+import { ProfitSharingHistoryProps } from "../types";
 
 export async function ProfitSharingHistory({
 	query,

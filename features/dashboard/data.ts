@@ -1,5 +1,3 @@
-// features/dashboard/data.ts
-
 import { PrismaClient } from "@prisma/client";
 import { unstable_noStore as noStore } from "next/cache";
 import { isSameDay, startOfDay, subDays } from "date-fns";
@@ -7,7 +5,6 @@ import { DashboardStats, ChartDataPoint } from "./types";
 
 const prisma = new PrismaClient();
 
-// Fungsi getDashboardStats (TETAP SAMA)
 export async function getDashboardStats(range: {
 	from: Date;
 	to: Date;
@@ -37,7 +34,6 @@ export async function getDashboardStats(range: {
 	}
 }
 
-// Fungsi getTransactionChartData (TETAP SAMA)
 export async function getTransactionChartData(range: {
 	from: Date;
 	to: Date;
@@ -69,34 +65,27 @@ export async function getTransactionChartData(range: {
 	}
 }
 
-// Fungsi getMainAccountChartData (DIPERBARUI DENGAN LOGIKA BARU)
 export async function getMainAccountChartData(range: {
 	from: Date;
 	to: Date;
 }): Promise<ChartDataPoint[]> {
 	noStore();
 	try {
-		// PERIKSA APAKAH RENTANG HANYA SATU HARI
 		if (isSameDay(range.from, range.to)) {
-			// --- LOGIKA BARU UNTUK TAMPILAN HARIAN ---
-
-			// 1. Dapatkan saldo awal hari ini (dari snapshot hari sebelumnya)
 			const previousDay = subDays(startOfDay(range.from), 1);
 			const previousDaySnapshot = await prisma.dailyBalanceSnapshot.findUnique({
 				where: { date: previousDay },
 			});
 			let runningBalance = previousDaySnapshot?.balance.toNumber() ?? 0;
 
-			// 2. Dapatkan semua transaksi rekening induk untuk hari ini
 			const transactionsToday = await prisma.mainAccountTransaction.findMany({
 				where: { createdAt: { gte: range.from, lte: range.to } },
 				orderBy: { createdAt: "asc" },
 			});
 
-			// 3. Bangun titik data grafik secara dinamis
 			const chartData: ChartDataPoint[] = [
 				{
-					label: "00:00", // Titik awal hari
+					label: "00:00",
 					value: runningBalance,
 				},
 			];
@@ -118,7 +107,6 @@ export async function getMainAccountChartData(range: {
 			}
 			return chartData;
 		} else {
-			// --- LOGIKA LAMA UNTUK RENTANG MULTI-HARI ---
 			const snapshots = await prisma.dailyBalanceSnapshot.findMany({
 				where: { date: { gte: range.from, lte: range.to } },
 				orderBy: { date: "asc" },

@@ -1,5 +1,3 @@
-// features/nasabah/components/detail-page-actions.tsx
-
 "use client";
 
 import { useState } from "react";
@@ -18,7 +16,6 @@ import { WithdrawForm } from "./WithdrawForm";
 
 type DialogAction = "deposit" | "withdraw" | null;
 
-// Komponen Dialog dinamis, sama seperti yang ada di row-actions
 function TransactionDialog({
 	action,
 	open,
@@ -60,7 +57,6 @@ function TransactionDialog({
 	);
 }
 
-// Komponen utama yang berisi tombol dan logika dialog
 export function DetailPageActions({ customer }: { customer: Customer }) {
 	const [dialogAction, setDialogAction] = useState<DialogAction>(null);
 

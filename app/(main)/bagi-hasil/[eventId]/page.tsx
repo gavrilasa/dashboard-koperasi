@@ -1,5 +1,3 @@
-// app/(main)/bagi-hasil/[eventId]/page.tsx
-
 import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -21,7 +19,6 @@ export const metadata = {
 	title: "Detail Event Bagi Hasil",
 };
 
-// Async component for Next.js 15 compatibility
 export default async function EventDetailPage({
 	params,
 	searchParams,
@@ -29,21 +26,18 @@ export default async function EventDetailPage({
 	params: Promise<{ eventId: string }>;
 	searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-	// Await both params and searchParams
 	const resolvedParams = await params;
 	const resolvedSearchParams = await searchParams;
 
 	const eventId = resolvedParams.eventId;
 	const currentPage = Number(resolvedSearchParams?.page) || 1;
 
-	// Fetch event details
 	const eventDetails = await fetchProfitSharingEventDetails(eventId);
 
 	if (!eventDetails) {
 		notFound();
 	}
 
-	// Transform data for safe client-side rendering
 	const safeEventData = {
 		id: eventDetails.id,
 		executedAt: eventDetails.executedAt,
@@ -53,7 +47,6 @@ export default async function EventDetailPage({
 		remainderAmount: eventDetails.remainderAmount.toNumber(),
 	};
 
-	// Transform recipient data for the table
 	const recipientData = eventDetails.recipientTransactions.map((tx) => ({
 		id: tx.customer.id,
 		name: tx.customer.name,
@@ -63,7 +56,6 @@ export default async function EventDetailPage({
 
 	return (
 		<div className="flex flex-col w-full gap-6">
-			{/* Breadcrumb navigation */}
 			<Link
 				href="/bagi-hasil"
 				className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
@@ -72,26 +64,21 @@ export default async function EventDetailPage({
 				Kembali ke Riwayat Bagi Hasil
 			</Link>
 
-			{/* Page header */}
 			<div>
-				<h1 className="text-2xl font-bold tracking-tight">
-					Detail Event Bagi Hasil
-				</h1>
+				<h1 className="text-2xl font-bold tracking-tight">Detail Bagi Hasil</h1>
 				<p className="text-muted-foreground">
-					Informasi lengkap event bagi hasil dan daftar penerima.
+					Informasi lengkap bagi hasil dan daftar penerima.
 				</p>
 			</div>
 
-			{/* Event summary */}
 			<EventSummaryCard event={safeEventData} />
 
-			{/* Recipients list */}
 			<Card className="shadow-lg">
 				<CardHeader>
 					<CardTitle>Daftar Penerima</CardTitle>
 					<CardDescription>
 						{eventDetails.numberOfRecipients} nasabah yang menerima bagi hasil
-						pada event ini.
+						pada sesi ini.
 					</CardDescription>
 				</CardHeader>
 				<CardContent>

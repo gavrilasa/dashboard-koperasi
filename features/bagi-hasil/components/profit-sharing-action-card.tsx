@@ -1,5 +1,3 @@
-// features/bagi-hasil/components/profit-sharing-action-card.tsx
-
 "use client";
 
 import { useState, useTransition } from "react";
@@ -16,17 +14,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
-// 👇 Import the action, not the data function
 import { getActiveCustomersCount } from "@/features/bagi-hasil/actions";
 import { ProfitSharingConfirmDialog } from "./profit-sharing-action-dialog";
 import { formatCurrency } from "@/lib/utils";
-
-// ... (PreviewData type remains the same) ...
-type PreviewData = {
-	totalAmount: number;
-	customerCount: number;
-	amountPerRecipient: number;
-};
+import { PreviewData } from "../types";
 
 export function ProfitSharingActionCard() {
 	const [isPending, startTransition] = useTransition();

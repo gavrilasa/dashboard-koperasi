@@ -241,7 +241,6 @@ export function NasabahForm({ customer }: { customer?: Customer | null }) {
 	);
 }
 
-// ... (komponen SubmitButton tetap sama)
 function SubmitButton({
 	isEdit,
 	isFileValid,

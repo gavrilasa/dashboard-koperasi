@@ -2,11 +2,7 @@
 
 import { type ColumnDef } from "@tanstack/react-table";
 import { formatCurrency } from "@/lib/utils";
-import { Customer } from "@prisma/client";
-
-export type RecipientData = Pick<Customer, "id" | "name" | "accountNumber"> & {
-	amountReceived: number;
-};
+import { RecipientData } from "../types";
 
 export const recipientListColumns: ColumnDef<RecipientData>[] = [
 	{

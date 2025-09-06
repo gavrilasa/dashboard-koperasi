@@ -1,13 +1,10 @@
-// features/transaksi/components/columns.tsx
-
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/lib/utils";
-import { TransactionWithCustomer } from "../data"; // Pastikan path impor ini benar
+import { TransactionWithCustomer } from "../types";
 
-// Fungsi helper untuk format tanggal dan waktu
 const formatDateTime = (date: Date) => {
 	return new Intl.DateTimeFormat("id-ID", {
 		dateStyle: "medium",

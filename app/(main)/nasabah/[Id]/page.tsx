@@ -1,5 +1,3 @@
-// app/(main)/nasabah/[Id]/page.tsx
-
 import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -26,12 +24,12 @@ export default async function NasabahDetailPage({
 	params,
 	searchParams,
 }: {
-	params: Promise<{ Id: string }>; // Corrected from 'id' to 'Id'
+	params: Promise<{ Id: string }>;
 	searchParams?: Promise<{ page?: string }>;
 }) {
 	const resolvedParams = await params;
 	const resolvedSearchParams = await searchParams;
-	const id = resolvedParams.Id; // Corrected from 'id' to 'Id'
+	const id = resolvedParams.Id;
 	const currentPage = Number(resolvedSearchParams?.page) || 1;
 
 	const customer = await fetchCustomerById(id);

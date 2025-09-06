@@ -1,5 +1,3 @@
-// features/nasabah/components/status-action-button.tsx
-
 "use client";
 
 import { useTransition } from "react";
@@ -10,7 +8,6 @@ import {
 	activateCustomer,
 	deactivateCustomer,
 } from "@/features/nasabah/actions";
-import type { Customer } from "../types";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -22,10 +19,7 @@ import {
 	AlertDialogTitle,
 	AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-
-interface StatusActionButtonProps {
-	customer: Pick<Customer, "id" | "status" | "name">;
-}
+import { StatusActionButtonProps } from "../types";
 
 export function StatusActionButton({ customer }: StatusActionButtonProps) {
 	const [isPending, startTransition] = useTransition();

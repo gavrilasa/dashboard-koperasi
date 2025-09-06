@@ -1,16 +1,12 @@
-// features/bagi-hasil/components/columns.tsx
-
 "use client";
 
 import Link from "next/link";
 import { type ColumnDef } from "@tanstack/react-table";
-// 👇 Import the new safe type
-import { type SafeProfitSharingEvent } from "@/features/bagi-hasil/data";
+import type { SafeProfitSharingEvent } from "../types";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatCurrency, formatDate } from "@/lib/utils";
 
-// 👇 Use the new safe type for the column definitions
 export const columns: ColumnDef<SafeProfitSharingEvent>[] = [
 	{
 		accessorKey: "executedAt",
@@ -28,7 +24,6 @@ export const columns: ColumnDef<SafeProfitSharingEvent>[] = [
 			align: "right",
 		},
 		cell: ({ row }) => {
-			// No longer need parseFloat, as it's already a number
 			const total = row.getValue("totalAmountShared") as number;
 			return <div className="font-semibold">{formatCurrency(total)}</div>;
 		},

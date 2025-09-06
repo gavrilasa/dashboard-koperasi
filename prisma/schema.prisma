@@ -58,6 +58,8 @@ model Transaction {
 
   profitSharingEventId String?
   profitSharingEvent   ProfitSharingEvent? @relation(fields: [profitSharingEventId], references: [id])
+
+  @@index([customerId, createdAt])
 }
 
 model IdempotencyKey {

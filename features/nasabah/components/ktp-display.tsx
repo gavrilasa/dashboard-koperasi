@@ -4,11 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-interface KtpDisplayProps {
-	ktpUrl: string;
-	customerName: string;
-}
+import { KtpDisplayProps } from "../types";
 
 export function KtpDisplay({ ktpUrl, customerName }: KtpDisplayProps) {
 	const [isBlurred, setIsBlurred] = useState(true);

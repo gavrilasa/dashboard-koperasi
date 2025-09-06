@@ -1,5 +1,3 @@
-// app/(main)/bagi-hasil/page.tsx
-
 import { ProfitSharingActionCard } from "@/features/bagi-hasil/components/profit-sharing-action-card";
 import { ProfitSharingHistory } from "@/features/bagi-hasil/components/profit-sharing-history";
 
@@ -7,13 +5,11 @@ export const metadata = {
 	title: "Bagi Hasil",
 };
 
-// Use async pattern for Next.js 15
 export default async function BagiHasilPage({
 	searchParams,
 }: {
 	searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-	// Must await searchParams in Next.js 15
 	const resolvedSearchParams = await searchParams;
 	const query =
 		typeof resolvedSearchParams?.query === "string"

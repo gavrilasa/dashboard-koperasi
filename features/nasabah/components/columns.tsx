@@ -1,5 +1,3 @@
-// features/nasabah/components/columns.tsx
-
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
@@ -13,7 +11,7 @@ export const columns: ColumnDef<Customer>[] = [
 		accessorKey: "name",
 		header: "Nama Nasabah",
 		meta: {
-			width: "30%", // Paling lebar
+			width: "30%",
 			align: "left",
 			truncate: true,
 		},
@@ -35,7 +33,7 @@ export const columns: ColumnDef<Customer>[] = [
 		header: "Saldo",
 		meta: {
 			width: "20%",
-			align: "right", // Angka rata kanan
+			align: "right",
 		},
 		cell: ({ row }) => {
 			const balance = parseFloat(row.getValue("balance"));
@@ -47,7 +45,7 @@ export const columns: ColumnDef<Customer>[] = [
 		header: "Status",
 		meta: {
 			width: "15%",
-			align: "center", // Status di tengah
+			align: "center",
 		},
 		cell: ({ row }) => {
 			const status = row.getValue("status") as string;

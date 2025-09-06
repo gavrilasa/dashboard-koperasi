@@ -1,10 +1,7 @@
-// features/transaksi/components/data-table.tsx
-
 "use client";
 
 import * as React from "react";
 import {
-	ColumnDef,
 	flexRender,
 	getCoreRowModel,
 	useReactTable,
@@ -19,11 +16,7 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
-
-interface TransactionDataTableProps<TData, TValue> {
-	columns: ColumnDef<TData, TValue>[];
-	data: TData[];
-}
+import { TransactionDataTableProps } from "../types";
 
 export function TransactionDataTable<TData, TValue>({
 	columns,
@@ -79,7 +72,7 @@ export function TransactionDataTable<TData, TValue>({
 											key={cell.id}
 											style={{ width: meta?.width }}
 											className={cn(
-												"px-4", // Menambahkan padding
+												"px-4",
 												meta?.align === "center" && "text-center",
 												meta?.align === "right" && "text-right",
 												meta?.truncate && "truncate"

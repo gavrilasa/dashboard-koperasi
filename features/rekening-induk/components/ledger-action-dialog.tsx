@@ -1,5 +1,3 @@
-// features/rekening-induk/components/ledger-action-dialog.tsx
-
 "use client";
 
 import { useState } from "react";
@@ -12,11 +10,7 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import { LedgerActionForm } from "./ledger-action-form";
-
-interface LedgerActionDialogProps {
-	type: "deposit" | "withdraw";
-	children: React.ReactNode; // Trigger button
-}
+import { LedgerActionDialogProps } from "../types";
 
 export function LedgerActionDialog({
 	type,

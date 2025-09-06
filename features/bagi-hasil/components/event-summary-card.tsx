@@ -1,5 +1,3 @@
-// features/bagi-hasil/components/event-summary-card.tsx
-
 import {
 	Card,
 	CardContent,
@@ -8,25 +6,8 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { formatCurrency, formatDate } from "@/lib/utils";
-// Hapus import 'ProfitSharingEvent' jika tidak digunakan secara penuh
-// import { type ProfitSharingEvent } from "@prisma/client";
+import { EventSummaryCardProps } from "../types";
 
-// Definisikan tipe "aman" yang hanya menggunakan number, bukan Decimal
-interface SafeEventSummary {
-	executedAt: Date;
-	totalAmountShared: number;
-	numberOfRecipients: number;
-	amountPerRecipient: number;
-}
-
-interface EventSummaryCardProps {
-	event: SafeEventSummary; // Gunakan tipe data yang aman di sini
-}
-
-/**
- * Komponen Server untuk menampilkan ringkasan detail dari
- * sebuah event bagi hasil.
- */
 export function EventSummaryCard({ event }: EventSummaryCardProps) {
 	return (
 		<Card>
@@ -46,7 +27,6 @@ export function EventSummaryCard({ event }: EventSummaryCardProps) {
 					<div className="flex items-center justify-between">
 						<span className="text-muted-foreground">Total Dana Dibagikan</span>
 						<span className="font-semibold text-blue-600">
-							{/* Tidak perlu .toNumber() lagi di sini */}
 							{formatCurrency(event.totalAmountShared)}
 						</span>
 					</div>
@@ -59,7 +39,6 @@ export function EventSummaryCard({ event }: EventSummaryCardProps) {
 					<div className="flex items-center justify-between">
 						<span className="text-muted-foreground">Dana per Nasabah</span>
 						<span className="font-semibold text-green-600">
-							{/* Tidak perlu .toNumber() lagi di sini */}
 							{formatCurrency(event.amountPerRecipient)}
 						</span>
 					</div>

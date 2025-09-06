@@ -11,14 +11,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
+import { DepositFormProps } from "../types";
 
-interface DepositFormProps {
-	onSuccess: () => void; // Prop untuk menutup dialog setelah sukses
-}
-
-/**
- * Komponen Tombol Submit dengan status pending.
- */
 function SubmitButton() {
 	const { pending } = useFormStatus();
 
@@ -36,9 +30,6 @@ function SubmitButton() {
 	);
 }
 
-/**
- * Form untuk melakukan aksi simpan tunai (deposit).
- */
 export function DepositForm({ onSuccess }: DepositFormProps) {
 	const { customer } = useCustomer();
 	const initialState: ActionState = {
@@ -56,17 +47,15 @@ export function DepositForm({ onSuccess }: DepositFormProps) {
 					state.data?.amount ?? 0
 				)} untuk nasabah ${state.data?.customerName}.`,
 			});
-			onSuccess(); // Panggil callback untuk menutup dialog
+			onSuccess();
 		}
 	}, [state, onSuccess]);
 
 	return (
 		<form action={formAction} className="space-y-4">
-			{/* Input tersembunyi untuk data penting */}
 			<input type="hidden" name="customerId" value={customer.id} />
 			<input type="hidden" name="idempotencyKey" value={crypto.randomUUID()} />
 
-			{/* Input Jumlah */}
 			<div className="space-y-2">
 				<Label htmlFor="amount">Jumlah Simpanan</Label>
 				<Input
@@ -85,8 +74,6 @@ export function DepositForm({ onSuccess }: DepositFormProps) {
 					))}
 				</div>
 			</div>
-
-			{/* Input Catatan (Opsional) */}
 			<div className="space-y-2">
 				<Label htmlFor="notes">Catatan (Opsional)</Label>
 				<Input
@@ -96,7 +83,6 @@ export function DepositForm({ onSuccess }: DepositFormProps) {
 				/>
 			</div>
 
-			{/* Menampilkan pesan error umum */}
 			{state.status === "error" && state.message && (
 				<p className="text-sm text-destructive">{state.message}</p>
 			)}

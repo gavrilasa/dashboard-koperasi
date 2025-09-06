@@ -1,7 +1,7 @@
 "use client";
 
-import { useActionState } from "react"; // Diubah dari 'useFormState' dan 'react-dom'
-import { useFormStatus } from "react-dom"; // useFormStatus tetap dari 'react-dom'
+import { useActionState } from "react";
+import { useFormStatus } from "react-dom";
 import { authenticate, type FormState } from "@/lib/actions/auth-actions";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,11 +17,10 @@ import { AlertCircle } from "lucide-react";
 
 export default function LoginPage() {
 	const initialState: FormState | undefined = undefined;
-	// Nama hook diubah menjadi useActionState
 	const [state, dispatch] = useActionState(authenticate, initialState);
 
 	return (
-		<Card className="mx-auto w-full max-w-sm">
+		<Card className="w-full max-w-sm mx-auto">
 			<CardHeader>
 				<CardTitle className="text-2xl">Login Admin</CardTitle>
 				<CardDescription>
@@ -47,10 +46,10 @@ export default function LoginPage() {
 
 					{state?.message && (
 						<div
-							className="flex items-center gap-2 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+							className="flex items-center gap-2 p-3 text-sm text-red-700 border border-red-200 rounded-md bg-red-50"
 							aria-live="polite"
 						>
-							<AlertCircle className="h-4 w-4" />
+							<AlertCircle className="w-4 h-4" />
 							<p>{state.message}</p>
 						</div>
 					)}

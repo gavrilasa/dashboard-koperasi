@@ -1,11 +1,9 @@
-// features/bagi-hasil/components/profit-sharing-action-dialog.tsx
-
 "use client";
 
 import { useEffect } from "react";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
-import { useRouter } from "next/navigation"; // 👈 Impor useRouter
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
 	AlertDialog,
@@ -21,21 +19,8 @@ import { executeProfitSharing } from "@/features/bagi-hasil/actions";
 import type { ActionState } from "@/features/bagi-hasil/types";
 import { formatCurrency } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
+import { ProfitSharingConfirmDialogProps } from "../types";
 
-// ... (Tipe PreviewData tetap sama)
-type PreviewData = {
-	totalAmount: number;
-	customerCount: number;
-	amountPerRecipient: number;
-};
-
-interface ProfitSharingConfirmDialogProps {
-	open: boolean;
-	onOpenChange: (open: boolean) => void;
-	previewData: PreviewData;
-}
-
-// ... (Komponen SubmitButton tetap sama)
 function SubmitButton() {
 	const { pending } = useFormStatus();
 
@@ -58,7 +43,7 @@ export function ProfitSharingConfirmDialog({
 	onOpenChange,
 	previewData,
 }: ProfitSharingConfirmDialogProps) {
-	const router = useRouter(); // 👈 Inisialisasi router
+	const router = useRouter();
 	const initialState: ActionState = { status: "error", message: null };
 	const [state, formAction] = useActionState(
 		executeProfitSharing,
@@ -70,8 +55,8 @@ export function ProfitSharingConfirmDialog({
 			toast.success("Eksekusi Berhasil", {
 				description: state.message,
 			});
-			onOpenChange(false); // Tutup dialog
-			router.refresh(); // 👈 Perintahkan Next.js untuk memuat ulang data di halaman saat ini
+			onOpenChange(false);
+			router.refresh();
 		} else if (state.status === "error" && state.message) {
 			toast.error("Eksekusi Gagal", {
 				description: state.message,

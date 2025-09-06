@@ -11,14 +11,8 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
+import { TransactionHistoryProps } from "../types";
 
-// Tipe props
-interface TransactionHistoryProps {
-	customerId: string;
-	currentPage: number;
-}
-
-// Fungsi utilitas
 const formatCurrency = (amount: number | bigint) => {
 	return new Intl.NumberFormat("id-ID", {
 		style: "currency",
@@ -34,14 +28,10 @@ const formatDateTime = (date: Date) => {
 	}).format(date);
 };
 
-/**
- * Komponen Server yang mengambil dan menampilkan riwayat transaksi nasabah dengan paginasi.
- */
 export async function TransactionHistory({
 	customerId,
 	currentPage,
 }: TransactionHistoryProps) {
-	// Mengambil data transaksi dan total halaman secara paralel
 	const [transactions, totalPages] = await Promise.all([
 		fetchCustomerTransactions(customerId, currentPage),
 		fetchCustomerTransactionPages(customerId),

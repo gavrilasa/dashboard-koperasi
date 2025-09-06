@@ -4,11 +4,11 @@
 
 import * as React from "react";
 import {
-	ColumnDef,
 	flexRender,
 	getCoreRowModel,
 	useReactTable,
 } from "@tanstack/react-table";
+import { DataTableProps } from "./types";
 
 import {
 	Table,
@@ -19,11 +19,6 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
-
-interface DataTableProps<TData, TValue> {
-	columns: ColumnDef<TData, TValue>[];
-	data: TData[];
-}
 
 export function DataTable<TData, TValue>({
 	columns,

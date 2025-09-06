@@ -1,8 +1,6 @@
-// features/nasabah/types.ts
-
 import { z } from "zod";
 
-const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3 MB
+const MAX_FILE_SIZE = 3 * 1024 * 1024;
 const ACCEPTED_IMAGE_TYPES = [
 	"image/jpeg",
 	"image/jpg",
@@ -73,3 +71,66 @@ export type SearchedCustomer = {
 	name: string;
 	accountNumber: string;
 };
+
+export interface CustomerContextType {
+	customer: Customer;
+}
+
+export type DialogAction = "deposit" | "withdraw" | "transfer" | null;
+
+export interface DepositFormProps {
+	onSuccess: () => void;
+}
+
+export interface KtpDisplayProps {
+	ktpUrl: string;
+	customerName: string;
+}
+
+export interface NasabahDialogProps {
+	customer?: Customer | null;
+	children: React.ReactNode;
+	open?: boolean;
+	onOpenChange?: (open: boolean) => void;
+}
+
+type CustomerInfo = {
+	name: string;
+	accountNumber: string;
+	address: string;
+};
+
+type TransactionInfo = {
+	id: string;
+	createdAt: Date;
+	description: string;
+	type: "KREDIT" | "DEBIT";
+	amount: number;
+};
+
+export type PrintLayoutProps = {
+	customer: CustomerInfo;
+	transactions: TransactionInfo[];
+	dateRange: {
+		from: string;
+		to: string;
+	};
+	saldoAwal: number;
+};
+
+export interface StatusActionButtonProps {
+	customer: Pick<Customer, "id" | "status" | "name">;
+}
+
+export interface TransactionHistoryProps {
+	customerId: string;
+	currentPage: number;
+}
+
+export interface TransferFormProps {
+	onSuccess: () => void;
+}
+
+export interface WithdrawFormProps {
+	onSuccess: () => void;
+}

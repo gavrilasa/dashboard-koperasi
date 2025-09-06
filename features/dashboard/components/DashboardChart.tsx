@@ -11,24 +11,7 @@ import {
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ChartDataPoint } from "../types";
-
-// ... (interface CustomTooltipProps tetap sama)
-interface CustomTooltipProps {
-	active?: boolean;
-	payload?: { value: number }[];
-	label?: string;
-	formatter: (value: number) => string;
-}
-
-interface DashboardChartProps {
-	title: string;
-	data: ChartDataPoint[];
-	isLoading: boolean;
-	valueFormatter: (value: number) => string;
-	chartColor: "green" | "yellow" | "primary";
-	yAxisWidth?: number; // Tambahkan prop baru untuk lebar sumbu Y
-}
+import { CustomTooltipProps, DashboardChartProps } from "../types";
 
 const colorMap = {
 	green: "oklch(0.6 0.18 145)",
@@ -42,7 +25,7 @@ export function DashboardChart({
 	isLoading,
 	valueFormatter,
 	chartColor,
-	yAxisWidth = 60, // Beri nilai default
+	yAxisWidth = 60,
 }: DashboardChartProps) {
 	const CustomTooltip = ({
 		active,
@@ -114,7 +97,7 @@ export function DashboardChart({
 									fontSize={12}
 									tickFormatter={valueFormatter}
 									domain={[yMinDomain, "auto"]}
-									width={yAxisWidth} // Terapkan lebar sumbu Y di sini
+									width={yAxisWidth}
 								/>
 								<Tooltip
 									content={<CustomTooltip formatter={valueFormatter} />}

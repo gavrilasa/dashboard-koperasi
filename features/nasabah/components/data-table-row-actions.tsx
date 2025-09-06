@@ -21,13 +21,8 @@ import { CustomerProvider } from "./CustomerContext";
 import { DepositForm } from "./DepositForm";
 import { WithdrawForm } from "./WithdrawForm";
 import { TransferForm } from "./TransferForm";
+import { DialogAction } from "../types";
 
-type DialogAction = "deposit" | "withdraw" | "transfer" | null;
-
-/**
- * Komponen Dialog Aksi Transaksi yang dinamis.
- * Merender form yang sesuai berdasarkan prop 'action'.
- */
 function TransactionDialog({
 	action,
 	open,
@@ -72,9 +67,6 @@ function TransactionDialog({
 	);
 }
 
-/**
- * Komponen untuk menampilkan aksi cepat di setiap baris tabel.
- */
 export function CustomerTableRowActions({ customer }: { customer: Customer }) {
 	const [dialogAction, setDialogAction] = useState<DialogAction>(null);
 
@@ -89,7 +81,6 @@ export function CustomerTableRowActions({ customer }: { customer: Customer }) {
 	return (
 		<TooltipProvider delayDuration={0}>
 			<div className="flex items-center justify-center gap-1">
-				{/* Tombol Lihat Detail */}
 				<Tooltip>
 					<TooltipTrigger asChild>
 						<Button asChild variant="ghost" size="icon">
@@ -104,7 +95,6 @@ export function CustomerTableRowActions({ customer }: { customer: Customer }) {
 					</TooltipContent>
 				</Tooltip>
 
-				{/* Tombol Simpan Tunai */}
 				<Tooltip>
 					<TooltipTrigger asChild>
 						<Button
@@ -121,7 +111,6 @@ export function CustomerTableRowActions({ customer }: { customer: Customer }) {
 					</TooltipContent>
 				</Tooltip>
 
-				{/* Tombol Tarik Tunai */}
 				<Tooltip>
 					<TooltipTrigger asChild>
 						<Button
@@ -138,7 +127,6 @@ export function CustomerTableRowActions({ customer }: { customer: Customer }) {
 					</TooltipContent>
 				</Tooltip>
 
-				{/* Tombol Transfer */}
 				<Tooltip>
 					<TooltipTrigger asChild>
 						<Button
@@ -155,10 +143,6 @@ export function CustomerTableRowActions({ customer }: { customer: Customer }) {
 					</TooltipContent>
 				</Tooltip>
 
-				{/*
-          Dialog Transaksi dibungkus dengan CustomerProvider.
-          Ini membuat data 'customer' tersedia untuk form apapun yang dirender di dalamnya.
-        */}
 				<CustomerProvider customer={customer}>
 					<TransactionDialog
 						action={dialogAction}

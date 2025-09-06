@@ -25,10 +25,7 @@ import {
 	CommandList,
 } from "@/components/ui/command";
 import { formatCurrency, cn } from "@/lib/utils";
-
-interface TransferFormProps {
-	onSuccess: () => void;
-}
+import { TransferFormProps } from "../types";
 
 function SubmitButton({ disabled }: { disabled: boolean }) {
 	const { pending } = useFormStatus();
@@ -56,7 +53,6 @@ export function TransferForm({ onSuccess }: TransferFormProps) {
 	const [amount, setAmount] = useState(0);
 	const [clientError, setClientError] = useState<string | null>(null);
 
-	// State untuk Combobox
 	const [open, setOpen] = useState(false);
 	const [destCustomer, setDestCustomer] = useState<SearchedCustomer | null>(
 		null
@@ -78,7 +74,6 @@ export function TransferForm({ onSuccess }: TransferFormProps) {
 		}
 		setIsSearching(true);
 		const results = await searchActiveCustomers(query);
-		// Saring hasil di sisi klien untuk menghapus nasabah pengirim
 		setSearchResults(results.filter((c) => c.id !== sourceCustomer.id));
 		setIsSearching(false);
 	}, 300);

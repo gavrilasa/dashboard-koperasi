@@ -1,5 +1,3 @@
-// features/nasabah/components/print-statement-dialog.tsx
-
 "use client";
 
 import { useState } from "react";
@@ -18,7 +16,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Printer } from "lucide-react";
 
-// Helper untuk format tanggal ke YYYY-MM-DD untuk nilai default input
 const formatDateForInput = (date: Date): string => {
 	return date.toISOString().split("T")[0];
 };
@@ -26,7 +23,6 @@ const formatDateForInput = (date: Date): string => {
 export function PrintStatementDialog({ customerId }: { customerId: string }) {
 	const [isOpen, setIsOpen] = useState(false);
 
-	// Atur rentang tanggal default ke bulan berjalan
 	const today = new Date();
 	const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 

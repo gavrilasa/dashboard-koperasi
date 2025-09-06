@@ -1,5 +1,3 @@
-// app/(main)/nasabah/[id]/cetak/page.tsx
-
 import { notFound } from "next/navigation";
 import {
 	fetchCustomerById,
@@ -7,17 +5,17 @@ import {
 	fetchCustomerTransactionsByDateRange,
 } from "@/features/nasabah/data";
 import { PrintLayout } from "@/features/nasabah/components/print-layout";
+import { startOfDay, endOfDay } from "date-fns";
 
 export const metadata = {
 	title: "Cetak Rekening Koran",
 };
 
-// Layout ini tidak memerlukan sidebar atau header
 export default async function CetakRekeningKoranPage({
 	params,
 	searchParams,
 }: {
-	params: Promise<{ Id: string }>; // Corrected from 'id' to 'Id'
+	params: Promise<{ Id: string }>;
 	searchParams?: Promise<{
 		from?: string;
 		to?: string;
@@ -25,14 +23,14 @@ export default async function CetakRekeningKoranPage({
 }) {
 	const resolvedParams = await params;
 	const resolvedSearchParams = await searchParams;
-	const id = resolvedParams.Id; // Corrected from 'id' to 'Id'
-	// Validasi tanggal, default ke bulan ini jika tidak ada
+	const id = resolvedParams.Id;
+
 	const fromDate = resolvedSearchParams?.from
-		? new Date(resolvedSearchParams.from)
-		: new Date(new Date().setDate(1));
+		? startOfDay(new Date(resolvedSearchParams.from))
+		: startOfDay(new Date(new Date().setDate(1)));
 	const toDate = resolvedSearchParams?.to
-		? new Date(resolvedSearchParams.to)
-		: new Date();
+		? endOfDay(new Date(resolvedSearchParams.to))
+		: endOfDay(new Date());
 
 	const customer = await fetchCustomerById(id);
 
@@ -45,7 +43,6 @@ export default async function CetakRekeningKoranPage({
 		fetchCustomerTransactionsByDateRange(id, { from: fromDate, to: toDate }),
 	]);
 
-	// Halaman ini tidak me-render layout utama, hanya komponen PrintLayout
 	return (
 		<PrintLayout
 			customer={customer}

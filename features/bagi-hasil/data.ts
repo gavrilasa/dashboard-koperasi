@@ -1,30 +1,15 @@
-// features/bagi-hasil/data.ts
-
 import { PrismaClient } from "@prisma/client";
 import { unstable_noStore as noStore } from "next/cache";
+import { SafeProfitSharingEvent } from "./types";
 
 const prisma = new PrismaClient();
 
-// features/bagi-hasil/data.ts
-
 const ITEMS_PER_PAGE = 15;
-
-// Define a new type for the event data that will be sent to the client
-export type SafeProfitSharingEvent = {
-	id: string;
-	executedAt: Date;
-	totalAmountShared: number;
-	numberOfRecipients: number;
-	amountPerRecipient: number;
-	remainderAmount: number;
-	mainAccountDebitTxId: string;
-};
 
 export async function fetchProfitSharingEvents(
 	query: string,
 	currentPage: number
 ): Promise<SafeProfitSharingEvent[]> {
-	// Return the safe type
 	noStore();
 	const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 	const numericQuery = query ? Number(query) : NaN;
@@ -45,7 +30,6 @@ export async function fetchProfitSharingEvents(
 			skip: offset,
 		});
 
-		// 👇 Convert Decimal fields to number before returning
 		return events.map((event) => ({
 			...event,
 			totalAmountShared: event.totalAmountShared.toNumber(),
@@ -58,7 +42,6 @@ export async function fetchProfitSharingEvents(
 	}
 }
 
-// ... (fetchProfitSharingPages and other functions remain the same)
 export async function fetchProfitSharingPages(query: string): Promise<number> {
 	noStore();
 	const numericQuery = query ? Number(query) : NaN;

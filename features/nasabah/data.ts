@@ -1,5 +1,3 @@
-// features/nasabah/data.ts
-
 import {
 	PrismaClient,
 	Customer,
@@ -11,10 +9,9 @@ import { unstable_noStore as noStore } from "next/cache";
 const prisma = new PrismaClient();
 const ITEMS_PER_PAGE = 10;
 
-// Definisikan tipe baru yang menyertakan relasi lampiran
 export type SafeCustomerWithAttachment = Omit<Customer, "balance"> & {
 	balance: number;
-	ktpAttachment: Attachment | null; // Lampiran bisa jadi null
+	ktpAttachment: Attachment | null;
 };
 
 export type SafeCustomer = Omit<Customer, "balance"> & {
@@ -73,7 +70,6 @@ export async function fetchCustomersPages(query: string) {
 	}
 }
 
-// SOLUSI: Modifikasi fungsi ini untuk menyertakan data lampiran
 export async function fetchCustomerById(
 	id: string
 ): Promise<SafeCustomerWithAttachment | null> {
@@ -82,7 +78,7 @@ export async function fetchCustomerById(
 		const customer = await prisma.customer.findUnique({
 			where: { id },
 			include: {
-				ktpAttachment: true, // Sertakan data dari relasi ktpAttachment
+				ktpAttachment: true,
 			},
 		});
 

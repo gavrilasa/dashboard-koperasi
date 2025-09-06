@@ -8,16 +8,11 @@ import {
 import { DashboardClient } from "@/features/dashboard/components/DashboardClient";
 import { DashboardSkeleton } from "@/features/dashboard/components/DashboardSkeleton";
 
-/**
- * Komponen data fetcher yang berjalan di server.
- * Mengambil semua data yang diperlukan dan meneruskannya ke komponen klien.
- */
 async function DashboardContent({
 	dateRange,
 }: {
 	dateRange: { from: Date; to: Date };
 }) {
-	// Mengambil semua data untuk dashboard secara paralel
 	const [stats, transactionChartData, mainAccountChartData] = await Promise.all(
 		[
 			getDashboardStats(dateRange),
@@ -26,7 +21,6 @@ async function DashboardContent({
 		]
 	);
 
-	// Me-render komponen klien dengan data yang sudah siap
 	return (
 		<DashboardClient
 			stats={stats}
@@ -36,12 +30,6 @@ async function DashboardContent({
 	);
 }
 
-/**
- * Halaman utama Dashboard.
- * Merupakan Server Component yang mengatur pengambilan data dan menampilkan
- * skeleton loader menggunakan Suspense saat data sedang dimuat atau saat
- * filter tanggal diubah di sisi klien.
- */
 export default async function HomePage({
 	searchParams,
 }: {
@@ -51,18 +39,14 @@ export default async function HomePage({
 	}>;
 }) {
 	const resolvedSearchParams = await searchParams;
-	// FIX: Pastikan rentang waktu mencakup seluruh hari
 	const from = resolvedSearchParams?.from
-		? startOfDay(new Date(resolvedSearchParams.from)) // Gunakan awal hari dari tanggal 'from'
-		: startOfDay(new Date()); // Default ke awal hari ini
+		? startOfDay(new Date(resolvedSearchParams.from))
+		: startOfDay(new Date());
 
 	const to = resolvedSearchParams?.to
-		? endOfDay(new Date(resolvedSearchParams.to)) // Gunakan akhir hari dari tanggal 'to'
-		: endOfDay(new Date()); // Default ke akhir hari ini
+		? endOfDay(new Date(resolvedSearchParams.to))
+		: endOfDay(new Date());
 
-	// Kunci unik untuk Suspense. Saat searchParams berubah, kunci ini berubah,
-	// yang akan memicu Suspense untuk menampilkan fallback (skeleton)
-	// dan me-render ulang komponen DashboardContent dengan data baru.
 	const suspenseKey = `${from.toISOString()}-${to.toISOString()}`;
 
 	return (

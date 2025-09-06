@@ -1,5 +1,3 @@
-// app/(main)/transaksi/page.tsx
-
 import { Suspense } from "react";
 import {
 	fetchFilteredTransactions,

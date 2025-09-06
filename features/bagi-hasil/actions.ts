@@ -1,5 +1,3 @@
-// features/bagi-hasil/actions.ts
-
 "use server";
 
 import { z } from "zod";
@@ -7,13 +5,10 @@ import { PrismaClient } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { formatDate } from "@/lib/utils";
 import { unstable_noStore as noStore } from "next/cache";
-
-// Menggunakan tipe State yang serupa dengan fitur nasabah untuk konsistensi
 import type { ActionState } from "./types";
 
 const prisma = new PrismaClient();
 
-// Skema untuk validasi input dari form
 const ProfitSharingSchema = z.object({
 	idempotencyKey: z.string().uuid(),
 	totalAmount: z.coerce
@@ -21,25 +16,17 @@ const ProfitSharingSchema = z.object({
 		.positive({ message: "Jumlah bagi hasil harus lebih dari nol." }),
 });
 
-/**
- * Server action untuk mengeksekusi proses bagi hasil.
- * Mendebit rekening induk dan mendistribusikan dana secara merata ke semua nasabah aktif.
- * @param prevState - State sebelumnya dari form.
- * @param formData - Data dari form yang dikirim oleh klien.
- * @returns State baru yang berisi pesan sukses atau error.
- */
 export async function executeProfitSharing(
 	prevState: ActionState,
 	formData: FormData
 ): Promise<ActionState> {
-	// 1. Validasi Input
 	const validatedFields = ProfitSharingSchema.safeParse(
 		Object.fromEntries(formData.entries())
 	);
 
 	if (!validatedFields.success) {
 		return {
-			status: "validation_error", // FIX: Added status
+			status: "validation_error",
 			errors: validatedFields.error.flatten().fieldErrors,
 			message: "Gagal memproses. Data yang dimasukkan tidak valid.",
 		};
@@ -48,26 +35,20 @@ export async function executeProfitSharing(
 	const { totalAmount, idempotencyKey } = validatedFields.data;
 
 	try {
-		// Menggunakan transaksi Prisma untuk memastikan semua operasi berhasil atau tidak sama sekali (rollback)
 		await prisma.$transaction(async (tx) => {
-			// 2. Validasi Idempotensi
 			const existingKey = await tx.idempotencyKey.findUnique({
 				where: { id: idempotencyKey },
 			});
 			if (existingKey) {
-				// Jika kunci sudah ada, anggap sukses tapi tidak melakukan apa-apa
-				// untuk mencegah eksekusi ganda.
 				throw new Error("DUPLICATE_EXECUTION");
 			}
 			await tx.idempotencyKey.create({ data: { id: idempotencyKey } });
 
-			// 3. Validasi Saldo Rekening Induk
 			const mainAccount = await tx.mainAccount.findFirst();
 			if (!mainAccount || Number(mainAccount.balance) < totalAmount) {
 				throw new Error("Saldo rekening induk tidak mencukupi.");
 			}
 
-			// 4. Ambil Semua Nasabah Aktif
 			const activeCustomers = await tx.customer.findMany({
 				where: { status: "ACTIVE" },
 			});
@@ -76,16 +57,12 @@ export async function executeProfitSharing(
 				throw new Error("Tidak ada nasabah aktif yang ditemukan.");
 			}
 
-			// 5. Perhitungan
 			const numberOfRecipients = activeCustomers.length;
-			// Pembulatan ke bawah untuk memastikan tidak melebihi total
 			const amountPerRecipient =
 				Math.floor((totalAmount * 100) / numberOfRecipients) / 100;
 			const totalDistributed = amountPerRecipient * numberOfRecipients;
 			const remainderAmount = totalAmount - totalDistributed;
 
-			// 6. Eksekusi Transaksi
-			// a. Debit Rekening Induk
 			await tx.mainAccount.update({
 				where: { id: mainAccount.id },
 				data: { balance: { decrement: totalAmount } },
@@ -101,7 +78,6 @@ export async function executeProfitSharing(
 				},
 			});
 
-			// b. Buat Event Bagi Hasil
 			const profitSharingEvent = await tx.profitSharingEvent.create({
 				data: {
 					totalAmountShared: totalAmount,
@@ -112,10 +88,8 @@ export async function executeProfitSharing(
 				},
 			});
 
-			// c. Kredit ke setiap nasabah (BULK OPERATIONS)
 			const customerIds = activeCustomers.map((c) => c.id);
 
-			// Update balances in bulk
 			await tx.customer.updateMany({
 				where: {
 					id: {
@@ -129,7 +103,6 @@ export async function executeProfitSharing(
 				},
 			});
 
-			// Create transactions in bulk
 			await tx.transaction.createMany({
 				data: customerIds.map((customerId) => ({
 					customerId,
@@ -144,34 +117,27 @@ export async function executeProfitSharing(
 		if (error instanceof Error) {
 			if (error.message === "DUPLICATE_EXECUTION") {
 				return {
-					status: "success", // FIX: Added status
+					status: "success",
 					message: "Proses berhasil. Permintaan duplikat diabaikan.",
 				};
 			}
-			// Mengembalikan pesan error yang spesifik dari validasi atau kegagalan transaksi
-			return { status: "error", message: error.message }; // FIX: Added status
+			return { status: "error", message: error.message };
 		}
-		// Menangkap error umum dari database
 		return {
-			status: "error", // FIX: Added status
+			status: "error",
 			message: "Database Error: Gagal mengeksekusi bagi hasil.",
 		};
 	}
 
-	// Revalidasi path untuk memperbarui cache di halaman terkait
 	revalidatePath("/bagi-hasil");
 	revalidatePath("/rekening-induk");
 
 	return {
-		status: "success", // FIX: Added status
+		status: "success",
 		message: "Proses bagi hasil berhasil dieksekusi.",
 	};
 }
 
-/**
- * Server action to safely get the count of active customers.
- * This function is designed to be called from client components.
- */
 export async function getActiveCustomersCount(): Promise<number> {
 	noStore();
 	try {
@@ -181,8 +147,6 @@ export async function getActiveCustomersCount(): Promise<number> {
 		return count;
 	} catch (error) {
 		console.error("Database Error:", error);
-		// In a real app, you might want more robust error handling
-		// but for this purpose, throwing an error is clear.
 		throw new Error("Gagal menghitung jumlah nasabah aktif.");
 	}
 }

@@ -1,24 +1,10 @@
-// features/transaksi/data.ts
-
-import { PrismaClient, Transaction, Customer } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { unstable_noStore as noStore } from "next/cache";
+import { TransactionWithCustomer } from "./types";
 
 const prisma = new PrismaClient();
 const ITEMS_PER_PAGE = 10;
 
-// Tipe kustom untuk menggabungkan data transaksi dengan data nasabah
-export type TransactionWithCustomer = Omit<Transaction, "amount"> & {
-	amount: number; // Pastikan amount adalah number
-	customer: Pick<Customer, "name">;
-};
-
-/**
- * Mengambil daftar transaksi dari database dengan filter dan paginasi.
- * @param query - String untuk mencari berdasarkan ID transaksi atau nama nasabah.
- * @param currentPage - Halaman saat ini untuk paginasi.
- * @param dateRange - Opsional, objek dengan tanggal 'from' dan 'to' untuk filter.
- * @returns Array dari transaksi yang cocok.
- */
 export async function fetchFilteredTransactions(
 	query: string,
 	currentPage: number,
@@ -32,7 +18,6 @@ export async function fetchFilteredTransactions(
 			where: {
 				AND: [
 					{
-						// Filter berdasarkan query pencarian
 						OR: [
 							{
 								id: {
@@ -51,7 +36,6 @@ export async function fetchFilteredTransactions(
 						],
 					},
 					{
-						// Filter berdasarkan rentang tanggal jika ada
 						createdAt: {
 							gte: dateRange?.from,
 							lte: dateRange?.to,
@@ -60,7 +44,6 @@ export async function fetchFilteredTransactions(
 				],
 			},
 			include: {
-				// Sertakan nama nasabah dari relasi
 				customer: {
 					select: {
 						name: true,
@@ -68,13 +51,12 @@ export async function fetchFilteredTransactions(
 				},
 			},
 			orderBy: {
-				createdAt: "desc", // Tampilkan yang terbaru di atas
+				createdAt: "desc",
 			},
 			take: ITEMS_PER_PAGE,
 			skip: offset,
 		});
 
-		// Konversi Decimal ke number sebelum me-return data
 		return transactions.map((tx) => ({
 			...tx,
 			amount: tx.amount.toNumber(),
@@ -85,12 +67,6 @@ export async function fetchFilteredTransactions(
 	}
 }
 
-/**
- * Menghitung total halaman transaksi berdasarkan filter yang diberikan.
- * @param query - String pencarian (ID transaksi atau nama nasabah).
- * @param dateRange - Opsional, objek dengan tanggal 'from' dan 'to' untuk filter.
- * @returns Jumlah total halaman.
- */
 export async function fetchTransactionPages(
 	query: string,
 	dateRange?: { from?: Date; to?: Date }

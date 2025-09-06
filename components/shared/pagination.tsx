@@ -27,7 +27,6 @@ export function Pagination({ totalPages }: { totalPages: number }) {
 
 	return (
 		<div className="flex items-center justify-center gap-2">
-			{/* Tombol ke Halaman Pertama */}
 			<Button
 				asChild
 				variant="outline"
@@ -41,7 +40,6 @@ export function Pagination({ totalPages }: { totalPages: number }) {
 				</Link>
 			</Button>
 
-			{/* Tombol ke Halaman Sebelumnya */}
 			<Button
 				asChild
 				variant="outline"
@@ -55,7 +53,6 @@ export function Pagination({ totalPages }: { totalPages: number }) {
 				</Link>
 			</Button>
 
-			{/* Tombol Halaman Saat Ini */}
 			<Button
 				variant="default"
 				className="w-8 h-8 p-0 cursor-default"
@@ -64,7 +61,6 @@ export function Pagination({ totalPages }: { totalPages: number }) {
 				{currentPage}
 			</Button>
 
-			{/* Tombol ke Halaman Berikutnya */}
 			<Button
 				asChild
 				variant="outline"
@@ -78,7 +74,6 @@ export function Pagination({ totalPages }: { totalPages: number }) {
 				</Link>
 			</Button>
 
-			{/* Tombol ke Halaman Terakhir */}
 			<Button
 				asChild
 				variant="outline"

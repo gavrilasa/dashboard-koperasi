@@ -1,5 +1,3 @@
-// app/(main)/nasabah/page.tsx
-
 import {
 	fetchFilteredCustomers,
 	fetchCustomersPages,
