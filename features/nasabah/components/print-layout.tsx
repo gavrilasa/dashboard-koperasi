@@ -82,24 +82,31 @@ export function PrintLayout({
 							<h2 className="text-xl font-semibold text-center">
 								REKENING KORAN
 							</h2>
-							<div className="grid grid-cols-2 p-4 text-sm border rounded gap-x-8 gap-y-2">
-								<div>
-									<p className="font-semibold">Nama Nasabah:</p>
-									<p>{customer.name}</p>
+							<div className="grid grid-cols-2 p-4 text-sm border rounded-lg gap-x-8">
+								{/* Kolom Kiri */}
+								<div className="space-y-2">
+									<div>
+										<p className="font-semibold">Nama Nasabah:</p>
+										<p>{customer.name}</p>
+									</div>
+									<div>
+										<p className="font-semibold">Alamat:</p>
+										<p>{customer.address}</p>
+									</div>
 								</div>
-								<div>
-									<p className="font-semibold">Nomor Rekening:</p>
-									<p>{customer.accountNumber}</p>
-								</div>
-								<div className="col-span-2">
-									<p className="font-semibold">Alamat:</p>
-									<p>{customer.address}</p>
-								</div>
-								<div className="col-span-2">
-									<p className="font-semibold">Periode:</p>
-									<p>
-										{formatDate(dateRange.from)} - {formatDate(dateRange.to)}
-									</p>
+
+								{/* Kolom Kanan */}
+								<div className="space-y-2">
+									<div>
+										<p className="font-semibold">Nomor Rekening:</p>
+										<p>{customer.accountNumber}</p>
+									</div>
+									<div>
+										<p className="font-semibold">Periode:</p>
+										<p>
+											{formatDate(dateRange.from)} - {formatDate(dateRange.to)}
+										</p>
+									</div>
 								</div>
 							</div>
 						</section>

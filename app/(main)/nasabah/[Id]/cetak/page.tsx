@@ -17,18 +17,22 @@ export default async function CetakRekeningKoranPage({
 	params,
 	searchParams,
 }: {
-	params: { id: string };
-	searchParams?: {
+	params: Promise<{ id: string }>;
+	searchParams?: Promise<{
 		from?: string;
 		to?: string;
-	};
+	}>;
 }) {
-	const id = params.id;
+	const resolvedParams = await params;
+	const resolvedSearchParams = await searchParams;
+	const id = resolvedParams.id;
 	// Validasi tanggal, default ke bulan ini jika tidak ada
-	const fromDate = searchParams?.from
-		? new Date(searchParams.from)
+	const fromDate = resolvedSearchParams?.from
+		? new Date(resolvedSearchParams.from)
 		: new Date(new Date().setDate(1));
-	const toDate = searchParams?.to ? new Date(searchParams.to) : new Date();
+	const toDate = resolvedSearchParams?.to
+		? new Date(resolvedSearchParams.to)
+		: new Date();
 
 	const customer = await fetchCustomerById(id);
 
