@@ -20,6 +20,7 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="id">
+			<meta name="apple-mobile-web-app-title" content="Koperasi Ibnu Khaldun" />
 			<body className={`${inter.variable} antialiased`}>
 				{children}
 				<Toaster />

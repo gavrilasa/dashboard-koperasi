@@ -27,6 +27,14 @@ export const formatCompactCurrency = (amount: number): string => {
 	return `Rp ${amount.toString()}`;
 };
 
+export const formatCurrencyDecimal = (amount: number | bigint): string => {
+	return new Intl.NumberFormat("id-ID", {
+		style: "decimal",
+		minimumFractionDigits: 0,
+		maximumFractionDigits: 0,
+	}).format(amount);
+};
+
 export const formatDate = (date: string | number | Date): string => {
 	const dateObj = new Date(date);
 	if (isNaN(dateObj.getTime())) {
@@ -38,4 +46,16 @@ export const formatDate = (date: string | number | Date): string => {
 		month: "long",
 		year: "numeric",
 	}).format(dateObj);
+};
+
+// Fungsi baru untuk format tanggal DD/MM/YY
+export const formatDateShort = (date: string | number | Date): string => {
+	const dateObj = new Date(date);
+	if (isNaN(dateObj.getTime())) {
+		return "Tanggal Tidak Valid";
+	}
+	const day = String(dateObj.getDate()).padStart(2, "0");
+	const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+	const year = String(dateObj.getFullYear()).slice(-2);
+	return `${day}/${month}/${year}`;
 };

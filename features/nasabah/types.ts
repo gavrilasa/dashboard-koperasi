@@ -127,10 +127,6 @@ type TransactionInfo = {
 export type PrintLayoutProps = {
 	customer: CustomerInfo;
 	transactions: TransactionInfo[];
-	dateRange: {
-		from: string;
-		to: string;
-	};
 	saldoAwal: number;
 };
 

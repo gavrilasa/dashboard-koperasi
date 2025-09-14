@@ -210,3 +210,26 @@ export async function fetchCustomerTransactionsByDateRange(
 		throw new Error("Gagal mengambil riwayat transaksi untuk dicetak.");
 	}
 }
+
+export async function fetchAllCustomerTransactions(customerId: string) {
+	noStore();
+	try {
+		const transactions = await prisma.transaction.findMany({
+			where: {
+				customerId,
+			},
+			orderBy: {
+				createdAt: "asc",
+			},
+		});
+
+		return transactions.map((tx) => ({
+			...tx,
+			amount: tx.amount.toNumber(),
+			type: tx.type as "KREDIT" | "DEBIT",
+		}));
+	} catch (error) {
+		console.error("Database Error:", error);
+		throw new Error("Gagal mengambil seluruh riwayat transaksi.");
+	}
+}

@@ -26,9 +26,9 @@ export function AppTitle() {
 							className="flex items-center justify-center"
 						>
 							<Image
-								src="/LogoKoperasi.png"
-								width={100}
-								height={20}
+								src="https://res.cloudinary.com/dah2v3xbg/image/upload/v1757598999/Logo-KSP-Ibnu-Khaldun_bdmwjz.webp"
+								width={200}
+								height={100}
 								alt="Logo Koperasi"
 								className="object-contain h-auto max-w-full"
 							/>
