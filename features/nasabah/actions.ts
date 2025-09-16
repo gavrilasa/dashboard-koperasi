@@ -6,8 +6,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { v2 as cloudinary, type UploadApiResponse } from "cloudinary";
 import sharp from "sharp";
-import type { ActionState, SearchedCustomer } from "./types";
-import { CustomerFormSchema } from "./types";
+import { ActionState } from "@/types";
+import { CustomerFormSchema, SearchedCustomer } from "./types";
 import { formatCurrency } from "@/lib/utils";
 
 const prisma = new PrismaClient();

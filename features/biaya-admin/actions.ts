@@ -5,7 +5,7 @@
 import { z } from "zod";
 import { PrismaClient, MainAccountTransactionSource } from "@prisma/client";
 import { revalidatePath } from "next/cache";
-import type { ActionState } from "./types";
+import type { ActionState } from "@/types";
 import { unstable_noStore as noStore } from "next/cache";
 
 const prisma = new PrismaClient();

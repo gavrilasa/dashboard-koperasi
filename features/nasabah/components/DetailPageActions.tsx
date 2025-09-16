@@ -57,7 +57,11 @@ function TransactionDialog({
 	);
 }
 
-export function DetailPageActions({ customer }: { customer: Customer }) {
+export default function DetailPageActions({
+	customer,
+}: {
+	customer: Customer;
+}) {
 	const [dialogAction, setDialogAction] = useState<DialogAction>(null);
 
 	const handleActionClick = (action: DialogAction) => {

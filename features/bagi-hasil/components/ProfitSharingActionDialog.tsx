@@ -16,7 +16,7 @@ import {
 	AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { executeProfitSharing } from "@/features/bagi-hasil/actions";
-import type { ActionState } from "@/features/bagi-hasil/types";
+import type { ActionState } from "@/types";
 import { formatCurrency } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 import { ProfitSharingConfirmDialogProps } from "../types";

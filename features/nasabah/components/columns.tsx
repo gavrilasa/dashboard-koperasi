@@ -4,7 +4,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { Customer } from "../types";
 import { formatCurrency } from "@/lib/utils";
-import { CustomerTableRowActions } from "./data-table-row-actions";
+import { CustomerTableRowActions } from "./DataTableRowActions";
 
 export const columns: ColumnDef<Customer>[] = [
 	{

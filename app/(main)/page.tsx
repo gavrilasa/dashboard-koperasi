@@ -6,7 +6,7 @@ import {
 	getTransactionChartData,
 	getMainAccountChartData,
 } from "@/features/dashboard/data";
-import { DashboardClient } from "@/features/dashboard/components/DashboardClient";
+import DashboardClient from "@/features/dashboard/components/DashboardClient";
 import { DashboardSkeleton } from "@/features/dashboard/components/DashboardSkeleton";
 
 async function DashboardContent({

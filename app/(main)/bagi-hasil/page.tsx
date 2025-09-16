@@ -1,5 +1,5 @@
-import { ProfitSharingActionCard } from "@/features/bagi-hasil/components/profit-sharing-action-card";
-import { ProfitSharingHistory } from "@/features/bagi-hasil/components/profit-sharing-history";
+import { ProfitSharingActionCard } from "@/features/bagi-hasil/components/ProfitSharingActionCard";
+import { ProfitSharingHistory } from "@/features/bagi-hasil/components/ProfitSharingHistory";
 
 export const metadata = {
 	title: "Bagi Hasil",

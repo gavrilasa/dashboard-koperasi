@@ -13,16 +13,18 @@ export const metadata = {
 export default async function CetakTransaksiPage({
 	searchParams,
 }: {
-	searchParams?: {
+	searchParams?: Promise<{
 		from?: string;
 		to?: string;
-	};
+	}>;
 }) {
-	const fromDate = searchParams?.from
-		? startOfDay(new Date(searchParams.from))
+	const resolvedSearchParams = await searchParams;
+
+	const fromDate = resolvedSearchParams?.from
+		? startOfDay(new Date(resolvedSearchParams.from))
 		: undefined;
-	const toDate = searchParams?.to
-		? endOfDay(new Date(searchParams.to))
+	const toDate = resolvedSearchParams?.to
+		? endOfDay(new Date(resolvedSearchParams.to))
 		: undefined;
 
 	if (!fromDate || !toDate) {

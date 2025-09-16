@@ -8,7 +8,7 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 
-export function TableSkeleton() {
+export default function TableSkeleton() {
 	return (
 		<div className="border rounded-md">
 			<Table>

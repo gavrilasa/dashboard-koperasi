@@ -4,9 +4,9 @@ import {
 	fetchAdminFeePages,
 } from "@/features/biaya-admin/data";
 import { columns } from "./columns";
-import { DataTable } from "@/components/shared/data-table";
-import { Search } from "@/components/shared/search";
-import { TableSkeleton } from "@/components/shared/skeletons";
+import DataTable from "@/components/shared/DataTable";
+import Search from "@/components/shared/Search";
+import TableSkeleton from "@/components/shared/Skeletons";
 import {
 	Card,
 	CardContent,
@@ -14,7 +14,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import { Pagination } from "@/components/shared/pagination";
+import Pagination from "@/components/shared/Pagination";
 import { AdminFeeHistoryProps } from "../types";
 
 export async function AdminFeeHistory({

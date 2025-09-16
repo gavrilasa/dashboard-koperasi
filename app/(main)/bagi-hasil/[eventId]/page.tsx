@@ -3,10 +3,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { fetchProfitSharingEventDetails } from "@/features/bagi-hasil/data";
-import { EventSummaryCard } from "@/features/bagi-hasil/components/event-summary-card";
-import { DataTable } from "@/components/shared/data-table";
+import { EventSummaryCard } from "@/features/bagi-hasil/components/EventSummaryCard";
+import DataTable from "@/components/shared/DataTable";
 import { recipientListColumns } from "@/features/bagi-hasil/components/recipient-list-columns";
-import { TableSkeleton } from "@/components/shared/skeletons";
+import TableSkeleton from "@/components/shared/Skeletons";
 import {
 	Card,
 	CardContent,

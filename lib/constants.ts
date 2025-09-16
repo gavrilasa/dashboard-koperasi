@@ -1,0 +1,3 @@
+export const ITEMS_PER_PAGE_TRANSACTIONS = 10;
+
+export const ITEMS_PER_PAGE_GENERAL = 15;

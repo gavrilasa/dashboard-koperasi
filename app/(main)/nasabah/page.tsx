@@ -2,13 +2,13 @@ import {
 	fetchFilteredCustomers,
 	fetchCustomersPages,
 } from "@/features/nasabah/data";
-import { CreateNasabahButton } from "@/features/nasabah/components/nasabah-dialogs";
-import { Search } from "@/components/shared/search";
-import { DataTable } from "@/components/shared/data-table";
+import { CreateNasabahButton } from "@/features/nasabah/components/NasabahDialogs";
+import Search from "@/components/shared/Search";
+import DataTable from "@/components/shared/DataTable";
 import { columns } from "@/features/nasabah/components/columns";
-import { Pagination } from "@/components/shared/pagination";
+import Pagination from "@/components/shared/Pagination";
 import { Suspense } from "react";
-import { TableSkeleton } from "@/components/shared/skeletons";
+import TableSkeleton from "@/components/shared/Skeletons";
 
 export const metadata = {
 	title: "Manajemen Nasabah",

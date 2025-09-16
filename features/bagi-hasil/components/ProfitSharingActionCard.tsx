@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { getActiveCustomersCount } from "@/features/bagi-hasil/actions";
-import { ProfitSharingConfirmDialog } from "./profit-sharing-action-dialog";
+import { ProfitSharingConfirmDialog } from "./ProfitSharingActionDialog";
 import { formatCurrency } from "@/lib/utils";
 import { PreviewData } from "../types";
 

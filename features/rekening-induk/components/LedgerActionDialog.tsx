@@ -9,7 +9,7 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
-import { LedgerActionForm } from "./ledger-action-form";
+import { LedgerActionForm } from "./LedgerActionForm";
 import { LedgerActionDialogProps } from "../types";
 
 export function LedgerActionDialog({

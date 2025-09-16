@@ -16,7 +16,8 @@ import {
 } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
 import { createCustomer, updateCustomer } from "../actions";
-import type { Customer, ActionState } from "../types";
+import type { ActionState } from "@/types";
+import type { Customer } from "../types";
 
 const formatDateForInput = (date?: Date | string | null): string => {
 	if (!date) return "";

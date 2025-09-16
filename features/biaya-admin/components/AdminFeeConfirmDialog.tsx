@@ -18,7 +18,7 @@ import {
 	AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { executeAdminFee } from "@/features/biaya-admin/actions";
-import type { ActionState } from "@/features/biaya-admin/types";
+import type { ActionState } from "@/types";
 import { formatCurrency } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 import { AdminFeeConfirmDialogProps } from "../types";

@@ -8,8 +8,8 @@ import {
 	SidebarRail,
 } from "@/components/ui/sidebar";
 import { navData } from "@/data/nav";
-import { NavGroup } from "./nav-group";
-import { AppTitle } from "./app-title";
+import { NavGroup } from "./NavGroup";
+import { AppTitle } from "./AppTitle";
 
 export function AppSidebar() {
 	return (

@@ -11,7 +11,7 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import { PlusCircle, Pencil } from "lucide-react";
-import { NasabahForm } from "./nasabah-form";
+import { NasabahForm } from "./NasabahForm";
 import type { Customer } from "../types";
 import { NasabahDialogProps } from "../types";
 // import { updateCustomer } from "../actions";

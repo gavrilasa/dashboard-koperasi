@@ -5,10 +5,10 @@ import { formatCompactCurrency, formatCurrency } from "@/lib/utils";
 import { StatCard } from "./StatCard";
 import { DashboardChart } from "./DashboardChart";
 import { DateRangeFilter } from "./DateRangeFilter";
-import { ClientOnly } from "@/components/shared/ClientOnly";
+import ClientOnly from "@/components/shared/ClientOnly";
 import { DashboardClientProps } from "../types";
 
-export function DashboardClient({
+export default function DashboardClient({
 	stats,
 	transactionChartData,
 	mainAccountChartData,

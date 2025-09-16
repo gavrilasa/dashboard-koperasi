@@ -1,4 +1,4 @@
-import { AdminFeeActionCard } from "@/features/biaya-admin/components/AdminFeeActionCard";
+import AdminFeeActionCard from "@/features/biaya-admin/components/AdminFeeActionCard";
 import { AdminFeeHistory } from "@/features/biaya-admin/components/AdminFeeHistory";
 
 export const metadata = {

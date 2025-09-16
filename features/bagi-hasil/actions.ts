@@ -5,7 +5,7 @@ import { PrismaClient } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { formatDate } from "@/lib/utils";
 import { unstable_noStore as noStore } from "next/cache";
-import type { ActionState } from "./types";
+import type { ActionState } from "@/types";
 
 const prisma = new PrismaClient();
 

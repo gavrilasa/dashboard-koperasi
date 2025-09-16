@@ -3,14 +3,14 @@ import Link from "next/link";
 import { format, startOfMonth } from "date-fns";
 import { Printer } from "lucide-react";
 import { fetchCombinedTransactions } from "@/features/transaksi/data";
-import { DataTable } from "@/components/shared/data-table";
+import DataTable from "@/components/shared/DataTable";
 import { columns } from "@/features/transaksi/components/columns";
-import { Search } from "@/components/shared/search";
-import { Pagination } from "@/components/shared/pagination";
-import { TableSkeleton } from "@/components/shared/skeletons";
+import Search from "@/components/shared/Search";
+import Pagination from "@/components/shared/Pagination";
+import TableSkeleton from "@/components/shared/Skeletons";
 import { TransactionDateRangeFilter } from "@/features/transaksi/components/DateRangeFilter";
 import { Button } from "@/components/ui/button";
-import { ClientOnly } from "@/components/shared/ClientOnly";
+import ClientOnly from "@/components/shared/ClientOnly";
 
 export const metadata = {
 	title: "Riwayat Transaksi",

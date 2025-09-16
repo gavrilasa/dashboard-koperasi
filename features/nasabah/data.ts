@@ -5,9 +5,9 @@ import {
 	Attachment,
 } from "@prisma/client";
 import { unstable_noStore as noStore } from "next/cache";
+import { ITEMS_PER_PAGE_TRANSACTIONS } from "@/lib/constants";
 
 const prisma = new PrismaClient();
-const ITEMS_PER_PAGE = 10;
 
 export type SafeCustomerWithAttachment = Omit<Customer, "balance"> & {
 	balance: number;
@@ -24,7 +24,7 @@ export async function fetchFilteredCustomers(
 	status?: AccountStatus
 ): Promise<SafeCustomer[]> {
 	noStore();
-	const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+	const offset = (currentPage - 1) * ITEMS_PER_PAGE_TRANSACTIONS;
 
 	try {
 		const customers = await prisma.customer.findMany({
@@ -36,7 +36,7 @@ export async function fetchFilteredCustomers(
 				],
 			},
 			orderBy: [{ status: "asc" }, { createdAt: "desc" }],
-			take: ITEMS_PER_PAGE,
+			take: ITEMS_PER_PAGE_TRANSACTIONS,
 			skip: offset,
 		});
 
@@ -62,7 +62,7 @@ export async function fetchCustomersPages(query: string) {
 			},
 		});
 
-		const totalPages = Math.ceil(count / ITEMS_PER_PAGE);
+		const totalPages = Math.ceil(count / ITEMS_PER_PAGE_TRANSACTIONS);
 		return totalPages;
 	} catch (error) {
 		console.error("Database Error:", error);
@@ -101,13 +101,13 @@ export async function fetchCustomerTransactions(
 	currentPage: number
 ) {
 	noStore();
-	const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+	const offset = (currentPage - 1) * ITEMS_PER_PAGE_TRANSACTIONS;
 
 	try {
 		const transactions = await prisma.transaction.findMany({
 			where: { customerId },
 			orderBy: { createdAt: "desc" },
-			take: ITEMS_PER_PAGE,
+			take: ITEMS_PER_PAGE_TRANSACTIONS,
 			skip: offset,
 		});
 		return transactions;
@@ -123,7 +123,7 @@ export async function fetchCustomerTransactionPages(customerId: string) {
 		const count = await prisma.transaction.count({
 			where: { customerId },
 		});
-		const totalPages = Math.ceil(count / ITEMS_PER_PAGE);
+		const totalPages = Math.ceil(count / ITEMS_PER_PAGE_TRANSACTIONS);
 		return totalPages;
 	} catch (error) {
 		console.error("Database Error:", error);

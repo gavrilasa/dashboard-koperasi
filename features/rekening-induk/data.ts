@@ -1,8 +1,8 @@
 import { PrismaClient, MainAccountTransaction } from "@prisma/client";
 import { unstable_noStore as noStore } from "next/cache";
+import { ITEMS_PER_PAGE_GENERAL } from "@/lib/constants";
 
 const prisma = new PrismaClient();
-const ITEMS_PER_PAGE = 15;
 
 export async function getMainAccountBalance(): Promise<number> {
 	noStore();
@@ -24,18 +24,18 @@ export async function getMainAccountTransactions(
 	currentPage: number
 ): Promise<MainAccountTransaction[]> {
 	noStore();
-	const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+	const offset = (currentPage - 1) * ITEMS_PER_PAGE_GENERAL;
 	try {
 		const transactions = await prisma.mainAccountTransaction.findMany({
 			where: {
 				source: {
-					notIn: ["FROM_CUSTOMER_DEPOSIT", "FROM_CUSTOMER_WITHDRAWAL"], // Filter diterapkan di sini
+					notIn: ["FROM_CUSTOMER_DEPOSIT", "FROM_CUSTOMER_WITHDRAWAL"],
 				},
 			},
 			orderBy: {
 				createdAt: "desc",
 			},
-			take: ITEMS_PER_PAGE,
+			take: ITEMS_PER_PAGE_GENERAL,
 			skip: offset,
 		});
 		return transactions;
@@ -51,11 +51,11 @@ export async function getMainAccountTransactionPages(): Promise<number> {
 		const count = await prisma.mainAccountTransaction.count({
 			where: {
 				source: {
-					notIn: ["FROM_CUSTOMER_DEPOSIT", "FROM_CUSTOMER_WITHDRAWAL"], // Filter diterapkan di sini
+					notIn: ["FROM_CUSTOMER_DEPOSIT", "FROM_CUSTOMER_WITHDRAWAL"],
 				},
 			},
 		});
-		const totalPages = Math.ceil(count / ITEMS_PER_PAGE);
+		const totalPages = Math.ceil(count / ITEMS_PER_PAGE_GENERAL);
 		return totalPages;
 	} catch (error) {
 		console.error("Database Error:", error);

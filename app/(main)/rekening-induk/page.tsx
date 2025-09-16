@@ -23,9 +23,9 @@ import {
 	getMainAccountTransactionPages,
 } from "@/features/rekening-induk/data";
 import { formatCurrency } from "@/lib/utils";
-import { Pagination } from "@/components/shared/pagination";
-import { TableSkeleton } from "@/components/shared/skeletons";
-import { LedgerActionDialog } from "@/features/rekening-induk/components/ledger-action-dialog";
+import Pagination from "@/components/shared/Pagination";
+import TableSkeleton from "@/components/shared/Skeletons";
+import { LedgerActionDialog } from "@/features/rekening-induk/components/LedgerActionDialog";
 import { MainAccountTransaction } from "@prisma/client";
 
 export const metadata = {

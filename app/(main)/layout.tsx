@@ -1,8 +1,8 @@
-import AuthenticatedLayout from "@/components/layout/authenticated-layout";
-import { Header } from "@/components/layout/header";
-import { Main } from "@/components/layout/main";
-import { NavUser } from "@/components/layout/nav-user";
-import { ClientOnly } from "@/components/shared/ClientOnly";
+import AuthenticatedLayout from "@/components/layout/AuthenticatedLayout";
+import { Header } from "@/components/layout/Header";
+import { Main } from "@/components/layout/Main";
+import { NavUser } from "@/components/layout/NavUser";
+import ClientOnly from "@/components/shared/ClientOnly";
 
 export default function ProtectedLayout({
 	children,

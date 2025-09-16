@@ -4,9 +4,9 @@ import {
 	fetchProfitSharingPages,
 } from "@/features/bagi-hasil/data";
 import { columns } from "./columns";
-import { DataTable } from "@/components/shared/data-table";
-import { Search } from "@/components/shared/search";
-import { TableSkeleton } from "@/components/shared/skeletons";
+import DataTable from "@/components/shared/DataTable";
+import Search from "@/components/shared/Search";
+import TableSkeleton from "@/components/shared/Skeletons";
 import {
 	Card,
 	CardContent,

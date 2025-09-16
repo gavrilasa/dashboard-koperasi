@@ -1,16 +1,16 @@
 import { PrismaClient } from "@prisma/client";
 import { unstable_noStore as noStore } from "next/cache";
 import type { SafeAdminFeeEvent } from "./types";
+import { ITEMS_PER_PAGE_GENERAL } from "@/lib/constants";
 
 const prisma = new PrismaClient();
-const ITEMS_PER_PAGE = 15;
 
 export async function fetchAdminFeeEvents(
 	query: string,
 	currentPage: number
 ): Promise<SafeAdminFeeEvent[]> {
 	noStore();
-	const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+	const offset = (currentPage - 1) * ITEMS_PER_PAGE_GENERAL;
 
 	try {
 		const events = await prisma.adminFeeEvent.findMany({
@@ -23,7 +23,7 @@ export async function fetchAdminFeeEvents(
 			orderBy: {
 				executedAt: "desc",
 			},
-			take: ITEMS_PER_PAGE,
+			take: ITEMS_PER_PAGE_GENERAL,
 			skip: offset,
 		});
 
@@ -49,7 +49,7 @@ export async function fetchAdminFeePages(query: string): Promise<number> {
 				},
 			},
 		});
-		return Math.ceil(count / ITEMS_PER_PAGE);
+		return Math.ceil(count / ITEMS_PER_PAGE_GENERAL);
 	} catch (error) {
 		console.error("Database Error:", error);
 		throw new Error(

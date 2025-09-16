@@ -21,7 +21,7 @@ import { AdminFeeConfirmDialog } from "./AdminFeeConfirmDialog";
 import { formatCurrency } from "@/lib/utils";
 import type { PreviewData } from "../types";
 
-export function AdminFeeActionCard() {
+export default function AdminFeeActionCard() {
 	const [isPending, startTransition] = useTransition();
 	const [amount, setAmount] = useState<number>(0);
 	const [description, setDescription] = useState<string>("");

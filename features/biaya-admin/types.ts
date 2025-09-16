@@ -1,17 +1,5 @@
 import { Customer } from "@prisma/client";
 
-export type ActionState = {
-	status: "success" | "error" | "validation_error";
-	message: string | null;
-	data?: {
-		amount?: number;
-		customerName?: string;
-	};
-	errors?: {
-		[key: string]: string[] | undefined;
-	};
-};
-
 export type PreviewData = {
 	amountPerCustomer: number;
 	description: string;

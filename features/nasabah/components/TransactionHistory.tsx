@@ -2,7 +2,7 @@ import {
 	fetchCustomerTransactions,
 	fetchCustomerTransactionPages,
 } from "@/features/nasabah/data";
-import { Pagination } from "@/components/shared/pagination";
+import Pagination from "@/components/shared/Pagination";
 import {
 	Table,
 	TableBody,

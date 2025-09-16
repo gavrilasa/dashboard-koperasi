@@ -11,14 +11,14 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft } from "lucide-react";
-import { TableSkeleton } from "@/components/shared/skeletons";
-import { TransactionHistory } from "@/features/nasabah/components/transaction-history";
+import TableSkeleton from "@/components/shared/Skeletons";
+import { TransactionHistory } from "@/features/nasabah/components/TransactionHistory";
 import { formatCurrency, formatDate } from "@/lib/utils";
-import { EditNasabahButton } from "@/features/nasabah/components/nasabah-dialogs";
-import { PrintStatementDialog } from "@/features/nasabah/components/print-statement-dialog";
-import { StatusActionButton } from "@/features/nasabah/components/status-action-button";
-import { DetailPageActions } from "@/features/nasabah/components/detail-page-actions";
-import { KtpDisplay } from "@/features/nasabah/components/ktp-display";
+import { EditNasabahButton } from "@/features/nasabah/components/NasabahDialogs";
+import { PrintStatementDialog } from "@/features/nasabah/components/PrintStatementDialog";
+import { StatusActionButton } from "@/features/nasabah/components/StatusActionButton";
+import DetailPageActions from "@/features/nasabah/components/DetailPageActions";
+import { KtpDisplay } from "@/features/nasabah/components/KtpDisplay";
 
 export default async function NasabahDetailPage({
 	params,

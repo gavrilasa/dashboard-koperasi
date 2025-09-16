@@ -4,9 +4,9 @@ import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { fetchAdminFeeEventDetails } from "@/features/biaya-admin/data";
 import { EventSummaryCard } from "@/features/biaya-admin/components/EventSummaryCard";
-import { DataTable } from "@/components/shared/data-table";
+import DataTable from "@/components/shared/DataTable";
 import { affectedCustomerListColumns } from "@/features/biaya-admin/components/AffectedCustomerListColumns";
-import { TableSkeleton } from "@/components/shared/skeletons";
+import TableSkeleton from "@/components/shared/Skeletons";
 import {
 	Card,
 	CardContent,

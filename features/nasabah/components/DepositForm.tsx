@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { useCustomer } from "./CustomerContext";
 import { deposit } from "../actions";
-import type { ActionState } from "../types";
+import type { ActionState } from "@/types";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
