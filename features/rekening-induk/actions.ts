@@ -51,9 +51,12 @@ export async function topUpMainAccount(
 				data: { balance: { increment: amount } },
 			});
 
+			const receiptNumber = `KOPERASI-${crypto.randomUUID()}`;
+
 			await tx.mainAccountTransaction.create({
 				data: {
 					mainAccountId: accountId,
+					receiptNumber: receiptNumber,
 					amount,
 					type: "KREDIT",
 					description,
@@ -87,7 +90,6 @@ export async function withdrawMainAccount(
 
 	if (!validatedFields.success) {
 		return {
-			// DIUBAH: Menambahkan status
 			status: "validation_error",
 			errors: validatedFields.error.flatten().fieldErrors,
 			message: "Data tidak valid.",
@@ -111,9 +113,12 @@ export async function withdrawMainAccount(
 				data: { balance: { decrement: amount } },
 			});
 
+			const receiptNumber = `KOPERASI-${crypto.randomUUID()}`;
+
 			await tx.mainAccountTransaction.create({
 				data: {
 					mainAccountId: accountId,
+					receiptNumber: receiptNumber,
 					amount,
 					type: "DEBIT",
 					description,
@@ -137,7 +142,6 @@ export async function withdrawMainAccount(
 
 	revalidatePath("/rekening-induk");
 	return {
-		// DIUBAH: Menambahkan status
 		status: "success",
 		message: "Penarikan berhasil.",
 	};

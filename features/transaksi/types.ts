@@ -10,3 +10,12 @@ export type TransactionWithCustomer = Omit<Transaction, "amount"> & {
 	amount: number;
 	customer: Pick<Customer, "name">;
 };
+
+export type CombinedTransaction = {
+	createdAt: Date;
+	receiptNumber: string;
+	customerName: string;
+	description: string;
+	type: string;
+	amount: number;
+};

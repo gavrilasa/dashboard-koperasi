@@ -1,8 +1,4 @@
-import {
-	PrismaClient,
-	MainAccountTransaction,
-	MainAccountTransactionSource,
-} from "@prisma/client";
+import { PrismaClient, MainAccountTransaction } from "@prisma/client";
 import { unstable_noStore as noStore } from "next/cache";
 
 const prisma = new PrismaClient();
@@ -32,7 +28,9 @@ export async function getMainAccountTransactions(
 	try {
 		const transactions = await prisma.mainAccountTransaction.findMany({
 			where: {
-				source: MainAccountTransactionSource.MANUAL_OPERATIONAL,
+				source: {
+					notIn: ["FROM_CUSTOMER_DEPOSIT", "FROM_CUSTOMER_WITHDRAWAL"], // Filter diterapkan di sini
+				},
 			},
 			orderBy: {
 				createdAt: "desc",
@@ -52,7 +50,9 @@ export async function getMainAccountTransactionPages(): Promise<number> {
 	try {
 		const count = await prisma.mainAccountTransaction.count({
 			where: {
-				source: MainAccountTransactionSource.MANUAL_OPERATIONAL,
+				source: {
+					notIn: ["FROM_CUSTOMER_DEPOSIT", "FROM_CUSTOMER_WITHDRAWAL"], // Filter diterapkan di sini
+				},
 			},
 		});
 		const totalPages = Math.ceil(count / ITEMS_PER_PAGE);

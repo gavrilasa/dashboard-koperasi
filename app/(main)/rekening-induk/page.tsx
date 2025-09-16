@@ -52,10 +52,11 @@ async function MainAccountTransactionTable({
 			<Table>
 				<TableHeader>
 					<TableRow>
-						<TableHead className="w-[25%]">Tanggal</TableHead>
-						<TableHead className="w-[40%]">Deskripsi</TableHead>
-						<TableHead className="w-[15%] text-center">Tipe</TableHead>
-						<TableHead className="w-[20%] text-right">Jumlah</TableHead>
+						<TableHead className="w-[20%]">Tanggal</TableHead>
+						<TableHead className="w-[20%]">No. Resi</TableHead>
+						<TableHead className="w-[35%]">Deskripsi</TableHead>
+						<TableHead className="w-[10%] text-center">Tipe</TableHead>
+						<TableHead className="w-[15%] text-right">Jumlah</TableHead>
 					</TableRow>
 				</TableHeader>
 				<TableBody>
@@ -63,6 +64,7 @@ async function MainAccountTransactionTable({
 						transactions.map((tx) => (
 							<TableRow key={tx.id}>
 								<TableCell>{formatDateTime(tx.createdAt)}</TableCell>
+								<TableCell className="truncate">{tx.receiptNumber}</TableCell>
 								<TableCell className="font-medium">{tx.description}</TableCell>
 								<TableCell className="text-center">
 									<Badge
@@ -83,9 +85,7 @@ async function MainAccountTransactionTable({
 						))
 					) : (
 						<TableRow>
-							<TableCell colSpan={4} className="h-24 text-center">
-								Tidak ada riwayat mutasi ditemukan.
-							</TableCell>
+							<TableCell colSpan={5} className="h-24 text-center"></TableCell>
 						</TableRow>
 					)}
 				</TableBody>

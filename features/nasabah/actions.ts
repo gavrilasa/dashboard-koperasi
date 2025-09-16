@@ -150,9 +150,11 @@ export async function createCustomer(
 				data: { balance: { increment: initialBalance } },
 			});
 
+			const receiptNumber = `KOPERASI-${crypto.randomUUID()}`; // Tambahkan ini
 			await tx.mainAccountTransaction.create({
 				data: {
 					mainAccountId: mainAccountId,
+					receiptNumber: receiptNumber, // Tambahkan ini
 					amount: initialBalance,
 					type: "KREDIT",
 					description: `Setoran Awal Nasabah Baru: ${newCustomer.name}`,
@@ -259,9 +261,11 @@ export async function deposit(
 				data: { balance: { increment: amount } },
 			});
 
+			const receiptNumber = `KOPERASI-${crypto.randomUUID()}`; // Tambahkan ini
 			await tx.mainAccountTransaction.create({
 				data: {
 					mainAccountId,
+					receiptNumber: receiptNumber, // Tambahkan ini
 					amount,
 					type: "KREDIT",
 					description: `Setoran Tunai dari Nasabah: ${customer.name}`,
@@ -361,9 +365,11 @@ export async function withdraw(
 				data: { balance: { decrement: amount } },
 			});
 
+			const receiptNumber = `KOPERASI-${crypto.randomUUID()}`; // Tambahkan ini
 			await tx.mainAccountTransaction.create({
 				data: {
 					mainAccountId,
+					receiptNumber: receiptNumber, // Tambahkan ini
 					amount,
 					type: "DEBIT",
 					description: `Penarikan Tunai oleh Nasabah: ${customer.name}`,

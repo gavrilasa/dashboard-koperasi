@@ -68,9 +68,11 @@ export async function executeProfitSharing(
 				data: { balance: { decrement: totalAmount } },
 			});
 
+			const receiptNumber = `KOPERASI-${crypto.randomUUID()}`; // Tambahkan ini
 			const mainAccountTx = await tx.mainAccountTransaction.create({
 				data: {
 					mainAccountId: mainAccount.id,
+					receiptNumber: receiptNumber, // Tambahkan ini
 					amount: totalAmount,
 					type: "DEBIT",
 					description: `Bagi Hasil - ${formatDate(new Date())}`,

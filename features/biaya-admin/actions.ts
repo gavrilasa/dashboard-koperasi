@@ -92,13 +92,15 @@ export async function executeAdminFee(
 			});
 
 			// 4. Catat pemasukan ke rekening induk
+			const receiptNumber = `KOPERASI-${crypto.randomUUID()}`; // Tambahkan ini
 			const mainAccountTx = await tx.mainAccountTransaction.create({
 				data: {
 					mainAccountId: mainAccountId,
+					receiptNumber: receiptNumber, // Tambahkan ini
 					amount: totalAmountCollected,
 					type: "KREDIT",
 					description: `Biaya Admin: ${description}`,
-					source: MainAccountTransactionSource.MANUAL_OPERATIONAL, // Ganti jika ada source yang lebih sesuai
+					source: MainAccountTransactionSource.MANUAL_OPERATIONAL,
 				},
 			});
 

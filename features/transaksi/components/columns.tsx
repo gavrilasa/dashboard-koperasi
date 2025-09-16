@@ -3,7 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/lib/utils";
-import { TransactionWithCustomer } from "../types";
+import { CombinedTransaction } from "../types";
 
 const formatDateTime = (date: Date) => {
 	return new Intl.DateTimeFormat("id-ID", {
@@ -12,7 +12,7 @@ const formatDateTime = (date: Date) => {
 	}).format(date);
 };
 
-export const columns: ColumnDef<TransactionWithCustomer>[] = [
+export const columns: ColumnDef<CombinedTransaction>[] = [
 	{
 		accessorKey: "createdAt",
 		header: "Tanggal",
@@ -22,7 +22,7 @@ export const columns: ColumnDef<TransactionWithCustomer>[] = [
 		cell: ({ row }) => <div>{formatDateTime(row.getValue("createdAt"))}</div>,
 	},
 	{
-		accessorKey: "id",
+		accessorKey: "receiptNumber",
 		header: "No. Resi",
 		meta: {
 			width: "20%",
@@ -30,7 +30,7 @@ export const columns: ColumnDef<TransactionWithCustomer>[] = [
 		},
 	},
 	{
-		accessorKey: "customer.name",
+		accessorKey: "customerName",
 		header: "Nama Nasabah",
 		meta: {
 			width: "25%",
