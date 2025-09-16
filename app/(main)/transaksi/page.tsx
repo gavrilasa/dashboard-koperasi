@@ -1,5 +1,3 @@
-// app/(main)/transaksi/page.tsx
-
 import { Suspense } from "react";
 import Link from "next/link";
 import { format, startOfMonth } from "date-fns";
@@ -12,31 +10,31 @@ import { Pagination } from "@/components/shared/pagination";
 import { TableSkeleton } from "@/components/shared/skeletons";
 import { TransactionDateRangeFilter } from "@/features/transaksi/components/DateRangeFilter";
 import { Button } from "@/components/ui/button";
-import { ClientOnly } from "@/components/shared/ClientOnly"; // Impor ClientOnly
+import { ClientOnly } from "@/components/shared/ClientOnly";
 
 export const metadata = {
 	title: "Riwayat Transaksi",
 };
 
 export default async function TransaksiPage({
-	searchParams: searchParamsProp, // Ubah nama prop
+	searchParams,
 }: {
-	searchParams?: {
+	searchParams?: Promise<{
 		query?: string;
 		page?: string;
 		from?: string;
 		to?: string;
-	};
+	}>;
 }) {
-	const searchParams = searchParamsProp; // Dapatkan objek searchParams
-
-	const query = searchParams?.query || "";
-	const currentPage = Number(searchParams?.page) || 1;
-
-	const fromDate = searchParams?.from
-		? new Date(searchParams.from)
+	const resolvedSearchParams = await searchParams;
+	const query = resolvedSearchParams?.query || "";
+	const currentPage = Number(resolvedSearchParams?.page) || 1;
+	const fromDate = resolvedSearchParams?.from
+		? new Date(resolvedSearchParams.from)
 		: startOfMonth(new Date());
-	const toDate = searchParams?.to ? new Date(searchParams.to) : new Date();
+	const toDate = resolvedSearchParams?.to
+		? new Date(resolvedSearchParams.to)
+		: new Date();
 
 	const { transactions, totalPages } = await fetchCombinedTransactions(
 		query,
@@ -59,8 +57,6 @@ export default async function TransaksiPage({
 
 				<div className="flex items-center justify-between gap-2">
 					<ClientOnly>
-						{" "}
-						{/* Bungkus dengan ClientOnly */}
 						<TransactionDateRangeFilter />
 					</ClientOnly>
 					<Search placeholder="Cari No. Resi atau nama nasabah..." />
