@@ -7,6 +7,7 @@ import { PrismaClient, MainAccountTransactionSource } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import type { ActionState } from "@/types";
 import { unstable_noStore as noStore } from "next/cache";
+import { generateUniqueReceiptNumber } from "@/lib/receipt-generator";
 
 const prisma = new PrismaClient();
 
@@ -92,11 +93,11 @@ export async function executeAdminFee(
 			});
 
 			// 4. Catat pemasukan ke rekening induk
-			const receiptNumber = `KOPERASI-${crypto.randomUUID()}`; // Tambahkan ini
+			const receiptNumber = await generateUniqueReceiptNumber("IK", 5, tx);
 			const mainAccountTx = await tx.mainAccountTransaction.create({
 				data: {
 					mainAccountId: mainAccountId,
-					receiptNumber: receiptNumber, // Tambahkan ini
+					receiptNumber: receiptNumber,
 					amount: totalAmountCollected,
 					type: "KREDIT",
 					description: `Biaya Admin: ${description}`,
@@ -128,14 +129,19 @@ export async function executeAdminFee(
 				},
 			});
 
-			await tx.transaction.createMany({
-				data: customerIdsToDebit.map((customerId) => ({
+			const transactionsData = await Promise.all(
+				customerIdsToDebit.map(async (customerId) => ({
 					customerId,
+					receiptNumber: await generateUniqueReceiptNumber("TR", 7, tx),
 					amount: amountPerCustomer,
 					type: "DEBIT",
 					description: description,
 					adminFeeEventId: adminFeeEvent.id,
-				})),
+				}))
+			);
+
+			await tx.transaction.createMany({
+				data: transactionsData,
 			});
 
 			// 6. Update status nasabah yang saldonya di bawah 50.000

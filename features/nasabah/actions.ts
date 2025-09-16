@@ -9,6 +9,7 @@ import sharp from "sharp";
 import { ActionState } from "@/types";
 import { CustomerFormSchema, SearchedCustomer } from "./types";
 import { formatCurrency } from "@/lib/utils";
+import { generateUniqueReceiptNumber } from "@/lib/receipt-generator";
 
 const prisma = new PrismaClient();
 
@@ -136,9 +137,12 @@ export async function createCustomer(
 				},
 			});
 
+			const receiptNumber = await generateUniqueReceiptNumber("SP", 7, tx);
+
 			const initialTransaction = await tx.transaction.create({
 				data: {
 					customerId: newCustomer.id,
+					receiptNumber: receiptNumber, // <-- Perubahan di sini
 					amount: initialBalance,
 					type: "KREDIT",
 					description: "SETORAN AWAL",
@@ -150,11 +154,15 @@ export async function createCustomer(
 				data: { balance: { increment: initialBalance } },
 			});
 
-			const receiptNumber = `KOPERASI-${crypto.randomUUID()}`; // Tambahkan ini
+			const mainAccountReceiptNumber = await generateUniqueReceiptNumber(
+				"IK",
+				5,
+				tx
+			);
 			await tx.mainAccountTransaction.create({
 				data: {
 					mainAccountId: mainAccountId,
-					receiptNumber: receiptNumber, // Tambahkan ini
+					receiptNumber: mainAccountReceiptNumber,
 					amount: initialBalance,
 					type: "KREDIT",
 					description: `Setoran Awal Nasabah Baru: ${newCustomer.name}`,
@@ -246,9 +254,12 @@ export async function deposit(
 			});
 			customerName = customer.name;
 
+			const receiptNumber = await generateUniqueReceiptNumber("SP", 7, tx); // <-- Perubahan di sini
+
 			const customerTransaction = await tx.transaction.create({
 				data: {
 					customerId,
+					receiptNumber: receiptNumber, // <-- Perubahan di sini
 					amount,
 					type: "KREDIT",
 					description: "SIMPAN TUNAI",
@@ -261,11 +272,15 @@ export async function deposit(
 				data: { balance: { increment: amount } },
 			});
 
-			const receiptNumber = `KOPERASI-${crypto.randomUUID()}`; // Tambahkan ini
+			const mainAccountReceiptNumber = await generateUniqueReceiptNumber(
+				"IK",
+				5,
+				tx
+			);
 			await tx.mainAccountTransaction.create({
 				data: {
 					mainAccountId,
-					receiptNumber: receiptNumber, // Tambahkan ini
+					receiptNumber: mainAccountReceiptNumber, // <-- Perubahan di sini
 					amount,
 					type: "KREDIT",
 					description: `Setoran Tunai dari Nasabah: ${customer.name}`,
@@ -350,9 +365,12 @@ export async function withdraw(
 				data: { balance: { decrement: amount } },
 			});
 
+			const receiptNumber = await generateUniqueReceiptNumber("TR", 7, tx); // <-- Perubahan di sini
+
 			const customerTransaction = await tx.transaction.create({
 				data: {
 					customerId,
+					receiptNumber: receiptNumber, // <-- Perubahan di sini
 					amount,
 					type: "DEBIT",
 					description: "TARIK TUNAI",
@@ -365,11 +383,16 @@ export async function withdraw(
 				data: { balance: { decrement: amount } },
 			});
 
-			const receiptNumber = `KOPERASI-${crypto.randomUUID()}`; // Tambahkan ini
+			const mainAccountReceiptNumber = await generateUniqueReceiptNumber(
+				// <-- Dulu KOPERASI-UUID
+				"IK",
+				5,
+				tx
+			);
 			await tx.mainAccountTransaction.create({
 				data: {
 					mainAccountId,
-					receiptNumber: receiptNumber, // Tambahkan ini
+					receiptNumber: mainAccountReceiptNumber, // <-- Perubahan di sini
 					amount,
 					type: "DEBIT",
 					description: `Penarikan Tunai oleh Nasabah: ${customer.name}`,
@@ -459,9 +482,19 @@ export async function transfer(
 				where: { id: destinationCustomer.id },
 				data: { balance: { increment: amount } },
 			});
+
+			// Membuat nomor resi terpisah untuk setiap transaksi
+			const debitReceiptNumber = await generateUniqueReceiptNumber("TF", 7, tx); // <-- Perubahan di sini
+			const creditReceiptNumber = await generateUniqueReceiptNumber(
+				"TF",
+				7,
+				tx
+			); // <-- Perubahan di sini
+
 			await tx.transaction.create({
 				data: {
 					customerId: sourceCustomerId,
+					receiptNumber: debitReceiptNumber, // <-- Perubahan di sini
 					amount,
 					type: "DEBIT",
 					description: `TRANSFER KELUAR ke ${destinationCustomer.name}`,
@@ -471,6 +504,7 @@ export async function transfer(
 			await tx.transaction.create({
 				data: {
 					customerId: destinationCustomer.id,
+					receiptNumber: creditReceiptNumber, // <-- Perubahan di sini
 					amount,
 					type: "KREDIT",
 					description: `TRANSFER MASUK dari ${sourceCustomer.name}`,

@@ -47,6 +47,7 @@ model Customer {
 
 model Transaction {
   id                   String              @id @default(cuid())
+  receiptNumber        String              @unique
   customerId           String
   customer             Customer            @relation(fields: [customerId], references: [id])
   amount               Decimal             @db.Decimal(15, 2)

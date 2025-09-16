@@ -56,16 +56,18 @@ export default async function TransaksiPage({
 				</p>
 
 				<div className="flex items-center justify-between gap-2">
-					<ClientOnly>
-						<TransactionDateRangeFilter />
-					</ClientOnly>
 					<Search placeholder="Cari No. Resi atau nama nasabah..." />
-					<Button asChild>
-						<Link href={printUrl} target="_blank">
-							<Printer className="w-4 h-4 mr-2" />
-							Cetak Laporan
-						</Link>
-					</Button>
+					<div className="flex gap-2">
+						<ClientOnly>
+							<TransactionDateRangeFilter />
+						</ClientOnly>
+						<Button asChild>
+							<Link href={printUrl} target="_blank">
+								<Printer className="w-4 h-4 mr-2" />
+								Cetak Laporan
+							</Link>
+						</Button>
+					</div>
 				</div>
 
 				<Suspense

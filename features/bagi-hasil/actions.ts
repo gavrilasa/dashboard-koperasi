@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { formatDate } from "@/lib/utils";
 import { unstable_noStore as noStore } from "next/cache";
 import type { ActionState } from "@/types";
+import { generateUniqueReceiptNumber } from "@/lib/receipt-generator";
 
 const prisma = new PrismaClient();
 
@@ -68,11 +69,12 @@ export async function executeProfitSharing(
 				data: { balance: { decrement: totalAmount } },
 			});
 
-			const receiptNumber = `KOPERASI-${crypto.randomUUID()}`; // Tambahkan ini
+			const receiptNumber = await generateUniqueReceiptNumber("IK", 5, tx);
+
 			const mainAccountTx = await tx.mainAccountTransaction.create({
 				data: {
 					mainAccountId: mainAccount.id,
-					receiptNumber: receiptNumber, // Tambahkan ini
+					receiptNumber: receiptNumber,
 					amount: totalAmount,
 					type: "DEBIT",
 					description: `Bagi Hasil - ${formatDate(new Date())}`,
@@ -108,12 +110,26 @@ export async function executeProfitSharing(
 			await tx.transaction.createMany({
 				data: customerIds.map((customerId) => ({
 					customerId,
+					receiptNumber: "", // Placeholder, akan diisi di bawah
 					amount: amountPerRecipient,
 					type: "KREDIT",
 					description: `Bagi Hasil - ${formatDate(new Date())}`,
 					profitSharingEventId: profitSharingEvent.id,
 				})),
 			});
+
+			// Update receipt numbers for each transaction
+			const transactionsToUpdate = await tx.transaction.findMany({
+				where: { profitSharingEventId: profitSharingEvent.id },
+			});
+
+			for (const trans of transactionsToUpdate) {
+				const uniqueReceipt = await generateUniqueReceiptNumber("SP", 7, tx);
+				await tx.transaction.update({
+					where: { id: trans.id },
+					data: { receiptNumber: uniqueReceipt },
+				});
+			}
 		});
 	} catch (error: unknown) {
 		if (error instanceof Error) {

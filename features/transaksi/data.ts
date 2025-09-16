@@ -1,7 +1,7 @@
 import { PrismaClient, Prisma } from "@prisma/client";
 import { unstable_noStore as noStore } from "next/cache";
-import { subDays } from "date-fns";
 import { CombinedTransaction } from "./types";
+import { subDays } from "date-fns";
 
 const prisma = new PrismaClient();
 const ITEMS_PER_PAGE = 10;
@@ -14,14 +14,12 @@ export async function fetchCombinedTransactions(
 	noStore();
 	const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
-	// Obyek dasar untuk filter nasabah
 	const customerWhere: Prisma.TransactionWhereInput = {
 		adminFeeEventId: null,
 		profitSharingEventId: null,
 		createdAt: { gte: dateRange?.from, lte: dateRange?.to },
 	};
 
-	// Obyek dasar untuk filter rekening induk
 	const mainAccountWhere: Prisma.MainAccountTransactionWhereInput = {
 		source: {
 			notIn: ["FROM_CUSTOMER_DEPOSIT", "FROM_CUSTOMER_WITHDRAWAL"],
@@ -29,10 +27,9 @@ export async function fetchCombinedTransactions(
 		createdAt: { gte: dateRange?.from, lte: dateRange?.to },
 	};
 
-	// Tambahkan kondisi pencarian hanya jika query ada
 	if (query) {
 		customerWhere.OR = [
-			{ id: { contains: query, mode: "insensitive" } },
+			{ receiptNumber: { contains: query, mode: "insensitive" } },
 			{ customer: { name: { contains: query, mode: "insensitive" } } },
 		];
 		mainAccountWhere.OR = [
@@ -55,7 +52,7 @@ export async function fetchCombinedTransactions(
 		const combined: CombinedTransaction[] = [
 			...customerTransactions.map((tx) => ({
 				createdAt: tx.createdAt,
-				receiptNumber: tx.id,
+				receiptNumber: tx.receiptNumber,
 				customerName: tx.customer.name,
 				description: tx.description,
 				type: tx.type,
@@ -113,7 +110,7 @@ export async function fetchAllCombinedTransactionsForPrint(dateRange?: {
 		const combined: CombinedTransaction[] = [
 			...customerTransactions.map((tx) => ({
 				createdAt: tx.createdAt,
-				receiptNumber: tx.id,
+				receiptNumber: tx.receiptNumber,
 				customerName: tx.customer.name,
 				description: tx.description,
 				type: tx.type,

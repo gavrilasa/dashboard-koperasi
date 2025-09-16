@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { PrismaClient, MainAccountTransactionSource } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import { generateUniqueReceiptNumber } from "@/lib/receipt-generator";
 import type { ActionState } from "@/types";
 
 const prisma = new PrismaClient();
@@ -51,7 +52,7 @@ export async function topUpMainAccount(
 				data: { balance: { increment: amount } },
 			});
 
-			const receiptNumber = `KOPERASI-${crypto.randomUUID()}`;
+			const receiptNumber = await generateUniqueReceiptNumber("IK", 5, tx);
 
 			await tx.mainAccountTransaction.create({
 				data: {
@@ -113,7 +114,7 @@ export async function withdrawMainAccount(
 				data: { balance: { decrement: amount } },
 			});
 
-			const receiptNumber = `KOPERASI-${crypto.randomUUID()}`;
+			const receiptNumber = await generateUniqueReceiptNumber("IK", 5, tx);
 
 			await tx.mainAccountTransaction.create({
 				data: {
