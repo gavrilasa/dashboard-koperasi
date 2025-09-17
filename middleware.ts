@@ -10,6 +10,12 @@ export default auth((req) => {
 	if (isLoggedIn && isAuthRoute) {
 		return NextResponse.redirect(new URL("/", req.url));
 	}
+
+	if (!isLoggedIn && !isAuthRoute) {
+		return NextResponse.redirect(new URL("/login", req.url));
+	}
+
+	return NextResponse.next();
 });
 
 export const config = {
