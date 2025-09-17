@@ -17,7 +17,7 @@ function SubmitButton({ type }: { type: "deposit" | "withdraw" }) {
 		type === "deposit" ? "Konfirmasi Top Up" : "Konfirmasi Penarikan";
 
 	return (
-		<Button type="submit" className="w-full" aria-disabled={pending}>
+		<Button type="submit" className="w-full" disabled={pending}>
 			{pending ? (
 				<>
 					<Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -34,16 +34,14 @@ export function LedgerActionForm({ type, onSuccess }: LedgerActionFormProps) {
 	const actionToUse =
 		type === "deposit" ? topUpMainAccount : withdrawMainAccount;
 
-	// FIX 2: Tambahkan properti 'status' yang wajib ada
 	const initialState: ActionState = {
-		status: "validation_error", // atau 'error', sesuaikan
+		status: "validation_error",
 		message: null,
 		errors: {},
 	};
 	const [state, formAction] = useActionState(actionToUse, initialState);
 
 	useEffect(() => {
-		// Periksa status 'success' untuk memicu onSuccess
 		if (state.status === "success") {
 			onSuccess();
 		}
@@ -51,6 +49,7 @@ export function LedgerActionForm({ type, onSuccess }: LedgerActionFormProps) {
 
 	return (
 		<form action={formAction} className="space-y-4">
+			<input type="hidden" name="idempotencyKey" value={crypto.randomUUID()} />
 			<div className="space-y-2">
 				<Label htmlFor="amount">Jumlah</Label>
 				<Input

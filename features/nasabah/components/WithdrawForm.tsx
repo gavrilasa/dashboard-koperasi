@@ -21,7 +21,7 @@ function SubmitButton({ disabled }: { disabled: boolean }) {
 			type="submit"
 			className="w-full"
 			aria-disabled={pending || disabled}
-			disabled={disabled}
+			disabled={pending || disabled}
 		>
 			{pending ? (
 				<>

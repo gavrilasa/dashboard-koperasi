@@ -9,6 +9,7 @@ import type { ActionState } from "@/types";
 const prisma = new PrismaClient();
 
 const LedgerActionSchema = z.object({
+	idempotencyKey: z.string().uuid(),
 	amount: z.coerce
 		.number()
 		.positive({ message: "Jumlah harus lebih dari nol." }),
@@ -42,11 +43,19 @@ export async function topUpMainAccount(
 		};
 	}
 
-	const { amount, description, notes } = validatedFields.data;
+	const { amount, description, notes, idempotencyKey } = validatedFields.data;
 	const accountId = await getMainAccountId();
 
 	try {
 		await prisma.$transaction(async (tx) => {
+			const existingKey = await tx.idempotencyKey.findUnique({
+				where: { id: idempotencyKey },
+			});
+			if (existingKey) {
+				throw new Error("DUPLICATE_EXECUTION");
+			}
+			await tx.idempotencyKey.create({ data: { id: idempotencyKey } });
+
 			await tx.mainAccount.update({
 				where: { id: accountId },
 				data: { balance: { increment: amount } },
@@ -66,7 +75,13 @@ export async function topUpMainAccount(
 				},
 			});
 		});
-	} catch (error) {
+	} catch (error: unknown) {
+		if (error instanceof Error && error.message === "DUPLICATE_EXECUTION") {
+			return {
+				status: "success",
+				message: "Top up berhasil. Permintaan duplikat diabaikan.",
+			};
+		}
 		console.error(error);
 		return {
 			status: "error",
@@ -97,11 +112,19 @@ export async function withdrawMainAccount(
 		};
 	}
 
-	const { amount, description, notes } = validatedFields.data;
+	const { amount, description, notes, idempotencyKey } = validatedFields.data;
 	const accountId = await getMainAccountId();
 
 	try {
 		await prisma.$transaction(async (tx) => {
+			const existingKey = await tx.idempotencyKey.findUnique({
+				where: { id: idempotencyKey },
+			});
+			if (existingKey) {
+				throw new Error("DUPLICATE_EXECUTION");
+			}
+			await tx.idempotencyKey.create({ data: { id: idempotencyKey } });
+
 			const account = await tx.mainAccount.findUniqueOrThrow({
 				where: { id: accountId },
 			});
@@ -130,6 +153,12 @@ export async function withdrawMainAccount(
 		});
 	} catch (error: unknown) {
 		if (error instanceof Error) {
+			if (error.message === "DUPLICATE_EXECUTION") {
+				return {
+					status: "success",
+					message: "Penarikan berhasil. Permintaan duplikat diabaikan.",
+				};
+			}
 			return {
 				status: "error",
 				message: error.message || "Database Error: Gagal melakukan penarikan.",

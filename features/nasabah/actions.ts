@@ -20,6 +20,7 @@ cloudinary.config({
 });
 
 const CreateCustomerSchema = CustomerFormSchema.extend({
+	idempotencyKey: z.string().uuid(),
 	ktpImage: CustomerFormSchema.shape.ktpImage.refine(
 		(file) => file !== undefined && file !== null,
 		{ message: "Foto KTP wajib diunggah." }
@@ -29,7 +30,11 @@ const CreateCustomerSchema = CustomerFormSchema.extend({
 		.min(50000, { message: "Saldo awal minimal adalah Rp 50.000." }),
 });
 
-const UpdateCustomerSchema = CustomerFormSchema.omit({ ktpImage: true });
+const UpdateCustomerSchema = CustomerFormSchema.omit({ ktpImage: true }).extend(
+	{
+		idempotencyKey: z.string().uuid(),
+	}
+);
 
 const DepositWithdrawSchema = z.object({
 	idempotencyKey: z.string().uuid(),
@@ -107,7 +112,8 @@ export async function createCustomer(
 		};
 	}
 
-	const { ktpImage, initialBalance, ...customerData } = validatedFields.data;
+	const { ktpImage, initialBalance, idempotencyKey, ...customerData } =
+		validatedFields.data;
 	const imageFile = ktpImage as File;
 	const mainAccountId = await getMainAccountId();
 
@@ -121,6 +127,14 @@ export async function createCustomer(
 		const imageUrl = await uploadToCloudinary(processedImageBuffer);
 
 		await prisma.$transaction(async (tx) => {
+			const existingKey = await tx.idempotencyKey.findUnique({
+				where: { id: idempotencyKey },
+			});
+			if (existingKey) {
+				return;
+			}
+			await tx.idempotencyKey.create({ data: { id: idempotencyKey } });
+
 			const newCustomer = await tx.customer.create({
 				data: {
 					...customerData,
@@ -142,7 +156,7 @@ export async function createCustomer(
 			const initialTransaction = await tx.transaction.create({
 				data: {
 					customerId: newCustomer.id,
-					receiptNumber: receiptNumber, // <-- Perubahan di sini
+					receiptNumber: receiptNumber,
 					amount: initialBalance,
 					type: "KREDIT",
 					description: "SETORAN AWAL",
@@ -202,11 +216,21 @@ export async function updateCustomer(
 			message: "Gagal memperbarui nasabah.",
 		};
 	}
-
+	const { idempotencyKey, ...customerData } = validatedFields.data;
 	try {
-		await prisma.customer.update({
-			where: { id },
-			data: validatedFields.data,
+		await prisma.$transaction(async (tx) => {
+			const existingKey = await tx.idempotencyKey.findUnique({
+				where: { id: idempotencyKey },
+			});
+			if (existingKey) {
+				return;
+			}
+			await tx.idempotencyKey.create({ data: { id: idempotencyKey } });
+
+			await tx.customer.update({
+				where: { id },
+				data: customerData,
+			});
 		});
 	} catch (error) {
 		console.error(error);

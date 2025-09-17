@@ -82,6 +82,7 @@ export function NasabahForm({ customer }: { customer?: Customer | null }) {
 
 	return (
 		<form action={formAction} className="space-y-4">
+			<input type="hidden" name="idempotencyKey" value={crypto.randomUUID()} />
 			<div className="space-y-2">
 				<Label htmlFor="name">Nama Lengkap</Label>
 				<Input
