@@ -1,5 +1,3 @@
-// File: features/biaya-admin/components/AdminFeeActionCard.tsx
-
 "use client";
 
 import { useState, useTransition } from "react";
@@ -20,15 +18,18 @@ import { getAdminFeePreview } from "@/features/biaya-admin/actions";
 import { AdminFeeConfirmDialog } from "./AdminFeeConfirmDialog";
 import { formatCurrency } from "@/lib/utils";
 import type { PreviewData } from "../types";
+import { useCurrencyInput } from "@/hooks/use-currency-input";
 
 export default function AdminFeeActionCard() {
 	const [isPending, startTransition] = useTransition();
-	const [amount, setAmount] = useState<number>(0);
+	const { rawValue: amountRawValue, inputProps: amountInputProps } =
+		useCurrencyInput({});
 	const [description, setDescription] = useState<string>("");
 	const [previewData, setPreviewData] = useState<PreviewData | null>(null);
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 
 	const handlePreview = () => {
+		const amount = Number(amountRawValue);
 		if (amount <= 0 || description.trim() === "") {
 			toast.error("Data Tidak Lengkap", {
 				description: "Harap isi nominal biaya dan deskripsi.",
@@ -80,15 +81,14 @@ export default function AdminFeeActionCard() {
 						<Input
 							id="amount"
 							name="amount"
-							type="number"
-							placeholder="Rp 0"
-							value={amount || ""}
-							onChange={(e) => setAmount(Number(e.target.value))}
 							disabled={isPending}
+							{...amountInputProps}
 						/>
 						<p className="text-sm text-muted-foreground">
 							Jumlah yang dimasukkan:{" "}
-							<span className="font-semibold">{formatCurrency(amount)}</span>
+							<span className="font-semibold">
+								{formatCurrency(Number(amountRawValue) || 0)}
+							</span>
 						</p>
 					</div>
 					<div className="space-y-2">
@@ -106,7 +106,7 @@ export default function AdminFeeActionCard() {
 				<CardFooter>
 					<Button
 						onClick={handlePreview}
-						disabled={isPending || amount <= 0 || !description}
+						disabled={isPending || Number(amountRawValue) <= 0 || !description}
 						className="w-full cursor-pointer"
 					>
 						{isPending ? (

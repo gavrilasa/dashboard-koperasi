@@ -18,14 +18,18 @@ import { getActiveCustomersCount } from "@/features/bagi-hasil/actions";
 import { ProfitSharingConfirmDialog } from "./ProfitSharingActionDialog";
 import { formatCurrency } from "@/lib/utils";
 import { PreviewData } from "../types";
+import { useCurrencyInput } from "@/hooks/use-currency-input";
 
 export function ProfitSharingActionCard() {
 	const [isPending, startTransition] = useTransition();
-	const [totalAmount, setTotalAmount] = useState<number>(0);
+	const { rawValue: totalAmountRawValue, inputProps: totalAmountInputProps } =
+		useCurrencyInput({});
 	const [previewData, setPreviewData] = useState<PreviewData | null>(null);
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 
 	const handlePreview = () => {
+		const totalAmount = Number(totalAmountRawValue);
+
 		if (totalAmount <= 0) {
 			toast.error("Jumlah tidak valid", {
 				description: "Total bagi hasil harus lebih dari nol.",
@@ -35,7 +39,6 @@ export function ProfitSharingActionCard() {
 
 		startTransition(async () => {
 			try {
-				// 👇 Call the server action here
 				const customerCount = await getActiveCustomersCount();
 				if (customerCount === 0) {
 					toast.warning("Tidak ada nasabah aktif", {
@@ -66,7 +69,6 @@ export function ProfitSharingActionCard() {
 	};
 
 	return (
-		// ... (JSX remains the same) ...
 		<>
 			<Card className="max-w-md shadow-lg">
 				<CardHeader>
@@ -81,16 +83,13 @@ export function ProfitSharingActionCard() {
 						<Input
 							id="totalAmount"
 							name="totalAmount"
-							type="number"
-							placeholder="Rp 0"
-							value={totalAmount || ""}
-							onChange={(e) => setTotalAmount(Number(e.target.value))}
 							disabled={isPending}
+							{...totalAmountInputProps}
 						/>
 						<p className="text-sm text-muted-foreground">
 							Jumlah yang dimasukkan:{" "}
 							<span className="font-semibold">
-								{formatCurrency(totalAmount)}
+								{formatCurrency(Number(totalAmountRawValue) || 0)}
 							</span>
 						</p>
 					</div>
@@ -98,7 +97,7 @@ export function ProfitSharingActionCard() {
 				<CardFooter>
 					<Button
 						onClick={handlePreview}
-						disabled={isPending || totalAmount <= 0}
+						disabled={isPending || Number(totalAmountRawValue) <= 0}
 						className="w-full cursor-pointer"
 					>
 						{isPending ? (

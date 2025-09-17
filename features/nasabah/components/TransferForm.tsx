@@ -25,8 +25,9 @@ import {
 	CommandItem,
 	CommandList,
 } from "@/components/ui/command";
-import { formatCurrency, cn } from "@/lib/utils";
+import { formatCurrency, cn, parseRupiahInput } from "@/lib/utils";
 import { TransferFormProps } from "../types";
+import { useCurrencyInput } from "@/hooks/use-currency-input";
 
 function SubmitButton({ disabled }: { disabled: boolean }) {
 	const { pending } = useFormStatus();
@@ -51,7 +52,8 @@ function SubmitButton({ disabled }: { disabled: boolean }) {
 
 export function TransferForm({ onSuccess }: TransferFormProps) {
 	const { customer: sourceCustomer } = useCustomer();
-	const [amount, setAmount] = useState(0);
+	const { rawValue: amountRawValue, inputProps: amountInputProps } =
+		useCurrencyInput({ maxValue: sourceCustomer.balance });
 	const [clientError, setClientError] = useState<string | null>(null);
 
 	const [open, setOpen] = useState(false);
@@ -84,8 +86,10 @@ export function TransferForm({ onSuccess }: TransferFormProps) {
 	}, [searchQuery, debouncedSearch]);
 
 	const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const value = Number(e.target.value);
-		setAmount(value);
+		const rawValue = parseRupiahInput(e.target.value);
+		const value = Number(rawValue);
+
+		amountInputProps.onChange(e);
 
 		if (value > sourceCustomer.balance) {
 			setClientError("Jumlah transfer melebihi saldo yang tersedia.");
@@ -107,7 +111,8 @@ export function TransferForm({ onSuccess }: TransferFormProps) {
 		}
 	}, [state, onSuccess]);
 
-	const isSubmitDisabled = !!clientError || amount <= 0 || !destCustomer;
+	const isSubmitDisabled =
+		!!clientError || Number(amountRawValue) <= 0 || !destCustomer;
 
 	return (
 		<form action={formAction} className="space-y-4">
@@ -199,13 +204,12 @@ export function TransferForm({ onSuccess }: TransferFormProps) {
 				<Label htmlFor="amount">Jumlah Transfer</Label>
 				<Input
 					id="amount"
-					name="amount"
-					type="number"
-					placeholder="Rp 0"
 					required
+					{...amountInputProps}
 					onChange={handleAmountChange}
 					aria-describedby="amount-error"
 				/>
+				<input type="hidden" name="amount" value={amountRawValue} />
 				<div id="amount-error" aria-live="polite" aria-atomic="true">
 					{clientError && (
 						<p className="mt-1 text-sm text-destructive">{clientError}</p>

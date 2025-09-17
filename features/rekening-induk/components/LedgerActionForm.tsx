@@ -10,6 +10,7 @@ import { Loader2 } from "lucide-react";
 import { topUpMainAccount, withdrawMainAccount } from "../actions";
 import { LedgerActionFormProps } from "../types";
 import type { ActionState } from "@/types";
+import { useCurrencyInput } from "@/hooks/use-currency-input";
 
 function SubmitButton({ type }: { type: "deposit" | "withdraw" }) {
 	const { pending } = useFormStatus();
@@ -41,6 +42,9 @@ export function LedgerActionForm({ type, onSuccess }: LedgerActionFormProps) {
 	};
 	const [state, formAction] = useActionState(actionToUse, initialState);
 
+	const { rawValue: amountRawValue, inputProps: amountInputProps } =
+		useCurrencyInput({});
+
 	useEffect(() => {
 		if (state.status === "success") {
 			onSuccess();
@@ -54,12 +58,11 @@ export function LedgerActionForm({ type, onSuccess }: LedgerActionFormProps) {
 				<Label htmlFor="amount">Jumlah</Label>
 				<Input
 					id="amount"
-					name="amount"
-					type="number"
-					placeholder="Rp 0"
 					aria-describedby="amount-error"
 					required
+					{...amountInputProps}
 				/>
+				<input type="hidden" name="amount" value={amountRawValue} />
 				<div id="amount-error" aria-live="polite" aria-atomic="true">
 					{state.errors?.amount?.map((error: string) => (
 						<p className="mt-1 text-sm text-destructive" key={error}>

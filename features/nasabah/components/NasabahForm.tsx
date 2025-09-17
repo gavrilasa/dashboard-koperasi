@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { useFormStatus } from "react-dom";
 import { useState, type ChangeEvent } from "react";
 import Image from "next/image";
@@ -18,6 +18,7 @@ import { Loader2 } from "lucide-react";
 import { createCustomer, updateCustomer } from "../actions";
 import type { ActionState } from "@/types";
 import type { Customer } from "../types";
+import { useCurrencyInput } from "@/hooks/use-currency-input";
 
 const formatDateForInput = (date?: Date | string | null): string => {
 	if (!date) return "";
@@ -42,6 +43,19 @@ export function NasabahForm({ customer }: { customer?: Customer | null }) {
 	};
 
 	const [state, formAction] = useActionState(actionToUse, initialState);
+
+	const {
+		rawValue: initialBalanceRawValue,
+		setValue: setInitialBalance,
+		inputProps: initialBalanceInputProps,
+	} = useCurrencyInput({});
+
+	useEffect(() => {
+		if (state.fields?.initialBalance) {
+			setInitialBalance(state.fields.initialBalance);
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [state.fields?.initialBalance]);
 
 	const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 	const [fileError, setFileError] = useState<string | null>(null);
@@ -162,12 +176,14 @@ export function NasabahForm({ customer }: { customer?: Customer | null }) {
 					<Label htmlFor="initialBalance">Saldo Awal</Label>
 					<Input
 						id="initialBalance"
-						name="initialBalance"
-						type="number"
-						placeholder="Minimal Rp 50.000"
-						defaultValue={state.fields?.initialBalance ?? ""}
 						aria-describedby="initialBalance-error"
 						required
+						{...initialBalanceInputProps}
+					/>
+					<input
+						type="hidden"
+						name="initialBalance"
+						value={initialBalanceRawValue}
 					/>
 					<div id="initialBalance-error" aria-live="polite" aria-atomic="true">
 						{state.errors?.initialBalance?.map((error: string) => (

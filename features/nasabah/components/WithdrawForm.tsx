@@ -10,8 +10,9 @@ import type { ActionState } from "@/types";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, parseRupiahInput } from "@/lib/utils";
 import { WithdrawFormProps } from "../types";
+import { useCurrencyInput } from "@/hooks/use-currency-input";
 
 function SubmitButton({ disabled }: { disabled: boolean }) {
 	const { pending } = useFormStatus();
@@ -37,7 +38,8 @@ function SubmitButton({ disabled }: { disabled: boolean }) {
 
 export function WithdrawForm({ onSuccess }: WithdrawFormProps) {
 	const { customer } = useCustomer();
-	const [amount, setAmount] = useState(0);
+	const { rawValue: amountRawValue, inputProps: amountInputProps } =
+		useCurrencyInput({ maxValue: customer.balance });
 	const [clientError, setClientError] = useState<string | null>(null);
 
 	const initialState: ActionState = {
@@ -49,8 +51,10 @@ export function WithdrawForm({ onSuccess }: WithdrawFormProps) {
 	const [state, formAction] = useActionState(withdraw, initialState);
 
 	const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const value = Number(e.target.value);
-		setAmount(value);
+		const rawValue = parseRupiahInput(e.target.value);
+		const value = Number(rawValue);
+
+		amountInputProps.onChange(e);
 
 		if (value > customer.balance) {
 			setClientError("Jumlah penarikan melebihi saldo yang tersedia.");
@@ -72,7 +76,7 @@ export function WithdrawForm({ onSuccess }: WithdrawFormProps) {
 		}
 	}, [state, onSuccess]);
 
-	const isSubmitDisabled = !!clientError || amount <= 0;
+	const isSubmitDisabled = !!clientError || Number(amountRawValue) <= 0;
 
 	return (
 		<form action={formAction} className="space-y-4">
@@ -88,13 +92,12 @@ export function WithdrawForm({ onSuccess }: WithdrawFormProps) {
 				<Label htmlFor="amount">Jumlah Penarikan</Label>
 				<Input
 					id="amount"
-					name="amount"
-					type="number"
-					placeholder="Rp 0"
 					required
+					{...amountInputProps}
 					onChange={handleAmountChange}
 					aria-describedby="amount-error"
 				/>
+				<input type="hidden" name="amount" value={amountRawValue} />
 				<div id="amount-error" aria-live="polite" aria-atomic="true">
 					{clientError && (
 						<p className="mt-1 text-sm text-destructive">{clientError}</p>

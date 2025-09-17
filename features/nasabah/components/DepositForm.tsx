@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
 import { DepositFormProps } from "../types";
+import { useCurrencyInput } from "@/hooks/use-currency-input";
 
 function SubmitButton() {
 	const { pending } = useFormStatus();
@@ -45,6 +46,9 @@ export function DepositForm({ onSuccess }: DepositFormProps) {
 
 	const [state, formAction] = useActionState(deposit, initialState);
 
+	const { rawValue: amountRawValue, inputProps: amountInputProps } =
+		useCurrencyInput({});
+
 	useEffect(() => {
 		if (state.status === "success") {
 			toast.success("Transaksi Berhasil", {
@@ -65,12 +69,11 @@ export function DepositForm({ onSuccess }: DepositFormProps) {
 				<Label htmlFor="amount">Jumlah Simpanan</Label>
 				<Input
 					id="amount"
-					name="amount"
-					type="number"
-					placeholder="Rp 0"
-					required
 					aria-describedby="amount-error"
+					required
+					{...amountInputProps}
 				/>
+				<input type="hidden" name="amount" value={amountRawValue} />
 				<div id="amount-error" aria-live="polite" aria-atomic="true">
 					{state.errors?.amount?.map((error: string) => (
 						<p className="mt-1 text-sm text-destructive" key={error}>
