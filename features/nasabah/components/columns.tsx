@@ -1,3 +1,5 @@
+// features/nasabah/components/columns.tsx
+
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
@@ -9,9 +11,9 @@ import { CustomerTableRowActions } from "./DataTableRowActions";
 export const columns: ColumnDef<Customer>[] = [
 	{
 		accessorKey: "name",
-		header: "Nama Nasabah",
+		header: "Nama",
 		meta: {
-			width: "30%",
+			width: "20%",
 			align: "left",
 			truncate: true,
 		},
@@ -23,6 +25,24 @@ export const columns: ColumnDef<Customer>[] = [
 		accessorKey: "accountNumber",
 		header: "Nomor Rekening",
 		meta: {
+			width: "15%",
+			align: "left",
+			truncate: true,
+		},
+	},
+	{
+		accessorKey: "phone",
+		header: "Nomor HP",
+		meta: {
+			width: "15%",
+			align: "left",
+			truncate: true,
+		},
+	},
+	{
+		accessorKey: "address",
+		header: "Alamat",
+		meta: {
 			width: "25%",
 			align: "left",
 			truncate: true,
@@ -32,8 +52,8 @@ export const columns: ColumnDef<Customer>[] = [
 		accessorKey: "balance",
 		header: "Saldo",
 		meta: {
-			width: "20%",
-			align: "right",
+			width: "15%",
+			align: "center",
 		},
 		cell: ({ row }) => {
 			const balance = parseFloat(row.getValue("balance"));
@@ -44,7 +64,7 @@ export const columns: ColumnDef<Customer>[] = [
 		accessorKey: "status",
 		header: "Status",
 		meta: {
-			width: "15%",
+			width: "10%", // Sesuaikan lebar kolom
 			align: "center",
 		},
 		cell: ({ row }) => {
