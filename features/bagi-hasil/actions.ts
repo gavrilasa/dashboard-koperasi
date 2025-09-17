@@ -107,29 +107,20 @@ export async function executeProfitSharing(
 				},
 			});
 
-			await tx.transaction.createMany({
-				data: customerIds.map((customerId) => ({
+			const transactionsData = await Promise.all(
+				customerIds.map(async (customerId) => ({
 					customerId,
-					receiptNumber: "", // Placeholder, akan diisi di bawah
+					receiptNumber: await generateUniqueReceiptNumber("SP", 7, tx),
 					amount: amountPerRecipient,
 					type: "KREDIT",
 					description: `Bagi Hasil - ${formatDate(new Date())}`,
 					profitSharingEventId: profitSharingEvent.id,
-				})),
-			});
+				}))
+			);
 
-			// Update receipt numbers for each transaction
-			const transactionsToUpdate = await tx.transaction.findMany({
-				where: { profitSharingEventId: profitSharingEvent.id },
+			await tx.transaction.createMany({
+				data: transactionsData,
 			});
-
-			for (const trans of transactionsToUpdate) {
-				const uniqueReceipt = await generateUniqueReceiptNumber("SP", 7, tx);
-				await tx.transaction.update({
-					where: { id: trans.id },
-					data: { receiptNumber: uniqueReceipt },
-				});
-			}
 		});
 	} catch (error: unknown) {
 		if (error instanceof Error) {
