@@ -126,10 +126,10 @@ export default async function RekeningIndukPage({
 					</CardDescription>
 				</CardHeader>
 				<CardContent className="space-y-4">
-					<p className="text-5xl font-bold tracking-tight text-green-600">
+					<p className="text-3xl lg:text-5xl font-bold tracking-tight text-green-600 transition-all">
 						{formatCurrency(mainBalance)}
 					</p>
-					<div className="flex gap-2">
+					<div className="flex flex-col lg:flex-row gap-2">
 						<LedgerActionDialog type="deposit">
 							<Button className="cursor-pointer">
 								<PlusCircle className="w-4 h-4 mr-2" /> Top Up Saldo

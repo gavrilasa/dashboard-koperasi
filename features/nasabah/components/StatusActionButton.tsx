@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import { useRouter } from "next/navigation"; // 1. Impor useRouter
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ShieldOff, UserCheck, Loader2 } from "lucide-react";
@@ -23,6 +24,7 @@ import { StatusActionButtonProps } from "../types";
 
 export function StatusActionButton({ customer }: StatusActionButtonProps) {
 	const [isPending, startTransition] = useTransition();
+	const router = useRouter();
 
 	const handleAction = () => {
 		startTransition(async () => {
@@ -43,6 +45,8 @@ export function StatusActionButton({ customer }: StatusActionButtonProps) {
 				toast.success("Aksi Berhasil", {
 					description: successMessage,
 				});
+
+				router.refresh();
 			}
 		});
 	};

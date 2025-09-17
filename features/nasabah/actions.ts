@@ -615,36 +615,63 @@ export async function activateCustomer(id: string): Promise<ActionState> {
 
 export async function deactivateCustomer(id: string): Promise<ActionState> {
 	try {
-		const customer = await prisma.customer.findUniqueOrThrow({
-			where: { id },
-			select: { balance: true },
-		});
+		const mainAccountId = await getMainAccountId();
 
-		if (customer.balance.greaterThanOrEqualTo(1)) {
-			return {
-				status: "error",
-				message: `Gagal menonaktifkan. Saldo nasabah harus Rp0 (Saldo saat ini: ${formatCurrency(
-					Number(customer.balance)
-				)}).`,
-			};
-		}
-
-		await prisma.customer.update({
-			where: { id },
-			data: {
-				status: "INACTIVE",
-				balance: 0,
-			},
+		await prisma.$transaction(async (tx) => {
+			const customer = await tx.customer.findUniqueOrThrow({
+				where: { id },
+				select: { balance: true, name: true },
+			});
+			const customerBalance = Number(customer.balance);
+			if (customerBalance >= 50000) {
+				throw new Error(
+					`Gagal menonaktifkan. Saldo nasabah harus di bawah Rp 50.000 (Saldo saat ini: ${formatCurrency(
+						customerBalance
+					)}).`
+				);
+			}
+			if (customerBalance > 0) {
+				await tx.mainAccount.update({
+					where: { id: mainAccountId },
+					data: { balance: { increment: customerBalance } },
+				});
+				const receiptNumber = await generateUniqueReceiptNumber("IK", 5, tx);
+				await tx.mainAccountTransaction.create({
+					data: {
+						mainAccountId: mainAccountId,
+						receiptNumber: receiptNumber,
+						amount: customerBalance,
+						type: "KREDIT",
+						description: `Sisa saldo dari penutupan akun: ${customer.name}`,
+						source: MainAccountTransactionSource.MANUAL_OPERATIONAL,
+					},
+				});
+			}
+			await tx.customer.update({
+				where: { id },
+				data: {
+					status: "INACTIVE",
+					balance: 0,
+				},
+			});
 		});
-	} catch (error) {
-		console.error("Database Error:", error);
+	} catch (error: unknown) {
+		const errorMessage =
+			error instanceof Error
+				? error.message
+				: "Database Error: Gagal menonaktifkan nasabah.";
 		return {
 			status: "error",
-			message: "Database Error: Gagal menonaktifkan nasabah.",
+			message: errorMessage,
 		};
 	}
 
 	revalidatePath("/nasabah");
 	revalidatePath(`/nasabah/${id}`);
-	redirect(`/nasabah/${id}`);
+
+	// Hapus redirect dan ganti dengan return object sukses
+	return {
+		status: "success",
+		message: "Nasabah berhasil dinonaktifkan.",
+	};
 }
