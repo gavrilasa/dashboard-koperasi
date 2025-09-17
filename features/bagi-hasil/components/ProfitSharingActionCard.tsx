@@ -99,7 +99,7 @@ export function ProfitSharingActionCard() {
 					<Button
 						onClick={handlePreview}
 						disabled={isPending || totalAmount <= 0}
-						className="w-full"
+						className="w-full cursor-pointer"
 					>
 						{isPending ? (
 							<>

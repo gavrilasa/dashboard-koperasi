@@ -286,7 +286,7 @@ function SubmitButton({
 	return (
 		<Button
 			type="submit"
-			className="w-full"
+			className="w-full cursor-pointer"
 			aria-disabled={pending || isDisabled}
 			disabled={pending || isDisabled}
 		>

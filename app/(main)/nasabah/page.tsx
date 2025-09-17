@@ -34,7 +34,15 @@ export default async function NasabahPage({
 	return (
 		<div className="flex flex-col w-full">
 			<div className="flex flex-col gap-4">
-				<h1 className="text-2xl font-bold tracking-tight">Manajemen Nasabah</h1>
+				<div>
+					<h1 className="text-2xl font-bold tracking-tight">
+						Manajemen Nasabah
+					</h1>
+					<p className="text-muted-foreground">
+						Kelola seluruh data nasabah dan melakukan pembaruan transaksi
+						nasabah.
+					</p>
+				</div>
 
 				<div className="flex items-center justify-between gap-2">
 					<Search placeholder="Cari nama atau no. rekening..." />

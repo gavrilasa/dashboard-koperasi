@@ -107,7 +107,7 @@ export default function AdminFeeActionCard() {
 					<Button
 						onClick={handlePreview}
 						disabled={isPending || amount <= 0 || !description}
-						className="w-full"
+						className="w-full cursor-pointer"
 					>
 						{isPending ? (
 							<>

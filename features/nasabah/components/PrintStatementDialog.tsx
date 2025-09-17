@@ -36,7 +36,7 @@ export function PrintStatementDialog({ customerId }: { customerId: string }) {
 	return (
 		<Dialog open={isOpen} onOpenChange={setIsOpen}>
 			<DialogTrigger asChild>
-				<Button variant="outline" size="sm">
+				<Button variant="outline" size="sm" className="cursor-pointer">
 					<Printer className="w-4 h-4 mr-2" />
 					Cetak Rekening Koran
 				</Button>

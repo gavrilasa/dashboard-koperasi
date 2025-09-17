@@ -75,10 +75,17 @@ export default function DetailPageActions({
 	return (
 		<>
 			<div className="flex gap-2 mt-4">
-				<Button onClick={() => handleActionClick("deposit")}>
+				<Button
+					onClick={() => handleActionClick("deposit")}
+					className="cursor-pointer"
+				>
 					<ArrowUpCircle className="w-4 h-4 mr-2" /> Simpan Tunai
 				</Button>
-				<Button variant="outline" onClick={() => handleActionClick("withdraw")}>
+				<Button
+					variant="outline"
+					onClick={() => handleActionClick("withdraw")}
+					className="cursor-pointer"
+				>
 					<ArrowDownCircle className="w-4 h-4 mr-2" /> Tarik Tunai
 				</Button>
 			</div>

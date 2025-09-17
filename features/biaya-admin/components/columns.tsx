@@ -12,35 +12,15 @@ export const columns: ColumnDef<SafeAdminFeeEvent>[] = [
 		accessorKey: "executedAt",
 		header: "Tanggal Eksekusi",
 		meta: {
-			width: "25%",
+			width: "20%",
 		},
 		cell: ({ row }) => <div>{formatDate(row.getValue("executedAt"))}</div>,
-	},
-	{
-		accessorKey: "description",
-		header: "Deskripsi",
-		meta: {
-			width: "20%",
-			truncate: true,
-		},
-	},
-	{
-		accessorKey: "totalAmountCollected",
-		header: () => <div className="text-center">Total Terkumpul</div>,
-		meta: {
-			width: "20%",
-			align: "center",
-		},
-		cell: ({ row }) => {
-			const total = row.getValue("totalAmountCollected") as number;
-			return <div className="font-semibold">{formatCurrency(total)}</div>;
-		},
 	},
 	{
 		accessorKey: "numberOfAffectedCustomers",
 		header: () => <div className="text-center">Jumlah Nasabah</div>,
 		meta: {
-			width: "20%",
+			width: "30%",
 			align: "center",
 		},
 		cell: ({ row }) => (
@@ -48,10 +28,23 @@ export const columns: ColumnDef<SafeAdminFeeEvent>[] = [
 		),
 	},
 	{
+		accessorKey: "totalAmountCollected",
+		header: () => <div className="text-center">Total Terkumpul</div>,
+		meta: {
+			width: "30%",
+			align: "center",
+		},
+		cell: ({ row }) => {
+			const total = row.getValue("totalAmountCollected") as number;
+			return <div className="font-semibold">{formatCurrency(total)}</div>;
+		},
+	},
+
+	{
 		id: "actions",
 		header: () => <div className="text-center">Aksi</div>,
 		meta: {
-			width: "15%",
+			width: "20%",
 			align: "center",
 		},
 		cell: ({ row }) => {

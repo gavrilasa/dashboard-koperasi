@@ -67,7 +67,7 @@ export function CreateNasabahButton() {
 export function EditNasabahButton({ customer }: { customer: Customer }) {
 	return (
 		<NasabahDialog customer={customer}>
-			<Button variant="outline" size="sm">
+			<Button variant="outline" size="sm" className="cursor-pointer">
 				<Pencil className="w-4 h-4 mr-2" />
 				Edit Profil
 			</Button>

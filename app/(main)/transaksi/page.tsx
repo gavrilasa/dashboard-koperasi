@@ -50,10 +50,14 @@ export default async function TransaksiPage({
 	return (
 		<div className="flex flex-col w-full">
 			<div className="flex flex-col gap-4">
-				<h1 className="text-2xl font-bold tracking-tight">Riwayat Transaksi</h1>
-				<p className="text-muted-foreground">
-					Lihat dan kelola semua transaksi yang tercatat dalam sistem.
-				</p>
+				<div>
+					<h1 className="text-2xl font-bold tracking-tight">
+						Riwayat Transaksi
+					</h1>
+					<p className="text-muted-foreground">
+						Lihat dan kelola semua transaksi yang tercatat dalam sistem.
+					</p>
+				</div>
 
 				<div className="flex items-center justify-between gap-2">
 					<Search placeholder="Cari No. Resi atau nama nasabah..." />

@@ -101,6 +101,7 @@ export function CustomerTableRowActions({ customer }: { customer: Customer }) {
 							variant="ghost"
 							size="icon"
 							onClick={() => handleActionClick("deposit")}
+							className="cursor-pointer"
 						>
 							<ArrowUpCircle className="w-4 h-4 text-green-500 fill-green-100" />
 							<span className="sr-only">Simpan Tunai</span>
@@ -117,6 +118,7 @@ export function CustomerTableRowActions({ customer }: { customer: Customer }) {
 							variant="ghost"
 							size="icon"
 							onClick={() => handleActionClick("withdraw")}
+							className="cursor-pointer"
 						>
 							<ArrowDownCircle className="w-4 h-4 text-red-500 fill-red-100" />
 							<span className="sr-only">Tarik Tunai</span>
@@ -133,6 +135,7 @@ export function CustomerTableRowActions({ customer }: { customer: Customer }) {
 							variant="ghost"
 							size="icon"
 							onClick={() => handleActionClick("transfer")}
+							className="cursor-pointer"
 						>
 							<ArrowDownUp className="w-4 h-4 text-yellow-500" />
 							<span className="sr-only">Transfer</span>
