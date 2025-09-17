@@ -2,7 +2,8 @@
 
 import { useState, useCallback } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { format, subDays } from "date-fns";
+import { format, subDays, parseISO } from "date-fns";
+import { id } from "date-fns/locale";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { DateRange } from "react-day-picker";
 
@@ -23,39 +24,29 @@ export function DateRangeFilter() {
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
 
-	const [activeDate, setActiveDate] = useState<DateRange | undefined>(() => {
+	const [date, setDate] = useState<DateRange | undefined>(() => {
 		const from = searchParams.get("from");
 		const to = searchParams.get("to");
-		return from && to ? { from: new Date(from), to: new Date(to) } : undefined;
+		if (from && to) {
+			return { from: parseISO(from), to: parseISO(to) };
+		}
+		const today = new Date();
+		const fromDate = subDays(today, 29);
+		return { from: fromDate, to: today };
 	});
 
-	const [calendarDate, setCalendarDate] = useState<DateRange | undefined>(
-		activeDate
+	const [activePreset, setActivePreset] = useState<Preset | string>(
+		searchParams.get("preset") || "month"
 	);
-
-	const [activePreset, setActivePreset] = useState<Preset>(() => {
-		const preset = searchParams.get("preset") as Preset;
-		return ["today", "week", "month"].includes(preset) ? preset : "custom";
-	});
 
 	const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
 	const updateUrlParams = useCallback(
-		(selectedDate: DateRange | undefined, preset: Preset) => {
-			const params = new URLSearchParams(searchParams);
-			if (selectedDate?.from && selectedDate?.to) {
-				const oneYear = 365 * 24 * 60 * 60 * 1000;
-				if (selectedDate.to.getTime() - selectedDate.from.getTime() > oneYear) {
-					toast.warning("Rentang Tanggal Terlalu Lebar", {
-						description:
-							"Rentang tanggal maksimal yang diizinkan adalah 1 tahun.",
-					});
-					return;
-				}
-				params.set("from", format(selectedDate.from, "yyyy-MM-dd"));
-				params.set("to", format(selectedDate.to, "yyyy-MM-dd"));
-				params.set("preset", preset);
-			}
+		(selectedDate: DateRange, preset: Preset | string) => {
+			const params = new URLSearchParams(searchParams.toString());
+			params.set("from", format(selectedDate.from!, "yyyy-MM-dd"));
+			params.set("to", format(selectedDate.to!, "yyyy-MM-dd"));
+			params.set("preset", preset);
 			router.replace(`${pathname}?${params.toString()}`);
 		},
 		[pathname, router, searchParams]
@@ -69,23 +60,28 @@ export function DateRangeFilter() {
 		if (preset === "today") {
 			newRange = { from: today, to: today };
 		} else if (preset === "week") {
-			const sixDaysAgo = subDays(today, 6);
-			newRange = { from: sixDaysAgo, to: today };
+			newRange = { from: subDays(today, 6), to: today };
 		} else {
-			const twentyNineDaysAgo = subDays(today, 29);
-			newRange = { from: twentyNineDaysAgo, to: today };
+			// month
+			newRange = { from: subDays(today, 29), to: today };
 		}
 
-		setActiveDate(newRange);
-		setCalendarDate(newRange);
+		setDate(newRange);
 		updateUrlParams(newRange, preset);
 	};
 
 	const handleApplyCustomDate = () => {
-		if (calendarDate?.from && calendarDate?.to) {
-			setActiveDate(calendarDate);
+		if (date?.from && date?.to) {
+			const oneYear = 365 * 24 * 60 * 60 * 1000;
+			if (date.to.getTime() - date.from.getTime() > oneYear) {
+				toast.warning("Rentang Tanggal Terlalu Lebar", {
+					description:
+						"Rentang tanggal maksimal yang diizinkan adalah 1 tahun.",
+				});
+				return;
+			}
 			setActivePreset("custom");
-			updateUrlParams(calendarDate, "custom");
+			updateUrlParams(date, "custom");
 			setIsPopoverOpen(false);
 		} else {
 			toast.error("Rentang Tidak Lengkap", {
@@ -95,15 +91,15 @@ export function DateRangeFilter() {
 	};
 
 	return (
-		<div className="flex items-center gap-2">
+		<div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
 			<Tabs
-				value={activePreset === "custom" ? "" : activePreset}
+				value={activePreset}
 				onValueChange={(value) => handlePresetChange(value as Preset)}
 			>
 				<TabsList>
 					<TabsTrigger value="today">Hari Ini</TabsTrigger>
-					<TabsTrigger value="week">Minggu lalu</TabsTrigger>
-					<TabsTrigger value="month">Bulan lalu</TabsTrigger>
+					<TabsTrigger value="week">Minggu Lalu</TabsTrigger>
+					<TabsTrigger value="month">Bulan Lalu</TabsTrigger>
 				</TabsList>
 			</Tabs>
 
@@ -113,23 +109,23 @@ export function DateRangeFilter() {
 						id="date"
 						variant={"outline"}
 						className={cn(
-							"w-[280px] justify-start text-left font-normal",
-							!activeDate && "text-muted-foreground",
+							"w-full sm:w-auto justify-start text-left font-normal whitespace-nowrap",
+							!date && "text-muted-foreground",
 							activePreset === "custom" && "border-primary ring-1 ring-primary"
 						)}
 					>
-						<CalendarIcon className="w-4 h-4 mr-2" />
-						{activeDate?.from ? (
-							activeDate.to ? (
+						<CalendarIcon className="w-4 h-4 mr-2 flex-shrink-0" />
+						{date?.from ? (
+							date.to ? (
 								<>
-									{format(activeDate.from, "LLL dd, y")} -{" "}
-									{format(activeDate.to, "LLL dd, y")}
+									{format(date.from, "dd MMMM yyyy", { locale: id })} -{" "}
+									{format(date.to, "dd MMMM yyyy", { locale: id })}
 								</>
 							) : (
-								format(activeDate.from, "LLL dd, y")
+								format(date.from, "dd MMMM yyyy", { locale: id })
 							)
 						) : (
-							<span>Pilih tanggal kustom</span>
+							<span>Pilih rentang tanggal</span>
 						)}
 					</Button>
 				</PopoverTrigger>
@@ -137,15 +133,15 @@ export function DateRangeFilter() {
 					<Calendar
 						initialFocus
 						mode="range"
-						defaultMonth={calendarDate?.from}
-						selected={calendarDate}
-						onSelect={setCalendarDate}
+						defaultMonth={date?.from}
+						selected={date}
+						onSelect={setDate}
 						numberOfMonths={2}
 						disabled={{ after: new Date() }}
 					/>
 					<div className="p-2 border-t">
 						<Button onClick={handleApplyCustomDate} className="w-full">
-							Apply
+							Terapkan
 						</Button>
 					</div>
 				</PopoverContent>

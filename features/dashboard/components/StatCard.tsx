@@ -25,7 +25,7 @@ export function StatCard({
 					</div>
 				) : (
 					<>
-						<div className="text-3xl font-bold">{value}</div>
+						<div className="text-2xl font-bold">{value}</div>
 						<p className="mt-1 text-sm text-muted-foreground">{description}</p>
 					</>
 				)}

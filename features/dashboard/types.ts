@@ -4,6 +4,7 @@ export type DashboardStats = {
 	mainAccountBalance: number;
 	activeCustomerCount: number;
 	totalTransactionVolume: number;
+	totalTransactionCount: number;
 };
 
 export type ChartDataPoint = {

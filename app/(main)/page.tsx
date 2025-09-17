@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
-import { endOfDay, startOfDay, format } from "date-fns";
+import { endOfDay, startOfDay, format, subDays } from "date-fns"; // Impor subDays
 import {
 	getDashboardStats,
 	getTransactionChartData,
@@ -47,8 +47,14 @@ export default async function HomePage({
 		!resolvedSearchParams?.to &&
 		!resolvedSearchParams?.preset
 	) {
-		const today = format(new Date(), "yyyy-MM-dd");
-		redirect(`/?from=${today}&to=${today}&preset=today`);
+		const toDate = new Date();
+		const fromDate = subDays(toDate, 29);
+		redirect(
+			`/?from=${format(fromDate, "yyyy-MM-dd")}&to=${format(
+				toDate,
+				"yyyy-MM-dd"
+			)}&preset=month`
+		);
 	}
 
 	const from = resolvedSearchParams?.from

@@ -11,22 +11,46 @@ export async function getDashboardStats(range: {
 }): Promise<DashboardStats> {
 	noStore();
 	try {
-		const [balanceSnapshot, activeCustomerCount, transactionVolume] =
-			await Promise.all([
-				prisma.dailyBalanceSnapshot.findFirst({
-					where: { date: { lte: range.to } },
-					orderBy: { date: "desc" },
-				}),
-				prisma.customer.count({ where: { status: "ACTIVE" } }),
-				prisma.transaction.aggregate({
-					_sum: { amount: true },
-					where: { createdAt: { gte: range.from, lte: range.to } },
-				}),
-			]);
+		const [
+			balanceSnapshot,
+			activeCustomerCount,
+			transactionVolume,
+			customerTransactionCount, // query baru
+			mainAccountTransactionCount, // query baru
+		] = await Promise.all([
+			prisma.dailyBalanceSnapshot.findFirst({
+				where: { date: { lte: range.to } },
+				orderBy: { date: "desc" },
+			}),
+			prisma.customer.count({ where: { status: "ACTIVE" } }),
+			prisma.transaction.aggregate({
+				_sum: { amount: true },
+				where: { createdAt: { gte: range.from, lte: range.to } },
+			}),
+			// Menghitung jumlah transaksi nasabah
+			prisma.transaction.count({
+				where: { createdAt: { gte: range.from, lte: range.to } },
+			}),
+			// Menghitung jumlah transaksi rekening induk
+			prisma.mainAccountTransaction.count({
+				where: {
+					createdAt: { gte: range.from, lte: range.to },
+					source: {
+						notIn: ["FROM_CUSTOMER_DEPOSIT", "FROM_CUSTOMER_WITHDRAWAL"],
+					},
+				},
+			}),
+		]);
+
+		// Menjumlahkan kedua hasil hitungan
+		const totalTransactionCount =
+			(customerTransactionCount ?? 0) + (mainAccountTransactionCount ?? 0);
+
 		return {
 			mainAccountBalance: balanceSnapshot?.balance.toNumber() ?? 0,
 			activeCustomerCount: activeCustomerCount ?? 0,
 			totalTransactionVolume: transactionVolume._sum.amount?.toNumber() ?? 0,
+			totalTransactionCount: totalTransactionCount, // properti baru dikembalikan
 		};
 	} catch (error) {
 		console.error("Database Error:", error);

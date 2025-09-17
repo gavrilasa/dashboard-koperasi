@@ -41,6 +41,7 @@ export const formatDate = (date: string | number | Date): string => {
 		return "Tanggal tidak valid";
 	}
 
+	// Perbaikan di sini: 'id-ID' dipisahkan dari objek opsi
 	return new Intl.DateTimeFormat("id-ID", {
 		day: "2-digit",
 		month: "long",
