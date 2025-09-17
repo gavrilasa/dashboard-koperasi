@@ -37,12 +37,6 @@ export function PrintLayout({
 
 	return (
 		<div className="p-4 bg-white sm:p-8">
-			<style jsx>{`
-				.mono-font {
-					font-family: "Geist Mono", "JetBrains Mono", "Fira Code", "Consolas",
-						monospace;
-				}
-			`}</style>
 			<div className="max-w-4xl mx-auto">
 				{/* Print Action Button (hidden during print) */}
 				<div className="flex justify-end mb-4 print:hidden">
@@ -116,7 +110,7 @@ export function PrintLayout({
 									</tr>
 								</thead>
 
-								<tbody className="mono-font">
+								<tbody className={GeistMono.className}>
 									<tr className="border-b">
 										<td colSpan={5} className="px-2 py-1 font-semibold">
 											Saldo Awal
