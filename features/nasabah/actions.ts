@@ -615,14 +615,14 @@ export async function activateCustomer(id: string): Promise<ActionState> {
 
 export async function deactivateCustomer(id: string): Promise<ActionState> {
 	try {
-		const mainAccountId = await getMainAccountId();
-
 		await prisma.$transaction(async (tx) => {
 			const customer = await tx.customer.findUniqueOrThrow({
 				where: { id },
-				select: { balance: true, name: true },
+				select: { balance: true },
 			});
+
 			const customerBalance = Number(customer.balance);
+
 			if (customerBalance >= 50000) {
 				throw new Error(
 					`Gagal menonaktifkan. Saldo nasabah harus di bawah Rp 50.000 (Saldo saat ini: ${formatCurrency(
@@ -630,28 +630,11 @@ export async function deactivateCustomer(id: string): Promise<ActionState> {
 					)}).`
 				);
 			}
-			if (customerBalance > 0) {
-				await tx.mainAccount.update({
-					where: { id: mainAccountId },
-					data: { balance: { increment: customerBalance } },
-				});
-				const receiptNumber = await generateUniqueReceiptNumber("IK", 5, tx);
-				await tx.mainAccountTransaction.create({
-					data: {
-						mainAccountId: mainAccountId,
-						receiptNumber: receiptNumber,
-						amount: customerBalance,
-						type: "KREDIT",
-						description: `Sisa saldo dari penutupan akun: ${customer.name}`,
-						source: MainAccountTransactionSource.MANUAL_OPERATIONAL,
-					},
-				});
-			}
+
 			await tx.customer.update({
 				where: { id },
 				data: {
 					status: "INACTIVE",
-					balance: 0,
 				},
 			});
 		});
@@ -660,6 +643,7 @@ export async function deactivateCustomer(id: string): Promise<ActionState> {
 			error instanceof Error
 				? error.message
 				: "Database Error: Gagal menonaktifkan nasabah.";
+
 		return {
 			status: "error",
 			message: errorMessage,
@@ -669,7 +653,6 @@ export async function deactivateCustomer(id: string): Promise<ActionState> {
 	revalidatePath("/nasabah");
 	revalidatePath(`/nasabah/${id}`);
 
-	// Hapus redirect dan ganti dengan return object sukses
 	return {
 		status: "success",
 		message: "Nasabah berhasil dinonaktifkan.",
