@@ -147,7 +147,8 @@ export function TransferForm({ onSuccess }: TransferFormProps) {
 							<ChevronsUpDown className="w-4 h-4 ml-2 opacity-50 shrink-0" />
 						</Button>
 					</PopoverTrigger>
-					<PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+					{/* Perubahan di sini: gunakan position="popper" dan hapus kelas lebar */}
+					<PopoverContent position="popper" className="p-0">
 						<Command>
 							<CommandInput
 								placeholder="Ketik untuk mencari..."

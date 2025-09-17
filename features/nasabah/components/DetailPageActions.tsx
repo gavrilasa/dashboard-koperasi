@@ -8,13 +8,14 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { ArrowUpCircle, ArrowDownCircle } from "lucide-react";
+import { ArrowUpCircle, ArrowDownCircle, ArrowDownUp } from "lucide-react";
 import type { Customer } from "../types";
 import { CustomerProvider } from "./CustomerContext";
 import { DepositForm } from "./DepositForm";
 import { WithdrawForm } from "./WithdrawForm";
+import { TransferForm } from "./TransferForm";
 
-type DialogAction = "deposit" | "withdraw" | null;
+type DialogAction = "deposit" | "withdraw" | "transfer" | null;
 
 function TransactionDialog({
 	action,
@@ -30,6 +31,7 @@ function TransactionDialog({
 	const titles: Record<NonNullable<DialogAction>, string> = {
 		deposit: "Simpan Tunai",
 		withdraw: "Tarik Tunai",
+		transfer: "Transfer Dana",
 	};
 
 	const title = action ? titles[action] : "";
@@ -40,6 +42,8 @@ function TransactionDialog({
 				return <DepositForm onSuccess={onSuccess} />;
 			case "withdraw":
 				return <WithdrawForm onSuccess={onSuccess} />;
+			case "transfer":
+				return <TransferForm onSuccess={onSuccess} />;
 			default:
 				return null;
 		}
@@ -87,6 +91,13 @@ export default function DetailPageActions({
 					className="cursor-pointer"
 				>
 					<ArrowDownCircle className="w-4 h-4 mr-2" /> Tarik Tunai
+				</Button>
+				<Button
+					variant="outline"
+					onClick={() => handleActionClick("transfer")}
+					className="cursor-pointer"
+				>
+					<ArrowDownUp className="w-4 h-4 mr-2" /> Transfer
 				</Button>
 			</div>
 
