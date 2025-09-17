@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { format, startOfMonth, parseISO } from "date-fns";
+import { id } from "date-fns/locale";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
@@ -20,21 +21,18 @@ export function TransactionDateRangeFilter() {
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
 
-	// Inisialisasi state dari URL search params, bukan dengan nilai default baru
 	const [date, setDate] = useState<DateRange | undefined>(() => {
 		const from = searchParams.get("from");
 		const to = searchParams.get("to");
 		if (from && to) {
 			return { from: parseISO(from), to: parseISO(to) };
 		}
-		// Jika tidak ada di URL, gunakan default bulan ini (akan disinkronkan oleh page.tsx)
 		const today = new Date();
 		return { from: startOfMonth(today), to: today };
 	});
 
 	const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
-	// Fungsi ini hanya akan dipanggil saat tombol "Terapkan" ditekan
 	const handleApplyDate = useCallback(() => {
 		if (date?.from && date?.to) {
 			const params = new URLSearchParams(searchParams.toString());
@@ -56,19 +54,20 @@ export function TransactionDateRangeFilter() {
 					id="date"
 					variant={"outline"}
 					className={cn(
-						"w-[280px] justify-start text-left font-normal",
+						"w-full sm:w-auto justify-start text-left font-normal whitespace-nowrap", // Perubahan di baris ini
 						!date && "text-muted-foreground"
 					)}
 				>
-					<CalendarIcon className="w-4 h-4 mr-2" />
+					<CalendarIcon className="w-4 h-4 mr-2 flex-shrink-0" />{" "}
+					{/* Tambahkan flex-shrink-0 */}
 					{date?.from ? (
 						date.to ? (
 							<>
-								{format(date.from, "LLL dd, y")} -{" "}
-								{format(date.to, "LLL dd, y")}
+								{format(date.from, "dd MMMM yyyy", { locale: id })} -{" "}
+								{format(date.to, "dd MMMM yyyy", { locale: id })}
 							</>
 						) : (
-							format(date.from, "LLL dd, y")
+							format(date.from, "dd MMMM yyyy", { locale: id })
 						)
 					) : (
 						<span>Pilih rentang tanggal</span>

@@ -1,16 +1,16 @@
+// app/(main)/transaksi/page.tsx
+
 import { Suspense } from "react";
-import Link from "next/link";
-import { format, startOfMonth } from "date-fns";
-import { Printer } from "lucide-react";
+import { startOfMonth } from "date-fns";
 import { fetchCombinedTransactions } from "@/features/transaksi/data";
-import DataTable from "@/components/shared/DataTable";
 import { columns } from "@/features/transaksi/components/columns";
 import Search from "@/components/shared/Search";
 import Pagination from "@/components/shared/Pagination";
 import TableSkeleton from "@/components/shared/Skeletons";
 import { TransactionDateRangeFilter } from "@/features/transaksi/components/DateRangeFilter";
-import { Button } from "@/components/ui/button";
 import ClientOnly from "@/components/shared/ClientOnly";
+import { PrintTransactionDialog } from "@/features/transaksi/components/PrintTransactionDialog";
+import { TransactionDataTable } from "@/features/transaksi/components/DataTable";
 
 export const metadata = {
 	title: "Riwayat Transaksi",
@@ -42,11 +42,6 @@ export default async function TransaksiPage({
 		{ from: fromDate, to: toDate }
 	);
 
-	const printUrl = `/transaksi/cetak?from=${format(
-		fromDate,
-		"yyyy-MM-dd"
-	)}&to=${format(toDate, "yyyy-MM-dd")}`;
-
 	return (
 		<div className="flex flex-col w-full">
 			<div className="flex flex-col gap-4">
@@ -64,13 +59,8 @@ export default async function TransaksiPage({
 					<div className="flex gap-2">
 						<ClientOnly>
 							<TransactionDateRangeFilter />
+							<PrintTransactionDialog />
 						</ClientOnly>
-						<Button asChild>
-							<Link href={printUrl} target="_blank">
-								<Printer className="w-4 h-4 mr-2" />
-								Cetak Laporan
-							</Link>
-						</Button>
 					</div>
 				</div>
 
@@ -80,7 +70,7 @@ export default async function TransaksiPage({
 					}
 					fallback={<TableSkeleton />}
 				>
-					<DataTable columns={columns} data={transactions} />
+					<TransactionDataTable columns={columns} data={transactions} />
 				</Suspense>
 
 				<div className="flex justify-end w-full mt-1">

@@ -14,14 +14,6 @@ const formatDateTime = (date: Date) => {
 
 export const columns: ColumnDef<CombinedTransaction>[] = [
 	{
-		accessorKey: "createdAt",
-		header: "Tanggal",
-		meta: {
-			width: "20%",
-		},
-		cell: ({ row }) => <div>{formatDateTime(row.getValue("createdAt"))}</div>,
-	},
-	{
 		accessorKey: "receiptNumber",
 		header: "No. Resi",
 		meta: {
@@ -44,6 +36,14 @@ export const columns: ColumnDef<CombinedTransaction>[] = [
 			width: "25%",
 			truncate: true,
 		},
+	},
+	{
+		accessorKey: "createdAt",
+		header: "Tanggal",
+		meta: {
+			width: "20%",
+		},
+		cell: ({ row }) => <div>{formatDateTime(row.getValue("createdAt"))}</div>,
 	},
 	{
 		accessorKey: "type",

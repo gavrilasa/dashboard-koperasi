@@ -41,7 +41,7 @@ export function TransactionDataTable<TData, TValue>({
 										key={header.id}
 										style={{ width: meta?.width }}
 										className={cn(
-											"px-4", // Menambahkan padding
+											"px-4",
 											meta?.align === "center" && "text-center",
 											meta?.align === "right" && "text-right"
 										)}
@@ -72,7 +72,7 @@ export function TransactionDataTable<TData, TValue>({
 											key={cell.id}
 											style={{ width: meta?.width }}
 											className={cn(
-												"px-4",
+												"px-4 py-3",
 												meta?.align === "center" && "text-center",
 												meta?.align === "right" && "text-right",
 												meta?.truncate && "truncate"
